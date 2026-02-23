@@ -7,12 +7,33 @@ const POLYGON_FILL_SELECTED_OPACITY = 1;
 
 let googleMapsLoaderPromise;
 
+const waitForGoogleMapsReady = (timeoutMs = 10000, intervalMs = 50) =>
+  new Promise((resolve, reject) => {
+    const startedAt = Date.now();
+
+    const check = () => {
+      if (window.google?.maps?.Map) {
+        resolve(window.google.maps);
+        return;
+      }
+
+      if (Date.now() - startedAt >= timeoutMs) {
+        reject(new Error("Google Maps no terminó de inicializar correctamente."));
+        return;
+      }
+
+      window.setTimeout(check, intervalMs);
+    };
+
+    check();
+  });
+
 const loadGoogleMaps = (apiKey) => {
   if (typeof window === "undefined") {
     return Promise.reject(new Error("Google Maps solo está disponible en el navegador."));
   }
 
-  if (window.google?.maps) {
+  if (window.google?.maps?.Map) {
     return Promise.resolve(window.google.maps);
   }
 
@@ -23,12 +44,18 @@ const loadGoogleMaps = (apiKey) => {
   googleMapsLoaderPromise = new Promise((resolve, reject) => {
     const existingScript = document.getElementById(SCRIPT_ID);
     if (existingScript) {
-      if (window.google?.maps) {
+      if (window.google?.maps?.Map) {
         resolve(window.google.maps);
         return;
       }
-      existingScript.addEventListener("load", () => resolve(window.google.maps), { once: true });
-      existingScript.addEventListener("error", () => reject(new Error("No se pudo cargar Google Maps.")), { once: true });
+      existingScript.addEventListener("load", () => {
+        waitForGoogleMapsReady().then(resolve).catch(reject);
+      }, { once: true });
+      existingScript.addEventListener(
+        "error",
+        () => reject(new Error("No se pudo cargar Google Maps.")),
+        { once: true }
+      );
       return;
     }
 
@@ -37,9 +64,16 @@ const loadGoogleMaps = (apiKey) => {
     script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&v=weekly&loading=async`;
     script.async = true;
     script.defer = true;
-    script.onload = () => resolve(window.google.maps);
+    script.onload = () => {
+      waitForGoogleMapsReady().then(resolve).catch(reject);
+    };
     script.onerror = () => reject(new Error("No se pudo cargar Google Maps."));
     document.head.appendChild(script);
+  });
+
+  googleMapsLoaderPromise = googleMapsLoaderPromise.catch((error) => {
+    googleMapsLoaderPromise = undefined;
+    throw error;
   });
 
   return googleMapsLoaderPromise;

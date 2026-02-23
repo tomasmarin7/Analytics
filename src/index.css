@@ -438,25 +438,25 @@ body {
   --side-popover-inner-gap: 14px;
   position: absolute;
   top: 20px;
-  left: 0;
+  right: 0;
   width: min(40vw, 620px);
   min-width: 420px;
   height: calc((100vh - var(--header-height) - 32px) * 0.48);
   min-height: 300px;
   max-height: 440px;
-  transform: translateX(calc(-100% + var(--side-popover-peek)));
+  transform: translateX(calc(100% - var(--side-popover-peek)));
   transition: transform 260ms ease;
 }
 
 .side-popover--open {
-  transform: translateX(var(--page-gutter));
+  transform: translateX(calc(var(--page-gutter) * -1));
 }
 
 .side-popover--open::after {
   content: "";
   position: absolute;
   top: 50%;
-  right: -12px;
+  left: -12px;
   width: 24px;
   height: 72px;
   transform: translateY(-50%);
@@ -481,7 +481,7 @@ body {
 .side-popover__toggle {
   position: absolute;
   top: 50%;
-  right: -24px;
+  left: -24px;
   width: 48px;
   height: 48px;
   border: 0;
@@ -497,7 +497,7 @@ body {
 }
 
 .side-popover--open .side-popover__toggle {
-  right: -66px;
+  left: -66px;
 }
 
 .side-popover__toggle:hover,
@@ -508,10 +508,10 @@ body {
 .side-popover__toggle::before {
   content: "";
   position: absolute;
-  left: -8px;
+  right: -8px;
   width: 12px;
   height: 100%;
-  border-radius: 999px 0 0 999px;
+  border-radius: 0 999px 999px 0;
   background: var(--surface);
   opacity: 0;
   transition: opacity 180ms ease;
@@ -526,12 +526,12 @@ body {
   height: 30px;
   object-fit: contain;
   display: block;
-  transform: rotate(90deg);
+  transform: rotate(270deg);
   transition: transform 180ms ease;
 }
 
 .side-popover__icon--left {
-  transform: rotate(270deg);
+  transform: rotate(90deg);
 }
 
 .side-popover__content {
@@ -656,21 +656,21 @@ body {
     min-height: 220px;
     max-height: 300px;
     --side-popover-inner-gap: 10px;
-    transform: translateX(calc(-100% + var(--side-popover-peek)));
+    transform: translateX(calc(100% - var(--side-popover-peek)));
   }
 
   .side-popover__toggle {
-    right: -22px;
+    left: -22px;
     width: 44px;
     height: 44px;
   }
 
   .side-popover--open .side-popover__toggle {
-    right: -54px;
+    left: -54px;
   }
 
   .side-popover--open::after {
-    right: -10px;
+    left: -10px;
     width: 20px;
     height: 60px;
     border-radius: 999px;
