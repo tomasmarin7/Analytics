@@ -55,22 +55,37 @@ body {
   height: 33.333%;
   min-height: 110px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 20px;
+  justify-content: flex-end;
+  padding-bottom: 18px;
   pointer-events: none;
 }
 
 .lower-dots-bridge__inner {
   width: calc(100% - (2 * var(--bridge-edge-offset)));
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   gap: 12px;
+  padding: 0;
+  outline: 1px dashed rgba(34, 37, 39, 0.45);
+  outline-offset: 0;
+}
+
+.lower-dots-bridge__track {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding-bottom: 48px;
 }
 
 .lower-dots-bridge__dot {
   width: 10px;
   height: 10px;
+  margin-top: 3px;
   border-radius: 999px;
   background: var(--bridge-line-color);
   flex: 0 0 auto;
@@ -78,8 +93,6 @@ body {
 
 .lower-dots-bridge__lines {
   position: relative;
-  flex: 1 1 auto;
-  min-width: 0;
   width: 100%;
   display: grid;
   grid-template-columns: repeat(363, minmax(0, 1fr));
@@ -103,7 +116,7 @@ body {
 
 .lower-dots-bridge__month-label {
   position: absolute;
-  top: calc(100% + 10px);
+  top: 0;
   left: 50%;
   transform: translateX(-50%);
   font-family: var(--font-brand);
@@ -113,6 +126,14 @@ body {
   letter-spacing: 0.01em;
   color: #222527;
   white-space: nowrap;
+}
+
+.lower-dots-bridge__months {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 24px;
+  height: 24px;
 }
 
 .lower-dots-bridge__today-dot {
@@ -136,6 +157,76 @@ body {
   background: #d54437;
   pointer-events: none;
   z-index: 3;
+}
+
+.lower-dots-bridge__extra {
+  position: relative;
+  width: calc(100% - (2 * var(--bridge-edge-offset)));
+  height: 150px;
+  outline: 1px dashed rgba(34, 37, 39, 0.45);
+  outline-offset: 0;
+  pointer-events: auto;
+}
+
+.lower-dots-bridge__extra-band {
+  position: absolute;
+  top: 22px;
+  height: 50px;
+  background: #d1d1d1;
+  cursor: grab;
+  pointer-events: auto;
+}
+
+.lower-dots-bridge__extra-band:active {
+  cursor: grabbing;
+}
+
+.lower-dots-bridge__extra-flag {
+  --flag-stem-width: 3px;
+  --flag-stem-height: 50px;
+  --flag-head-width: 16px;
+  --flag-head-height: 22px;
+  position: absolute;
+  top: 22px;
+  width: 0;
+  height: var(--flag-stem-height);
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: ew-resize;
+  pointer-events: auto;
+}
+
+.lower-dots-bridge__extra-flag-stem {
+  position: absolute;
+  left: calc(var(--flag-stem-width) * -0.5);
+  top: 0;
+  width: var(--flag-stem-width);
+  height: var(--flag-stem-height);
+  background: #222527;
+}
+
+.lower-dots-bridge__extra-flag-head {
+  position: absolute;
+  top: 0;
+  width: 0;
+  height: 0;
+  border-top: 0 solid transparent;
+  border-bottom: var(--flag-head-height) solid transparent;
+}
+
+.lower-dots-bridge__extra-flag:active {
+  opacity: 0.8;
+}
+
+.lower-dots-bridge__extra-flag--right .lower-dots-bridge__extra-flag-head {
+  left: calc(var(--flag-stem-width) * 0.5);
+  border-left: var(--flag-head-width) solid #222527;
+}
+
+.lower-dots-bridge__extra-flag--left .lower-dots-bridge__extra-flag-head {
+  right: calc(var(--flag-stem-width) * 0.5);
+  border-right: var(--flag-head-width) solid #222527;
 }
 
 .header {
