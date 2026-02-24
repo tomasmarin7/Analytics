@@ -1,19 +1,23 @@
 import { TIMELINE_ARIA_LABEL } from "./timeline/constants";
+import { DAY_MS } from "./timeline/constants";
 import RangeSlider from "./rangeSlider/RangeSlider";
 import TimelineTrack from "./timeline/TimelineTrack";
 import { useTimelineController } from "./timeline/useTimelineController";
 
-const TimelineControls = () => {
+const TimelineControls = ({ activeEventId, onTimelineEventToggle }) => {
   const {
     sliderRef,
     dayLines,
     lineVisualLevel,
     monthMarkers,
     visiblePeriods,
+    timelineEvents,
+    viewStartMs,
+    viewEndMs,
+    yearStartMs,
+    yearEndMs,
     isTodayVisible,
     todayLeftPercent,
-    isJanuaryMarkerVisible,
-    januaryMarkerLeftPercent,
     leftHandleExpr,
     rightHandleExpr,
     visibleDays,
@@ -26,17 +30,17 @@ const TimelineControls = () => {
     const fallbackYear = new Date().getFullYear();
     const defaultStartMs = Date.UTC(fallbackYear, 0, 1);
     const defaultEndMs = Date.UTC(fallbackYear, 3, 1);
+    const nextStartMs = period?.focusStartMs ?? defaultStartMs;
+    const nextEndMs = period?.focusEndMs ?? defaultEndMs;
+
+    const isFocusedOnPeriod =
+      Math.abs(viewStartMs - nextStartMs) < DAY_MS && Math.abs(viewEndMs - nextEndMs) < DAY_MS;
 
     setVisibleRangeByDates({
-      startMs: period?.focusStartMs ?? defaultStartMs,
-      endMs: period?.focusEndMs ?? defaultEndMs,
+      startMs: isFocusedOnPeriod ? yearStartMs : nextStartMs,
+      endMs: isFocusedOnPeriod ? yearEndMs : nextEndMs,
       animate: true,
     });
-  };
-
-  const handleJanuaryMarkerClick = () => {
-    // Placeholder for future CSV/DB-driven action tied to this timeline event.
-    console.log("Análisis Foliar");
   };
 
   return (
@@ -50,9 +54,9 @@ const TimelineControls = () => {
         onFertilizationClick={handleFertilizationClick}
         isTodayVisible={isTodayVisible}
         todayLeftPercent={todayLeftPercent}
-        isJanuaryMarkerVisible={isJanuaryMarkerVisible}
-        januaryMarkerLeftPercent={januaryMarkerLeftPercent}
-        onJanuaryMarkerClick={handleJanuaryMarkerClick}
+        timelineEvents={timelineEvents}
+        activeEventId={activeEventId}
+        onTimelineEventToggle={onTimelineEventToggle}
       />
 
       <RangeSlider

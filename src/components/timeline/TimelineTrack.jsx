@@ -12,9 +12,9 @@ const TimelineTrack = ({
   onFertilizationClick,
   isTodayVisible,
   todayLeftPercent,
-  isJanuaryMarkerVisible,
-  januaryMarkerLeftPercent,
-  onJanuaryMarkerClick,
+  timelineEvents,
+  activeEventId,
+  onTimelineEventToggle,
 }) => (
   <div className="lower-dots-bridge__inner">
     <span className="lower-dots-bridge__dot" aria-hidden="true" />
@@ -27,9 +27,9 @@ const TimelineTrack = ({
         visibleDays={visibleDays}
         isTodayVisible={isTodayVisible}
         todayLeftPercent={todayLeftPercent}
-        isJanuaryMarkerVisible={isJanuaryMarkerVisible}
-        januaryMarkerLeftPercent={januaryMarkerLeftPercent}
-        onJanuaryMarkerClick={onJanuaryMarkerClick}
+        timelineEvents={timelineEvents}
+        activeEventId={activeEventId}
+        onTimelineEventToggle={onTimelineEventToggle}
       />
       <MonthLabels markers={monthMarkers} />
     </div>

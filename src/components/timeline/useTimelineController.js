@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DAY_MS, HANDLE_EDGE_OFFSET_PX, MIN_VISIBLE_DAYS } from "./constants";
 import { createDefaultPeriods } from "../decisionButtons/periods";
+import { TIMELINE_EVENT_DEFINITIONS } from "./eventMarker/eventsConfig";
 import { clamp, getDayLines, getLineVisualLevel, getMonthMarkers, getVisiblePeriods, getYearDomain, toRatio } from "./timelineMath";
 
 const DEFAULT_RATIOS = {
@@ -61,6 +62,22 @@ export const useTimelineController = ({ periods } = {}) => {
     [periodItems, viewStartMs, viewEndMs, viewSpanMs],
   );
 
+  const timelineEvents = useMemo(
+    () =>
+      TIMELINE_EVENT_DEFINITIONS.map((eventDef) => {
+        const eventMs = Date.UTC(year, eventDef.month, eventDef.day);
+
+        return {
+          id: eventDef.id,
+          label: eventDef.label,
+          connector: eventDef.connector,
+          isVisible: eventMs >= viewStartMs && eventMs <= viewEndMs,
+          leftPercent: ((eventMs - viewStartMs) / viewSpanMs) * 100,
+        };
+      }),
+    [year, viewStartMs, viewSpanMs, viewEndMs],
+  );
+
   const dayLines = useMemo(() => getDayLines({ visibleDays, viewStartMs }), [visibleDays, viewStartMs]);
   const lineVisualLevel = useMemo(
     () => getLineVisualLevel({ leftRatio, rightRatio, minRangeRatio }),
@@ -69,10 +86,6 @@ export const useTimelineController = ({ periods } = {}) => {
 
   const isTodayVisible = todayMs >= viewStartMs && todayMs <= viewEndMs;
   const todayLeftPercent = ((todayMs - viewStartMs) / viewSpanMs) * 100;
-
-  const januaryMarkerMs = Date.UTC(year, 0, 13);
-  const isJanuaryMarkerVisible = januaryMarkerMs >= viewStartMs && januaryMarkerMs <= viewEndMs;
-  const januaryMarkerLeftPercent = ((januaryMarkerMs - viewStartMs) / viewSpanMs) * 100;
 
   const setRatios = useCallback((nextLeft, nextRight) => {
     const { minRangeRatio: minGap } = ratiosRef.current;
@@ -278,10 +291,13 @@ export const useTimelineController = ({ periods } = {}) => {
     lineVisualLevel,
     monthMarkers,
     visiblePeriods,
+    timelineEvents,
+    viewStartMs,
+    viewEndMs,
+    yearStartMs,
+    yearEndMs,
     isTodayVisible,
     todayLeftPercent,
-    isJanuaryMarkerVisible,
-    januaryMarkerLeftPercent,
     leftHandleExpr,
     rightHandleExpr,
     visibleDays,
