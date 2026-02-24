@@ -1,0 +1,65 @@
+.lower-dots-bridge__diamond-button {
+  position: absolute;
+  top: 50%;
+  width: 56px;
+  height: 56px;
+  transform: translate(-50%, -50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+  z-index: 10;
+}
+
+.lower-dots-bridge__diamond-shape {
+  width: 36px;
+  height: 36px;
+  box-sizing: border-box;
+  border: none;
+  border-radius: 2px;
+  background:
+    radial-gradient(120% 130% at 8% 6%, rgba(74, 86, 77, 0.7) 0%, rgba(74, 86, 77, 0) 48%),
+    radial-gradient(130% 120% at 92% 88%, rgba(152, 165, 145, 0.34) 0%, rgba(152, 165, 145, 0) 56%),
+    linear-gradient(135deg, #5f6c5e 0%, #788572 46%, #97a58f 100%);
+  transform: rotate(45deg);
+  box-shadow: none;
+}
+
+.lower-dots-bridge__diamond-button:hover .lower-dots-bridge__diamond-shape,
+.lower-dots-bridge__diamond-button:focus-visible .lower-dots-bridge__diamond-shape {
+  box-shadow: none;
+}
+
+.lower-dots-bridge__diamond-button:focus-visible {
+  outline: 2px solid rgba(118, 255, 118, 0.65);
+  outline-offset: 2px;
+}
+
+.lower-dots-bridge__diamond-stem {
+  position: absolute;
+  left: 50%;
+  top: calc(50% + 40px);
+  width: calc(var(--month-line-width, 2px) + 1px);
+  height: 70px;
+  transform: translateX(-50%);
+  background: #222527;
+  border-radius: 999px;
+}
+
+.lower-dots-bridge__diamond-label {
+  position: absolute;
+  left: 50%;
+  top: calc(50% + 126px);
+  transform: translateX(-50%);
+  font-family: var(--font-brand);
+  font-size: 21px;
+  line-height: 1.1;
+  font-weight: 500;
+  letter-spacing: 0.005em;
+  color: #222527;
+  white-space: nowrap;
+}

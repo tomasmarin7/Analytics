@@ -1,8 +1,18 @@
 import TodayMarker from "./TodayMarker";
+import FoliarAnalysisButton from "./foliarAnalysisButton/FoliarAnalysisButton";
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
-const DayLines = ({ dayLines, lineVisualLevel, visibleDays, isTodayVisible, todayLeftPercent }) => (
+const DayLines = ({
+  dayLines,
+  lineVisualLevel,
+  visibleDays,
+  isTodayVisible,
+  todayLeftPercent,
+  isJanuaryMarkerVisible,
+  januaryMarkerLeftPercent,
+  onJanuaryMarkerClick,
+}) => (
   <div
     className={`lower-dots-bridge__lines lower-dots-bridge__lines--${lineVisualLevel}`}
     style={{
@@ -27,6 +37,9 @@ const DayLines = ({ dayLines, lineVisualLevel, visibleDays, isTodayVisible, toda
     })}
 
     {isTodayVisible && <TodayMarker leftPercent={todayLeftPercent} />}
+    {isJanuaryMarkerVisible && (
+      <FoliarAnalysisButton leftPercent={januaryMarkerLeftPercent} onClick={onJanuaryMarkerClick} />
+    )}
   </div>
 );
 

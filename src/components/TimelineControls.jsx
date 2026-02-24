@@ -12,6 +12,8 @@ const TimelineControls = () => {
     visiblePeriods,
     isTodayVisible,
     todayLeftPercent,
+    isJanuaryMarkerVisible,
+    januaryMarkerLeftPercent,
     leftHandleExpr,
     rightHandleExpr,
     visibleDays,
@@ -32,6 +34,11 @@ const TimelineControls = () => {
     });
   };
 
+  const handleJanuaryMarkerClick = () => {
+    // Placeholder for future CSV/DB-driven action tied to this timeline event.
+    console.log("Análisis Foliar");
+  };
+
   return (
     <section className="lower-dots-bridge" aria-label={TIMELINE_ARIA_LABEL}>
       <TimelineTrack
@@ -43,6 +50,9 @@ const TimelineControls = () => {
         onFertilizationClick={handleFertilizationClick}
         isTodayVisible={isTodayVisible}
         todayLeftPercent={todayLeftPercent}
+        isJanuaryMarkerVisible={isJanuaryMarkerVisible}
+        januaryMarkerLeftPercent={januaryMarkerLeftPercent}
+        onJanuaryMarkerClick={handleJanuaryMarkerClick}
       />
 
       <RangeSlider

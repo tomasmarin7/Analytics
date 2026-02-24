@@ -21,6 +21,7 @@
   justify-content: center;
   gap: 12px;
   padding: 0;
+  transform: translateY(-80px);
 }
 
 .lower-dots-bridge__track {
@@ -95,7 +96,7 @@
   --day-line-width: 1.15px;
   --day-line-height: 4.5px;
   --month-line-width: 2.1px;
-  --month-line-height: 60px;
+  --month-line-height: 56px;
   --day-line-opacity: 0.94;
 }
 
@@ -103,7 +104,7 @@
   --day-line-width: 1.3px;
   --day-line-height: 5.2px;
   --month-line-width: 2.2px;
-  --month-line-height: 66px;
+  --month-line-height: 56px;
   --day-line-opacity: 0.97;
 }
 
@@ -111,7 +112,7 @@
   --day-line-width: 1.5px;
   --day-line-height: 5.8px;
   --month-line-width: 2.35px;
-  --month-line-height: 72px;
+  --month-line-height: 56px;
   --day-line-opacity: 1;
 }
 

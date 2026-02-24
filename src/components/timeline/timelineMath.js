@@ -17,6 +17,7 @@ export const getYearDomain = (year) => {
 
 export const getMonthMarkers = ({ year, startMs, endMs }) => {
   const markers = [];
+  const viewSpanMs = endMs - startMs + DAY_MS;
 
   for (let monthIndex = 0; monthIndex < 12; monthIndex += 1) {
     const monthStartMs = Date.UTC(year, monthIndex, 1);
@@ -25,7 +26,7 @@ export const getMonthMarkers = ({ year, startMs, endMs }) => {
     markers.push({
       id: monthIndex,
       label: MONTH_NAMES[monthIndex],
-      ratio: toRatio(monthStartMs, startMs, endMs),
+      ratio: clamp((monthStartMs - startMs + DAY_MS / 2) / viewSpanMs, 0, 1),
     });
   }
 

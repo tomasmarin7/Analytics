@@ -70,6 +70,10 @@ export const useTimelineController = ({ periods } = {}) => {
   const isTodayVisible = todayMs >= viewStartMs && todayMs <= viewEndMs;
   const todayLeftPercent = ((todayMs - viewStartMs) / viewSpanMs) * 100;
 
+  const januaryMarkerMs = Date.UTC(year, 0, 13);
+  const isJanuaryMarkerVisible = januaryMarkerMs >= viewStartMs && januaryMarkerMs <= viewEndMs;
+  const januaryMarkerLeftPercent = ((januaryMarkerMs - viewStartMs) / viewSpanMs) * 100;
+
   const setRatios = useCallback((nextLeft, nextRight) => {
     const { minRangeRatio: minGap } = ratiosRef.current;
     const spread = nextRight - nextLeft;
@@ -276,6 +280,8 @@ export const useTimelineController = ({ periods } = {}) => {
     visiblePeriods,
     isTodayVisible,
     todayLeftPercent,
+    isJanuaryMarkerVisible,
+    januaryMarkerLeftPercent,
     leftHandleExpr,
     rightHandleExpr,
     visibleDays,
