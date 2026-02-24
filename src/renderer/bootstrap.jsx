@@ -7,6 +7,7 @@ import "./index.css";
 
 const App = () => {
   const [activeEventId, setActiveEventId] = useState(null);
+  const [selectedCuartel, setSelectedCuartel] = useState(null);
 
   const handleTimelineEventToggle = (eventId) => {
     setActiveEventId((current) => (current === eventId ? null : eventId));
@@ -16,8 +17,12 @@ const App = () => {
     <div className="app">
       <Header />
       <main className="app__content">
-        <SidePopover />
-        <TimelineControls activeEventId={activeEventId} onTimelineEventToggle={handleTimelineEventToggle} />
+        <SidePopover onSelectedCuartelChange={setSelectedCuartel} />
+        <TimelineControls
+          activeEventId={activeEventId}
+          onTimelineEventToggle={handleTimelineEventToggle}
+          selectedCuartel={selectedCuartel}
+        />
       </main>
     </div>
   );

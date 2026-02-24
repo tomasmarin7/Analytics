@@ -113,7 +113,13 @@ const collectPolygonPaths = (value) => {
   return value.flatMap((item) => collectPolygonPaths(item));
 };
 
-const Mapa = ({ coordinate = DEFAULT_COORDINATE, zoom = DEFAULT_ZOOM, isVisible = true, polygons = [] }) => {
+const Mapa = ({
+  coordinate = DEFAULT_COORDINATE,
+  zoom = DEFAULT_ZOOM,
+  isVisible = true,
+  polygons = [],
+  onPolygonSelect,
+}) => {
   const mapElementRef = useRef(null);
   const mapRef = useRef(null);
   const polygonRefs = useRef([]);
@@ -304,6 +310,7 @@ const Mapa = ({ coordinate = DEFAULT_COORDINATE, zoom = DEFAULT_ZOOM, isVisible 
 
     clearPolygons();
     setSelectedPolygonId(null);
+    onPolygonSelect?.(null);
 
     const normalizedPolygons = collectPolygonPaths(polygons);
 
@@ -322,6 +329,7 @@ const Mapa = ({ coordinate = DEFAULT_COORDINATE, zoom = DEFAULT_ZOOM, isVisible 
       polygon.setMap(mapRef.current);
       polygon.addListener("click", () => {
         setSelectedPolygonId(polygonId);
+        onPolygonSelect?.(polygonId);
       });
 
       polygonRefs.current.push({ polygonId, polygon });

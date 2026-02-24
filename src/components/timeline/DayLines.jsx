@@ -3,6 +3,8 @@ import TodayMarker from "./TodayMarker";
 import TimelineEventMarker from "./eventMarker/TimelineEventMarker";
 import { EventActivationOverlay } from "./eventActivation";
 import { EVENT_ACTIVATION_VERTICAL_TOP_PX } from "./eventActivation/constants";
+import FoliarAnalysisPanel from "../foliarAnalysis/FoliarAnalysisPanel";
+import { FOLIAR_ANALYSIS_EVENT_ID } from "./eventMarker/eventsConfig";
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
@@ -15,6 +17,7 @@ const DayLines = ({
   timelineEvents,
   activeEventId,
   onTimelineEventToggle,
+  selectedCuartel,
 }) => {
   const linesRef = useRef(null);
   const [containerWidth, setContainerWidth] = useState(0);
@@ -65,7 +68,11 @@ const DayLines = ({
 
       {isTodayVisible && <TodayMarker leftPercent={todayLeftPercent} />}
 
-      <EventActivationOverlay activeEvent={activeEvent} containerWidth={containerWidth} />
+      <EventActivationOverlay activeEvent={activeEvent} containerWidth={containerWidth}>
+        {activeEvent?.id === FOLIAR_ANALYSIS_EVENT_ID ? (
+          <FoliarAnalysisPanel eventLabel={activeEvent.label} selectedCuartel={selectedCuartel} />
+        ) : null}
+      </EventActivationOverlay>
 
       {visibleEvents.map((event) => (
         <TimelineEventMarker

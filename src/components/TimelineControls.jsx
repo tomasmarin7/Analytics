@@ -4,7 +4,7 @@ import RangeSlider from "./rangeSlider/RangeSlider";
 import TimelineTrack from "./timeline/TimelineTrack";
 import { useTimelineController } from "./timeline/useTimelineController";
 
-const TimelineControls = ({ activeEventId, onTimelineEventToggle }) => {
+const TimelineControls = ({ activeEventId, onTimelineEventToggle, selectedCuartel }) => {
   const {
     sliderRef,
     dayLines,
@@ -57,6 +57,7 @@ const TimelineControls = ({ activeEventId, onTimelineEventToggle }) => {
         timelineEvents={timelineEvents}
         activeEventId={activeEventId}
         onTimelineEventToggle={onTimelineEventToggle}
+        selectedCuartel={selectedCuartel}
       />
 
       <RangeSlider

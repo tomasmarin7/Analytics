@@ -15,6 +15,7 @@ const TimelineTrack = ({
   timelineEvents,
   activeEventId,
   onTimelineEventToggle,
+  selectedCuartel,
 }) => (
   <div className="lower-dots-bridge__inner">
     <span className="lower-dots-bridge__dot" aria-hidden="true" />
@@ -30,6 +31,7 @@ const TimelineTrack = ({
         timelineEvents={timelineEvents}
         activeEventId={activeEventId}
         onTimelineEventToggle={onTimelineEventToggle}
+        selectedCuartel={selectedCuartel}
       />
       <MonthLabels markers={monthMarkers} />
     </div>

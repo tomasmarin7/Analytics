@@ -9,6 +9,10 @@
   pointer-events: none;
 }
 
+.timeline-event-activation__bullet--interactive {
+  pointer-events: auto;
+}
+
 .timeline-event-activation__vertical {
   position: absolute;
   top: var(--event-fixed-vertical-top, -900px);
