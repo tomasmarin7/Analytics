@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Mapa from "./Mapa";
 import mapaCompletoHuerto from "../../mapa_completo_huerto.json";
+import flechaSidePopover from "../assets/images/flecha-side-pop-over.png";
 
 const MAP_COORDINATE = { lat: -35.80658, lng: -71.807608 };
 const MAP_ZOOM = 15;
@@ -30,7 +31,7 @@ const SidePopover = () => {
       >
         <img
           className={`side-popover__icon ${isOpen ? "side-popover__icon--left" : ""}`}
-          src="/flecha-side-pop-over.png"
+          src={flechaSidePopover}
           alt=""
           aria-hidden="true"
         />

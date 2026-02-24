@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import "./HeaderNavCarousel.css";
 
 const NAV_ITEMS = [
   {

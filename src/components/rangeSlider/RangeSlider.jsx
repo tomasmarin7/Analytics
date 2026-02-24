@@ -1,4 +1,5 @@
-import { RANGE_SLIDER_ARIA_LABEL } from "./constants";
+import { RANGE_SLIDER_ARIA_LABEL } from "../timeline/constants";
+import "./RangeSlider.css";
 
 const RangeSlider = ({ sliderRef, leftHandleExpr, rightHandleExpr, startDrag, onHandleKeyDown }) => (
   <section className="lower-dots-bridge__extra" ref={sliderRef} aria-label={RANGE_SLIDER_ARIA_LABEL}>

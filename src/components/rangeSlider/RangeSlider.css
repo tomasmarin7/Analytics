@@ -1,0 +1,79 @@
+.lower-dots-bridge__extra {
+  position: relative;
+  width: calc(100% - (2 * var(--bridge-edge-offset)));
+  height: 92px;
+  outline: 1px dashed rgba(34, 37, 39, 0.45);
+  outline-offset: 0;
+  pointer-events: auto;
+}
+
+.lower-dots-bridge__extra-band {
+  position: absolute;
+  top: 20px;
+  height: 34px;
+  background: rgba(34, 37, 39, 0.15);
+  border: 0;
+  border-radius: 0;
+  cursor: grab;
+  pointer-events: auto;
+  touch-action: none;
+}
+
+.lower-dots-bridge__extra-band:active {
+  cursor: grabbing;
+}
+
+.lower-dots-bridge__extra-flag {
+  --flag-stem-width: 3px;
+  --flag-stem-height: 50px;
+  --flag-head-width: 14px;
+  --flag-head-height: 20px;
+  position: absolute;
+  top: 11px;
+  width: 0;
+  height: var(--flag-stem-height);
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: ew-resize;
+  pointer-events: auto;
+  touch-action: none;
+}
+
+.lower-dots-bridge__extra-flag-stem {
+  position: absolute;
+  left: calc(var(--flag-stem-width) * -0.5);
+  top: 0;
+  width: var(--flag-stem-width);
+  height: var(--flag-stem-height);
+  background: #222527;
+}
+
+.lower-dots-bridge__extra-flag-head {
+  position: absolute;
+  top: 0;
+  width: 0;
+  height: 0;
+  border-top: 0 solid transparent;
+  border-bottom: var(--flag-head-height) solid transparent;
+}
+
+.lower-dots-bridge__extra-flag:active {
+  opacity: 0.8;
+}
+
+.lower-dots-bridge__extra-flag--right .lower-dots-bridge__extra-flag-head {
+  left: calc(var(--flag-stem-width) * 0.5);
+  border-left: var(--flag-head-width) solid #222527;
+}
+
+.lower-dots-bridge__extra-flag--left .lower-dots-bridge__extra-flag-head {
+  right: calc(var(--flag-stem-width) * 0.5);
+  border-right: var(--flag-head-width) solid #222527;
+}
+
+@media (max-width: 1100px) {
+  .lower-dots-bridge__extra {
+    width: calc(100% - 24px);
+  }
+}

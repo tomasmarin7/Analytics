@@ -1,0 +1,25 @@
+.usuario-header {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.usuario-header__icon {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  display: block;
+}
+
+.usuario-header__name {
+  font-family: var(--font-brand);
+  font-size: 18px;
+  line-height: 1;
+  color: var(--text-dark);
+}
+
+@media (max-width: 900px) {
+  .usuario-header__name {
+    font-size: 16px;
+  }
+}

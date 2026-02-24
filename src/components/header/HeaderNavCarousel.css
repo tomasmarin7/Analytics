@@ -1,0 +1,127 @@
+.header-nav {
+  --nav-item-width: 114px;
+  --nav-gap: 8px;
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+
+.header-nav::before,
+.header-nav::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 56px;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.header-nav::before {
+  left: 0;
+  background: linear-gradient(to right, var(--bg), rgba(229, 229, 229, 0));
+}
+
+.header-nav::after {
+  right: 0;
+  background: linear-gradient(to left, var(--bg), rgba(229, 229, 229, 0));
+}
+
+.header-nav__track {
+  display: flex;
+  align-items: stretch;
+  gap: var(--nav-gap);
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 8px 0;
+  scroll-behavior: auto;
+  scrollbar-width: none;
+  cursor: grab;
+  user-select: none;
+  touch-action: pan-y;
+}
+
+.header-nav__track::-webkit-scrollbar {
+  display: none;
+}
+
+.header-nav__track--dragging {
+  cursor: grabbing;
+}
+
+.header-nav__item {
+  --item-opacity: 0.3;
+  --item-scale: 0.94;
+  width: var(--nav-item-width);
+  min-width: var(--nav-item-width);
+  border: 0;
+  background: transparent;
+  padding: 4px 8px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  opacity: var(--item-opacity);
+  transform: scale(var(--item-scale));
+  transition: opacity 160ms ease, transform 160ms ease, color 160ms ease;
+  color: #2f3234;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.header-nav__item:hover {
+  opacity: 1;
+  color: #101214;
+  transform: scale(1.03);
+}
+
+.header-nav__item--active {
+  color: #0f1113;
+  --item-opacity: 1;
+  --item-scale: 1;
+  font-weight: 700;
+}
+
+.header-nav__icon {
+  width: 28px;
+  height: 28px;
+  fill: currentColor;
+  display: block;
+}
+
+.header-nav__title {
+  font-family: var(--font-brand);
+  font-size: 14px;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .header-nav::before,
+  .header-nav::after {
+    width: 42px;
+  }
+
+  .header-nav__track {
+    --nav-gap: 4px;
+    padding: 8px 0;
+    gap: 4px;
+  }
+
+  .header-nav__item {
+    --nav-item-width: 96px;
+    min-width: 96px;
+    padding: 4px 6px;
+    gap: 4px;
+  }
+
+  .header-nav__icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .header-nav__title {
+    font-size: 12px;
+  }
+}

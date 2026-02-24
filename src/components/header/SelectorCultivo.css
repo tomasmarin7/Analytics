@@ -1,0 +1,48 @@
+.selector-cultivo {
+  min-height: 48px;
+  padding: 0 20px 0 0;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(
+    120deg,
+    var(--cerezo-soft-1) 0%,
+    var(--cerezo-soft-2) 52%,
+    var(--cerezo-soft-3) 100%
+  );
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  box-shadow: 0 8px 16px rgba(181, 109, 123, 0.24);
+}
+
+.selector-cultivo__icon {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  display: block;
+}
+
+.selector-cultivo__label {
+  font-family: var(--font-brand);
+  font-size: 18px;
+  line-height: 1;
+  color: #ffffff;
+}
+
+@media (max-width: 900px) {
+  .selector-cultivo {
+    min-height: 44px;
+    padding-right: 14px;
+    gap: 8px;
+  }
+
+  .selector-cultivo__icon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .selector-cultivo__label {
+    font-size: 16px;
+  }
+}

@@ -1,7 +1,7 @@
 import { createRoot } from "react-dom/client";
-import Header from "./components/Header";
+import Header from "./components/header/Header";
 import SidePopover from "./components/SidePopover";
-import LowerDotsBridge from "./components/LowerDotsBridge";
+import TimelineControls from "./components/TimelineControls";
 import "./index.css";
 
 const App = () => {
@@ -10,7 +10,7 @@ const App = () => {
       <Header />
       <main className="app__content">
         <SidePopover />
-        <LowerDotsBridge />
+        <TimelineControls />
       </main>
     </div>
   );

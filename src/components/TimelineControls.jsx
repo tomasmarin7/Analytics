@@ -1,9 +1,9 @@
-import RangeSlider from "./lowerDotsBridge/RangeSlider";
-import TimelineTrack from "./lowerDotsBridge/TimelineTrack";
-import { TIMELINE_ARIA_LABEL } from "./lowerDotsBridge/constants";
-import { useTimelineController } from "./lowerDotsBridge/useTimelineController";
+import { TIMELINE_ARIA_LABEL } from "./timeline/constants";
+import RangeSlider from "./rangeSlider/RangeSlider";
+import TimelineTrack from "./timeline/TimelineTrack";
+import { useTimelineController } from "./timeline/useTimelineController";
 
-const LowerDotsBridge = () => {
+const TimelineControls = () => {
   const {
     sliderRef,
     dayLines,
@@ -19,6 +19,8 @@ const LowerDotsBridge = () => {
     onHandleKeyDown,
   } = useTimelineController();
 
+  const handleFertilizationClick = () => {};
+
   return (
     <section className="lower-dots-bridge" aria-label={TIMELINE_ARIA_LABEL}>
       <TimelineTrack
@@ -27,6 +29,7 @@ const LowerDotsBridge = () => {
         visibleDays={visibleDays}
         monthMarkers={monthMarkers}
         visiblePeriods={visiblePeriods}
+        onFertilizationClick={handleFertilizationClick}
         isTodayVisible={isTodayVisible}
         todayLeftPercent={todayLeftPercent}
       />
@@ -42,4 +45,4 @@ const LowerDotsBridge = () => {
   );
 };
 
-export default LowerDotsBridge;
+export default TimelineControls;

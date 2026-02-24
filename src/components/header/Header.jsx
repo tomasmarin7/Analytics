@@ -2,6 +2,8 @@ import { useState } from "react";
 import HeaderNavCarousel from "./HeaderNavCarousel";
 import SelectorCultivo from "./SelectorCultivo";
 import UsuarioHeader from "./UsuarioHeader";
+import "./Header.css";
+import logoEmpresa from "../../assets/images/logo-empresa.png";
 
 const Header = () => {
   const [logoError, setLogoError] = useState(false);
@@ -12,7 +14,7 @@ const Header = () => {
         {!logoError ? (
           <img
             className="header__logo"
-            src="/logo-empresa.png"
+            src={logoEmpresa}
             alt="Logo de la empresa"
             onError={() => setLogoError(true)}
           />

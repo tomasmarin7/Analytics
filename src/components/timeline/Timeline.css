@@ -1,0 +1,200 @@
+.lower-dots-bridge {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  min-height: 260px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-bottom: 16px;
+  pointer-events: none;
+}
+
+.lower-dots-bridge__inner {
+  --bridge-lines-top-offset: 46px;
+  width: calc(100% - (2 * var(--bridge-edge-offset)));
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 12px;
+  padding: 0;
+  outline: 1px dashed rgba(34, 37, 39, 0.45);
+  outline-offset: 0;
+}
+
+.lower-dots-bridge__track {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding-top: var(--bridge-lines-top-offset);
+  padding-bottom: 78px;
+}
+
+.lower-dots-bridge__periods {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(var(--bridge-lines-top-offset) - 120px);
+  height: 100px;
+  pointer-events: none;
+}
+
+.lower-dots-bridge__period {
+  position: absolute;
+  top: 0;
+  height: 22px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  overflow: hidden;
+  padding: 0 10px;
+}
+
+.lower-dots-bridge__period-label {
+  font-family: var(--font-brand);
+  font-size: 12px;
+  line-height: 1;
+  color: #ffffff;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.lower-dots-bridge__dot {
+  width: 10px;
+  height: 10px;
+  margin-top: calc(var(--bridge-lines-top-offset) + 8px);
+  border-radius: 999px;
+  background: var(--bridge-line-color);
+  flex: 0 0 auto;
+}
+
+.lower-dots-bridge__lines {
+  --timeline-lines-height: 26px;
+  --day-line-width: 1px;
+  --day-line-height: 4px;
+  --month-line-width: 2px;
+  --month-line-height: 56px;
+  --day-line-opacity: 0.92;
+  position: relative;
+  width: 100%;
+  height: var(--timeline-lines-height);
+  display: grid;
+  grid-template-rows: var(--timeline-lines-height);
+  grid-template-columns: repeat(363, minmax(0, 1fr));
+  align-items: center;
+  align-content: start;
+  overflow: visible;
+}
+
+.lower-dots-bridge__lines--low {
+  --day-line-width: 1.15px;
+  --day-line-height: 4.5px;
+  --month-line-width: 2.1px;
+  --month-line-height: 60px;
+  --day-line-opacity: 0.94;
+}
+
+.lower-dots-bridge__lines--mid {
+  --day-line-width: 1.3px;
+  --day-line-height: 5.2px;
+  --month-line-width: 2.2px;
+  --month-line-height: 66px;
+  --day-line-opacity: 0.97;
+}
+
+.lower-dots-bridge__lines--high {
+  --day-line-width: 1.5px;
+  --day-line-height: 5.8px;
+  --month-line-width: 2.35px;
+  --month-line-height: 72px;
+  --day-line-opacity: 1;
+}
+
+.lower-dots-bridge__line {
+  position: relative;
+  width: var(--day-line-width, 1px);
+  height: var(--day-line-height, 4px);
+  opacity: var(--day-line-opacity, 1);
+  background: var(--bridge-line-color);
+  justify-self: center;
+  border-radius: 999px;
+  transform-origin: center center;
+  transition: transform 160ms ease-out;
+}
+
+.lower-dots-bridge__line--month-start {
+  width: var(--month-line-width, 2px);
+  height: var(--month-line-height, 100px);
+  background: var(--bridge-month-line-color);
+  align-self: start;
+  transform: translateY(8px);
+  transform-origin: center top;
+}
+
+.lower-dots-bridge__month-label {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-brand);
+  font-size: clamp(14px, 1vw, 18px);
+  line-height: 1.15;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: #222527;
+  white-space: nowrap;
+}
+
+.lower-dots-bridge__months {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(var(--bridge-lines-top-offset) + 72px);
+  height: 24px;
+}
+
+.lower-dots-bridge__today-stem {
+  position: absolute;
+  bottom: -36px;
+  width: 3px;
+  height: 66px;
+  transform: translateX(-50%);
+  background: #d54437;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.lower-dots-bridge__today-dot {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  bottom: -44px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: #d54437;
+  pointer-events: none;
+  z-index: 3;
+}
+
+@media (max-width: 1100px) {
+  .lower-dots-bridge {
+    min-height: 280px;
+    gap: 10px;
+  }
+
+  .lower-dots-bridge__inner {
+    width: calc(100% - 24px);
+  }
+
+  .lower-dots-bridge__period-label {
+    font-size: 11px;
+  }
+
+  .lower-dots-bridge__month-label {
+    font-size: 12px;
+  }
+}

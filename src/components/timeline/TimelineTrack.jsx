@@ -1,6 +1,7 @@
 import DayLines from "./DayLines";
 import MonthLabels from "./MonthLabels";
-import PeriodLayer from "./PeriodLayer";
+import PeriodLayer from "../decisionButtons/PeriodLayer";
+import "./Timeline.css";
 
 const TimelineTrack = ({
   dayLines,
@@ -8,6 +9,7 @@ const TimelineTrack = ({
   visibleDays,
   monthMarkers,
   visiblePeriods,
+  onFertilizationClick,
   isTodayVisible,
   todayLeftPercent,
 }) => (
@@ -15,7 +17,7 @@ const TimelineTrack = ({
     <span className="lower-dots-bridge__dot" aria-hidden="true" />
 
     <div className="lower-dots-bridge__track" aria-hidden="true">
-      <PeriodLayer periods={visiblePeriods} />
+      <PeriodLayer periods={visiblePeriods} onFertilizationClick={onFertilizationClick} />
       <DayLines
         dayLines={dayLines}
         lineVisualLevel={lineVisualLevel}

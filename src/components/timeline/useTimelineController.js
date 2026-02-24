@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DAY_MS, HANDLE_EDGE_OFFSET_PX, MIN_VISIBLE_DAYS } from "./constants";
-import { createDefaultPeriods } from "./periods";
+import { createDefaultPeriods } from "../decisionButtons/periods";
 import {
   clamp,
   getDayLines,
