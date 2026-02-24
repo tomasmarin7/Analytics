@@ -1,14 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DAY_MS, HANDLE_EDGE_OFFSET_PX, MIN_VISIBLE_DAYS } from "./constants";
 import { createDefaultPeriods } from "../decisionButtons/periods";
-import {
-  clamp,
-  getDayLines,
-  getLineVisualLevel,
-  getMonthMarkers,
-  getVisiblePeriods,
-  getYearDomain,
-} from "./timelineMath";
+import { clamp, getDayLines, getLineVisualLevel, getMonthMarkers, getVisiblePeriods, getYearDomain, toRatio } from "./timelineMath";
 
 const DEFAULT_RATIOS = {
   leftRatio: 0,
@@ -21,6 +14,7 @@ export const useTimelineController = ({ periods } = {}) => {
   const sliderRef = useRef(null);
   const dragRef = useRef(null);
   const ratiosRef = useRef(DEFAULT_RATIOS);
+  const animationFrameRef = useRef(null);
 
   const now = new Date();
   const year = now.getFullYear();
@@ -94,6 +88,44 @@ export const useTimelineController = ({ periods } = {}) => {
     setRightRatio(clampedRight);
   }, []);
 
+  const cancelRangeAnimation = useCallback(() => {
+    if (!animationFrameRef.current) return;
+    cancelAnimationFrame(animationFrameRef.current);
+    animationFrameRef.current = null;
+  }, []);
+
+  const animateToRatios = useCallback(
+    (targetLeft, targetRight, { durationMs = 380 } = {}) => {
+      cancelRangeAnimation();
+
+      const startLeft = ratiosRef.current.leftRatio;
+      const startRight = ratiosRef.current.rightRatio;
+      const deltaLeft = targetLeft - startLeft;
+      const deltaRight = targetRight - startRight;
+      const startTime = performance.now();
+
+      const easeInOutQuad = (t) => (t < 0.5 ? 2 * t * t : 1 - ((-2 * t + 2) ** 2) / 2);
+
+      const step = (nowMs) => {
+        const elapsed = nowMs - startTime;
+        const progress = clamp(elapsed / durationMs, 0, 1);
+        const eased = easeInOutQuad(progress);
+
+        setRatios(startLeft + deltaLeft * eased, startRight + deltaRight * eased);
+
+        if (progress < 1) {
+          animationFrameRef.current = requestAnimationFrame(step);
+          return;
+        }
+
+        animationFrameRef.current = null;
+      };
+
+      animationFrameRef.current = requestAnimationFrame(step);
+    },
+    [cancelRangeAnimation, setRatios],
+  );
+
   const getRatioFromClientX = useCallback((clientX) => {
     const slider = sliderRef.current;
     if (!slider) return null;
@@ -149,15 +181,17 @@ export const useTimelineController = ({ periods } = {}) => {
   useEffect(() => {
     return () => {
       dragRef.current = null;
+      cancelRangeAnimation();
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerup", stopDrag);
     };
-  }, [onPointerMove, stopDrag]);
+  }, [cancelRangeAnimation, onPointerMove, stopDrag]);
 
   const startDrag =
     (mode) =>
     (event) => {
       event.preventDefault();
+      cancelRangeAnimation();
 
       const startRatio = getRatioFromClientX(event.clientX);
       if (startRatio === null) return;
@@ -212,6 +246,25 @@ export const useTimelineController = ({ periods } = {}) => {
       setRatios(currentLeft, clamp(currentRight + delta, currentLeft + minGap, 1));
     };
 
+  const setVisibleRangeByDates = useCallback(
+    ({ startMs, endMs, animate = true }) => {
+      const nextStartMs = clamp(startMs, yearStartMs, yearEndMs);
+      const nextEndMs = clamp(endMs, yearStartMs, yearEndMs);
+      if (nextEndMs < nextStartMs) return;
+
+      const nextLeftRatio = clamp(toRatio(nextStartMs, yearStartMs, yearEndMs), 0, 1);
+      const nextRightRatio = clamp(toRatio(nextEndMs, yearStartMs, yearEndMs), 0, 1);
+
+      if (animate) {
+        animateToRatios(nextLeftRatio, nextRightRatio);
+        return;
+      }
+
+      setRatios(nextLeftRatio, nextRightRatio);
+    },
+    [animateToRatios, setRatios, yearEndMs, yearStartMs],
+  );
+
   const leftHandleExpr = `calc(${HANDLE_EDGE_OFFSET_PX}px + (100% - ${HANDLE_EDGE_OFFSET_PX * 2}px) * ${leftRatio})`;
   const rightHandleExpr = `calc(${HANDLE_EDGE_OFFSET_PX}px + (100% - ${HANDLE_EDGE_OFFSET_PX * 2}px) * ${rightRatio})`;
 
@@ -228,5 +281,6 @@ export const useTimelineController = ({ periods } = {}) => {
     visibleDays,
     startDrag,
     onHandleKeyDown,
+    setVisibleRangeByDates,
   };
 };

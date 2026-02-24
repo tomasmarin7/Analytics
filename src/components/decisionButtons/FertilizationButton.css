@@ -1,47 +1,44 @@
-.lower-dots-bridge__february-button {
-  --february-chamfer-size: 20px;
+.lower-dots-bridge__fertilization-button {
   position: absolute;
   top: 0;
-  height: 100px;
-  border-radius: 20px;
-  display: inline-flex;
-  align-items: flex-start;
+  height: 96px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
   justify-content: flex-start;
-  padding: 10px 12px;
-  border: 1px solid rgba(110, 116, 121, 0.5);
-  background: linear-gradient(180deg, #6f757b 0%, #d5d9dd 100%);
-  overflow: hidden;
-  box-shadow: 0 4px 14px rgba(34, 37, 39, 0.16);
+  padding: 16px 24px 14px;
+  border: none;
+  border-radius: 16px;
+  background:
+    radial-gradient(120% 130% at 8% 6%, rgba(84, 97, 87, 0.62) 0%, rgba(84, 97, 87, 0) 48%),
+    radial-gradient(130% 120% at 92% 88%, rgba(223, 229, 214, 0.54) 0%, rgba(223, 229, 214, 0) 56%),
+    linear-gradient(135deg, #7e897d 0%, #a5b09f 46%, #c7cebf 100%);
+  color: #222527;
   cursor: pointer;
   pointer-events: auto;
-  clip-path: polygon(
-    0 0,
-    calc(100% - var(--february-chamfer-size)) 0,
-    100% var(--february-chamfer-size),
-    100% 100%,
-    0 100%
-  );
+  transition: transform 140ms ease;
 }
 
-.lower-dots-bridge__february-button-label {
-  position: relative;
-  z-index: 1;
+.lower-dots-bridge__fertilization-button:hover {
+  transform: translateY(-1px);
+}
+
+.lower-dots-bridge__fertilization-button:active {
+  transform: translateY(0);
+}
+
+.lower-dots-bridge__fertilization-button:focus-visible {
+  outline: 2px solid rgba(34, 37, 39, 0.65);
+  outline-offset: 2px;
+}
+
+.lower-dots-bridge__fertilization-title {
   font-family: var(--font-brand);
-  font-size: 18px;
-  line-height: 1.1;
-  font-weight: 500;
+  font-size: 24px;
+  line-height: 1.05;
+  font-weight: 400;
   color: #ffffff;
+  letter-spacing: 0.005em;
+  margin: 0;
   text-align: left;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
-.lower-dots-bridge__february-button:hover {
-  background: linear-gradient(180deg, #667077 0%, #dfe3e6 100%);
-}
-
-.lower-dots-bridge__february-button:focus-visible {
-  outline: 2px solid #222527;
-  outline-offset: 1px;
 }

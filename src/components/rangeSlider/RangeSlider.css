@@ -2,8 +2,6 @@
   position: relative;
   width: calc(100% - (2 * var(--bridge-edge-offset)));
   height: 92px;
-  outline: 1px dashed rgba(34, 37, 39, 0.45);
-  outline-offset: 0;
   pointer-events: auto;
 }
 

@@ -21,8 +21,6 @@
   justify-content: center;
   gap: 12px;
   padding: 0;
-  outline: 1px dashed rgba(34, 37, 39, 0.45);
-  outline-offset: 0;
 }
 
 .lower-dots-bridge__track {
@@ -31,15 +29,17 @@
   min-width: 0;
   padding-top: var(--bridge-lines-top-offset);
   padding-bottom: 78px;
+  isolation: isolate;
 }
 
 .lower-dots-bridge__periods {
   position: absolute;
   left: 0;
   right: 0;
-  top: calc(var(--bridge-lines-top-offset) - 120px);
-  height: 100px;
+  top: calc(var(--bridge-lines-top-offset) - 102px);
+  height: 96px;
   pointer-events: none;
+  z-index: 1;
 }
 
 .lower-dots-bridge__period {
@@ -88,6 +88,7 @@
   align-items: center;
   align-content: start;
   overflow: visible;
+  z-index: 2;
 }
 
 .lower-dots-bridge__lines--low {
@@ -161,11 +162,11 @@
   position: absolute;
   bottom: -36px;
   width: 3px;
-  height: 66px;
+  height: 84px;
   transform: translateX(-50%);
   background: #d54437;
   pointer-events: none;
-  z-index: 3;
+  z-index: 9999;
 }
 
 .lower-dots-bridge__today-dot {
@@ -177,7 +178,7 @@
   border-radius: 999px;
   background: #d54437;
   pointer-events: none;
-  z-index: 3;
+  z-index: 9999;
 }
 
 @media (max-width: 1100px) {

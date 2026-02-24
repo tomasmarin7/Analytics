@@ -1,7 +1,9 @@
+@import "./styles/fonts.css";
+
 :root {
   --bg: #e5e5e5;
   --text-dark: #222527;
-  --font-brand: "Lufga", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  --font-brand: "Lufga";
   --header-height: 104px;
   --page-gutter: 32px;
   --side-popover-peek: 20px;
@@ -11,13 +13,6 @@
   --bridge-edge-offset: 72px;
   --bridge-line-color: rgba(34, 37, 39, 0.5);
   --bridge-month-line-color: rgba(20, 22, 24, 0.85);
-}
-
-@font-face {
-  font-family: "Lufga";
-  src: url("/fonts/Lufga-Regular.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
 }
 
 * {
@@ -33,7 +28,7 @@ body,
 
 body {
   background: var(--bg);
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: var(--font-brand);
 }
 
 .app {

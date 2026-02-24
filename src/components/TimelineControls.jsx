@@ -17,9 +17,20 @@ const TimelineControls = () => {
     visibleDays,
     startDrag,
     onHandleKeyDown,
+    setVisibleRangeByDates,
   } = useTimelineController();
 
-  const handleFertilizationClick = () => {};
+  const handleFertilizationClick = (period) => {
+    const fallbackYear = new Date().getFullYear();
+    const defaultStartMs = Date.UTC(fallbackYear, 0, 1);
+    const defaultEndMs = Date.UTC(fallbackYear, 3, 1);
+
+    setVisibleRangeByDates({
+      startMs: period?.focusStartMs ?? defaultStartMs,
+      endMs: period?.focusEndMs ?? defaultEndMs,
+      animate: true,
+    });
+  };
 
   return (
     <section className="lower-dots-bridge" aria-label={TIMELINE_ARIA_LABEL}>
