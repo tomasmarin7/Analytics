@@ -3,8 +3,6 @@ import { createRoot } from "react-dom/client";
 import Header from "../components/header/Header";
 import SidePopover from "../components/SidePopover";
 import TimelineControls from "../components/TimelineControls";
-import FoliarAnalysisPanel from "../components/foliarAnalysis/FoliarAnalysisPanel";
-import { FOLIAR_ANALYSIS_EVENT_ID } from "../components/timeline/eventMarker/eventsConfig";
 import "./index.css";
 
 const App = () => {
@@ -18,7 +16,6 @@ const App = () => {
     <div className="app">
       <Header />
       <main className="app__content">
-        {activeEventId === FOLIAR_ANALYSIS_EVENT_ID && <FoliarAnalysisPanel />}
         <SidePopover />
         <TimelineControls activeEventId={activeEventId} onTimelineEventToggle={handleTimelineEventToggle} />
       </main>

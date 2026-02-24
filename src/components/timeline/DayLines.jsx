@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import TodayMarker from "./TodayMarker";
 import TimelineEventMarker from "./eventMarker/TimelineEventMarker";
+import { EventActivationOverlay } from "./eventActivation";
+import { EVENT_ACTIVATION_VERTICAL_TOP_PX } from "./eventActivation/constants";
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
@@ -32,9 +34,7 @@ const DayLines = ({
     };
   }, []);
 
-  const fixedVerticalEvents = timelineEvents.filter(
-    (event) => event.id === activeEventId && event.connector?.fixedLeftPx !== undefined,
-  );
+  const activeEvent = timelineEvents.find((event) => event.id === activeEventId) ?? null;
   const visibleEvents = timelineEvents.filter((event) => event.isVisible);
 
   return (
@@ -42,6 +42,7 @@ const DayLines = ({
       ref={linesRef}
       className={`lower-dots-bridge__lines lower-dots-bridge__lines--${lineVisualLevel}`}
       style={{
+        "--event-fixed-vertical-top": `${EVENT_ACTIVATION_VERTICAL_TOP_PX}px`,
         gridTemplateColumns: `repeat(${visibleDays}, minmax(0, 1fr))`,
       }}
     >
@@ -64,14 +65,7 @@ const DayLines = ({
 
       {isTodayVisible && <TodayMarker leftPercent={todayLeftPercent} />}
 
-      {fixedVerticalEvents.map((event) => (
-        <span
-          key={`fixed-vertical-${event.id}`}
-          className="lower-dots-bridge__event-fixed-vertical"
-          style={{ left: `${event.connector.fixedLeftPx}px` }}
-          aria-hidden="true"
-        />
-      ))}
+      <EventActivationOverlay activeEvent={activeEvent} containerWidth={containerWidth} />
 
       {visibleEvents.map((event) => (
         <TimelineEventMarker

@@ -137,17 +137,6 @@
   transform-origin: center top;
 }
 
-.lower-dots-bridge__event-fixed-vertical {
-  position: absolute;
-  top: -1200px;
-  transform: translateX(-50%);
-  width: 3px;
-  height: 1320px;
-  border-radius: 999px;
-  background: #222527;
-  z-index: 0;
-}
-
 .lower-dots-bridge__month-label {
   position: absolute;
   top: 0;
@@ -210,4 +199,5 @@
   .lower-dots-bridge__month-label {
     font-size: 12px;
   }
+
 }
