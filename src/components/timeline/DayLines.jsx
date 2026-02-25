@@ -17,6 +17,7 @@ const DayLines = ({
   timelineEvents,
   activeEventId,
   onTimelineEventToggle,
+  selectedHuerto,
   selectedCuartel,
 }) => {
   const linesRef = useRef(null);
@@ -70,7 +71,11 @@ const DayLines = ({
 
       <EventActivationOverlay activeEvent={activeEvent} containerWidth={containerWidth}>
         {activeEvent?.id === FOLIAR_ANALYSIS_EVENT_ID ? (
-          <FoliarAnalysisPanel eventLabel={activeEvent.label} selectedCuartel={selectedCuartel} />
+          <FoliarAnalysisPanel
+            eventLabel={activeEvent.label}
+            selectedHuerto={selectedHuerto}
+            selectedCuartel={selectedCuartel}
+          />
         ) : null}
       </EventActivationOverlay>
 

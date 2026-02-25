@@ -8,6 +8,7 @@ import "./index.css";
 const App = () => {
   const [activeEventId, setActiveEventId] = useState(null);
   const [selectedCuartel, setSelectedCuartel] = useState(null);
+  const selectedHuerto = "Huerto";
 
   const handleTimelineEventToggle = (eventId) => {
     setActiveEventId((current) => (current === eventId ? null : eventId));
@@ -21,6 +22,7 @@ const App = () => {
         <TimelineControls
           activeEventId={activeEventId}
           onTimelineEventToggle={handleTimelineEventToggle}
+          selectedHuerto={selectedHuerto}
           selectedCuartel={selectedCuartel}
         />
       </main>

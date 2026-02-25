@@ -15,6 +15,7 @@ const TimelineTrack = ({
   timelineEvents,
   activeEventId,
   onTimelineEventToggle,
+  selectedHuerto,
   selectedCuartel,
 }) => (
   <div className="lower-dots-bridge__inner">
@@ -31,6 +32,7 @@ const TimelineTrack = ({
         timelineEvents={timelineEvents}
         activeEventId={activeEventId}
         onTimelineEventToggle={onTimelineEventToggle}
+        selectedHuerto={selectedHuerto}
         selectedCuartel={selectedCuartel}
       />
       <MonthLabels markers={monthMarkers} />
