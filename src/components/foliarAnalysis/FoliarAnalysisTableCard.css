@@ -1,13 +1,22 @@
 .foliar-analysis-table-card {
   position: relative;
   min-width: 0;
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   border-radius: 0 16px 16px 16px;
-  background: #b0b7a9;
-  padding: 12px 10px 10px;
+  background: rgba(58, 62, 66, 0.28);
+  padding: 12px 10px 8px;
   display: flex;
   flex-direction: column;
+  margin-top: 0;
+  min-width: 920px;
+}
+
+.foliar-analysis-table-card--with-tabs {
   margin-top: var(--data-records-header-height);
+}
+
+.foliar-analysis-table-card--bud {
+  background: #8a5a4b;
 }
 
 .foliar-analysis-table-card__tabs {
@@ -35,24 +44,13 @@
   box-shadow: 0 1px 0 #b0b7a9;
 }
 
-.foliar-analysis-tabs-only {
-  position: relative;
-  margin-top: var(--data-records-header-height);
-  min-height: 0;
-}
-
-.foliar-analysis-tabs-only__tabs {
-  display: flex;
-  gap: 8px;
-}
-
 .foliar-analysis-table-card__inner {
   width: 100%;
   height: auto;
-  border-radius: 2px;
+  border-radius: 10px;
   overflow: hidden;
-  background: #f4f5f6;
-  padding: 1px;
+  background: transparent;
+  padding: 0;
 }
 
 .foliar-analysis-table-card__grid {
@@ -67,41 +65,47 @@
   width: 100%;
   height: auto;
   overflow: auto;
+  border-radius: 10px;
+  background: rgba(19, 25, 20, 0.28);
 }
 
 .foliar-analysis-table-card__table {
   width: 100%;
-  min-width: 980px;
+  min-width: 900px;
   border-collapse: collapse;
   font-family: var(--font-brand);
   font-size: 18px;
-  color: #1f2225;
+  color: #ffffff;
+}
+
+.foliar-analysis-table-card__table--bud {
+  min-width: 860px;
 }
 
 .foliar-analysis-table-card__table thead th {
   position: sticky;
   top: 0;
   z-index: 1;
-  background: #e7eaec;
+  background: rgba(17, 24, 18, 0.86);
   text-align: left;
-  padding: 0 12px;
-  font-weight: 600;
-  border-bottom: 1px solid #c6ccd1;
+  padding: 8px 12px;
+  font-weight: 500;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
   white-space: nowrap;
   height: var(--data-records-table-header-h);
   vertical-align: middle;
 }
 
 .foliar-analysis-table-card__table tbody td {
-  padding: 0 12px;
-  border-bottom: 1px solid #d9dee2;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
   white-space: nowrap;
   height: var(--data-records-table-row-h);
   vertical-align: middle;
 }
 
 .foliar-analysis-table-card__table tbody tr:nth-child(even) {
-  background: #f7f9fa;
+  background: rgba(23, 31, 25, 0.42);
 }
 
 .foliar-analysis-table-card__empty-message {
@@ -115,11 +119,15 @@
   text-align: center;
   font-family: var(--font-brand);
   font-size: 14px;
-  color: rgba(34, 37, 39, 0.62);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 @media (max-width: 900px) {
   .foliar-analysis-table-card {
+    min-width: 720px;
+  }
+
+  .foliar-analysis-table-card--with-tabs {
     margin-top: var(--data-records-header-height);
   }
 

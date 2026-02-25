@@ -11,6 +11,9 @@ export const useDataRecordsSectionData = ({
   rawRows,
   mapRow,
   scoreFields,
+  keepAllRowsPerYear = false,
+  groupDisplayYears = false,
+  sortRows,
   selectedYears: controlledSelectedYears,
   onSelectedYearsChange,
 }) => {
@@ -44,30 +47,44 @@ export const useDataRecordsSectionData = ({
     [selectedYears, availableYears]
   );
 
-  const filteredRowsByYear = useMemo(
-    () =>
-      cuartelRows
-        .filter((row) => selectedYearsForCuartel.includes(row.year))
-        .reduce((rowsByYear, row) => {
-          const current = rowsByYear.get(row.year);
-          if (!current || countDataPoints(row, scoreFields) > countDataPoints(current, scoreFields)) {
-            rowsByYear.set(row.year, row);
-          }
-          return rowsByYear;
-        }, new Map()),
-    [cuartelRows, selectedYearsForCuartel, scoreFields]
+  const filteredRows = useMemo(
+    () => cuartelRows.filter((row) => selectedYearsForCuartel.includes(row.year)),
+    [cuartelRows, selectedYearsForCuartel]
   );
 
   const rowData = useMemo(
-    () =>
-      [...filteredRowsByYear.values()].sort((a, b) => {
+    () => {
+      const defaultSortRows = (a, b) => {
         if (a.year !== b.year) return a.year - b.year;
         return String(a.cuartel).localeCompare(String(b.cuartel));
-      }),
-    [filteredRowsByYear]
+      };
+
+      const rowsForTable = keepAllRowsPerYear
+        ? filteredRows
+        : filteredRows.reduce((rowsByYear, row) => {
+            const current = rowsByYear.get(row.year);
+            if (!current || countDataPoints(row, scoreFields) > countDataPoints(current, scoreFields)) {
+              rowsByYear.set(row.year, row);
+            }
+            return rowsByYear;
+          }, new Map()).values();
+
+      return [...rowsForTable].sort(sortRows ?? defaultSortRows);
+    },
+    [filteredRows, keepAllRowsPerYear, scoreFields, sortRows]
   );
 
-  const displayYears = useMemo(() => rowData.map((row) => row.year), [rowData]);
+  const displayYears = useMemo(() => {
+    if (!groupDisplayYears) return rowData.map((row) => row.year);
+
+    let previousYear = null;
+    return rowData.map((row) => {
+      const currentYear = row.year;
+      const shouldDisplayYear = currentYear !== previousYear;
+      previousYear = currentYear;
+      return shouldDisplayYear ? currentYear : "";
+    });
+  }, [rowData, groupDisplayYears]);
 
   const toggleYear = (year) => {
     setSelectedYears((current) =>
