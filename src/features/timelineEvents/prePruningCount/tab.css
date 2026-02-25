@@ -1,6 +1,7 @@
 .foliar-analysis-table-card__tab--pre-pruning-count {
   color: #141619;
-  background: transparent;
-  box-shadow: none;
-  border: 2px solid #141619;
+  background: rgba(186, 192, 198, 0.22);
+  box-shadow: 0 1px 0 rgba(186, 192, 198, 0.22);
+  border: 1px solid rgba(16, 17, 18, 0.6);
+  border-bottom: none;
 }

@@ -19,6 +19,16 @@
   background: #8a5a4b;
 }
 
+.foliar-analysis-table-card--pre-pruning-count {
+  background: rgba(186, 192, 198, 0.22);
+  border: 1px solid rgba(16, 17, 18, 0.6);
+}
+
+.foliar-analysis-table-card--pre-pruning-count .foliar-analysis-table-card__table-scroll {
+  background: rgba(205, 210, 216, 0.26);
+  border: 1px solid rgba(16, 17, 18, 0.5);
+}
+
 .foliar-analysis-table-card__tabs {
   position: absolute;
   top: calc(-1 * var(--data-records-header-height));
@@ -69,6 +79,10 @@
   background: rgba(19, 25, 20, 0.28);
 }
 
+.foliar-analysis-table-card--bud .foliar-analysis-table-card__table-scroll {
+  background: rgba(138, 90, 75, 0.38);
+}
+
 .foliar-analysis-table-card__table {
   width: 100%;
   min-width: 900px;
@@ -80,6 +94,11 @@
 
 .foliar-analysis-table-card__table--bud {
   min-width: 860px;
+}
+
+.foliar-analysis-table-card__table--pre-pruning-count {
+  min-width: 1240px;
+  color: #141619;
 }
 
 .foliar-analysis-table-card__table thead th {
@@ -96,6 +115,12 @@
   vertical-align: middle;
 }
 
+.foliar-analysis-table-card__table--pre-pruning-count thead th {
+  background: rgba(17, 24, 18, 0.86);
+  color: #ffffff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+}
+
 .foliar-analysis-table-card__table tbody td {
   padding: 8px 12px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.14);
@@ -104,20 +129,52 @@
   vertical-align: middle;
 }
 
+.foliar-analysis-table-card__table--pre-pruning-count tbody td {
+  border-bottom: 1px solid rgba(16, 17, 18, 0.5);
+}
+
 .foliar-analysis-table-card__row--year-band-a {
-  background: rgba(23, 31, 25, 0.42);
+  background: rgba(22, 31, 25, 0.68);
 }
 
 .foliar-analysis-table-card__row--year-band-b {
-  background: rgba(32, 40, 34, 0.56);
+  background: rgba(19, 25, 20, 0.28);
+}
+
+.foliar-analysis-table-card__table--bud .foliar-analysis-table-card__row--year-band-a {
+  background: rgba(111, 72, 56, 0.72);
+}
+
+.foliar-analysis-table-card__table--bud .foliar-analysis-table-card__row--year-band-b {
+  background: rgba(138, 90, 75, 0.38);
+}
+
+.foliar-analysis-table-card__table--pre-pruning-count .foliar-analysis-table-card__row--year-band-a {
+  background: rgba(174, 182, 191, 0.62);
+}
+
+.foliar-analysis-table-card__table--pre-pruning-count .foliar-analysis-table-card__row--year-band-b {
+  background: rgba(205, 210, 216, 0.26);
 }
 
 .foliar-analysis-table-card__row--year-start td {
   border-top: 1px solid rgba(255, 255, 255, 0.24);
 }
 
+.foliar-analysis-table-card__table--pre-pruning-count .foliar-analysis-table-card__row--year-start td {
+  border-top: 1px solid rgba(16, 17, 18, 0.56);
+}
+
 .foliar-analysis-table-card__row--variedad-start td {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.foliar-analysis-table-card__table--pre-pruning-count .foliar-analysis-table-card__row--variedad-start td {
+  box-shadow: inset 0 1px 0 rgba(16, 17, 18, 0.35);
+}
+
+.foliar-analysis-table-card--pre-pruning-count .foliar-analysis-table-card__empty-message {
+  color: rgba(20, 22, 25, 0.85);
 }
 
 .foliar-analysis-table-card__table--bud .foliar-analysis-table-card__row--variedad-start td:first-child {

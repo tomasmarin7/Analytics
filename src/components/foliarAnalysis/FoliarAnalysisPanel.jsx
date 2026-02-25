@@ -1,11 +1,22 @@
 import foliarAnalysisRows from "../../data/foliarAnalysisRows.json";
 import budAnalysisRows from "../../data/budAnalysisRows.json";
+import prePruningCountRows from "../../data/prePruningCountRows.json";
 import { useMemo } from "react";
 import DataRecordsSection from "../dataRecordsSection/DataRecordsSection";
 import FoliarAnalysisTableCard from "./FoliarAnalysisTableCard";
 import { FOLIAR_COLUMNS, FOLIAR_SCORE_FIELDS, mapFoliarRow } from "./foliarAnalysisConfig";
 import { BUD_COLUMNS, BUD_SCORE_FIELDS, mapBudRow, sortBudRows } from "./budAnalysisConfig";
-import { BUD_ANALYSIS_EVENT_ID, FOLIAR_ANALYSIS_EVENT_ID } from "../../features/timelineEvents";
+import {
+  BUD_ANALYSIS_EVENT_ID,
+  FOLIAR_ANALYSIS_EVENT_ID,
+  PRE_PRUNING_COUNT_EVENT_ID,
+} from "../../features/timelineEvents";
+import {
+  PRE_PRUNING_COUNT_COLUMNS,
+  PRE_PRUNING_COUNT_SCORE_FIELDS,
+  mapPrePruningCountRow,
+  sortPrePruningCountRows,
+} from "./prePruningCountConfig";
 import "../../features/timelineEvents/budAnalysis/tab.css";
 import "../../features/timelineEvents/prePruningCount/tab.css";
 
@@ -79,11 +90,20 @@ const FoliarAnalysisPanel = ({
   selectedYears,
   onSelectedYearsChange,
 }) => {
+  const prePruningEvent = activeEvents.find(
+    (event) =>
+      event.id === PRE_PRUNING_COUNT_EVENT_ID ||
+      String(event.label ?? "")
+        .trim()
+        .toLowerCase()
+        .includes("conteo")
+  );
   const tabByEventId = Object.fromEntries(activeEvents.map((event) => [event.id, { id: event.id, label: event.label }]));
   const hasFoliarAnalysis = activeEvents.some((event) => event.id === FOLIAR_ANALYSIS_EVENT_ID);
   const hasBudAnalysis = activeEvents.some((event) => event.id === BUD_ANALYSIS_EVENT_ID);
-  const hasDataTable = hasFoliarAnalysis || hasBudAnalysis;
-  const primaryTableType = hasBudAnalysis ? "bud" : hasFoliarAnalysis ? "foliar" : null;
+  const hasPrePruningCount = Boolean(prePruningEvent);
+  const hasDataTable = hasFoliarAnalysis || hasBudAnalysis || hasPrePruningCount;
+  const primaryTableType = hasPrePruningCount ? "pre-pruning-count" : hasBudAnalysis ? "bud" : hasFoliarAnalysis ? "foliar" : null;
 
   const foliarRowData = useMemo(
     () =>
@@ -116,14 +136,38 @@ const FoliarAnalysisPanel = ({
           ariaLabel: "Tabla de análisis de yemas",
         }
       : null,
+    hasPrePruningCount
+      ? {
+          id: "pre-pruning-count",
+          type: "pre-pruning-count",
+          tabItem: prePruningEvent ? { id: prePruningEvent.id, label: prePruningEvent.label } : null,
+          columns: PRE_PRUNING_COUNT_COLUMNS,
+          ariaLabel: "Tabla de conteo pre poda",
+        }
+      : null,
   ].filter(Boolean);
+  const hasOnlyFoliarTable = tableItems.length === 1 && tableItems[0]?.type === "foliar";
+  const normalizedTableItems = tableItems.map((table) =>
+    table.type === "foliar" && hasOnlyFoliarTable
+      ? { ...table, columns: table.columns.filter((column) => column.field !== "variedad") }
+      : table
+  );
   const tablesToRender =
-    tableItems.length > 0
-      ? tableItems
+    normalizedTableItems.length > 0
+      ? normalizedTableItems
       : [{ id: "no-data-table", type: null, tabItem: null, columns: [], rowData: [], ariaLabel: "Tabla de análisis" }];
 
   const primaryTableConfig =
-    primaryTableType === "foliar"
+    primaryTableType === "pre-pruning-count"
+      ? {
+          rawRows: prePruningCountRows,
+          mapRow: mapPrePruningCountRow,
+          scoreFields: PRE_PRUNING_COUNT_SCORE_FIELDS,
+          keepAllRowsPerYear: true,
+          groupDisplayYears: true,
+          sortRows: sortPrePruningCountRows,
+        }
+      : primaryTableType === "foliar"
       ? { rawRows: foliarAnalysisRows, mapRow: mapFoliarRow, scoreFields: FOLIAR_SCORE_FIELDS }
       : primaryTableType === "bud"
         ? {
@@ -152,11 +196,37 @@ const FoliarAnalysisPanel = ({
     >
       {({ selectedYearsCount, rowData: sectionRowData }) => {
         const rowsByTableType = {
-          bud: hasBudAnalysis ? sectionRowData : [],
-          foliar: hasBudAnalysis
+          bud: hasBudAnalysis && primaryTableType === "bud" ? sectionRowData : [],
+          "pre-pruning-count":
+            hasPrePruningCount && primaryTableType === "pre-pruning-count" ? sectionRowData : [],
+          foliar: primaryTableType === "bud" || primaryTableType === "pre-pruning-count"
             ? alignRowsToYearLayout(foliarRowData, sectionRowData, { showOnlyFirstRowPerYear: true })
             : foliarRowData,
         };
+
+        if (hasBudAnalysis && primaryTableType !== "bud") {
+          rowsByTableType.bud = buildTableRows({
+            selectedCuartel,
+            selectedYears,
+            rawRows: budAnalysisRows,
+            mapRow: mapBudRow,
+            scoreFields: BUD_SCORE_FIELDS,
+            keepAllRowsPerYear: true,
+            sortRows: sortBudRows,
+          });
+        }
+
+        if (hasPrePruningCount && primaryTableType !== "pre-pruning-count") {
+          rowsByTableType["pre-pruning-count"] = buildTableRows({
+            selectedCuartel,
+            selectedYears,
+            rawRows: prePruningCountRows,
+            mapRow: mapPrePruningCountRow,
+            scoreFields: PRE_PRUNING_COUNT_SCORE_FIELDS,
+            keepAllRowsPerYear: true,
+            sortRows: sortPrePruningCountRows,
+          });
+        }
 
         return tablesToRender.map((table) => (
           <FoliarAnalysisTableCard
