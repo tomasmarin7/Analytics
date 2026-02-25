@@ -4,7 +4,7 @@ import TimelineEventMarker from "./eventMarker/TimelineEventMarker";
 import { EventActivationOverlay } from "./eventActivation";
 import { EVENT_ACTIVATION_VERTICAL_TOP_PX } from "./eventActivation/constants";
 import FoliarAnalysisPanel from "../foliarAnalysis/FoliarAnalysisPanel";
-import { FOLIAR_ANALYSIS_EVENT_ID } from "./eventMarker/eventsConfig";
+import { DATA_RECORDS_EVENT_IDS } from "../../features/timelineEvents";
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
@@ -15,7 +15,7 @@ const DayLines = ({
   isTodayVisible,
   todayLeftPercent,
   timelineEvents,
-  activeEventId,
+  activeEventIds,
   onTimelineEventToggle,
   selectedHuerto,
   selectedCuartel,
@@ -40,7 +40,8 @@ const DayLines = ({
     };
   }, []);
 
-  const activeEvent = timelineEvents.find((event) => event.id === activeEventId) ?? null;
+  const activeEventSet = new Set(activeEventIds ?? []);
+  const activeEvents = timelineEvents.filter((event) => activeEventSet.has(event.id));
   const visibleEvents = timelineEvents.filter((event) => event.isVisible);
 
   return (
@@ -71,10 +72,10 @@ const DayLines = ({
 
       {isTodayVisible && <TodayMarker leftPercent={todayLeftPercent} />}
 
-      <EventActivationOverlay activeEvent={activeEvent} containerWidth={containerWidth}>
-        {activeEvent?.id === FOLIAR_ANALYSIS_EVENT_ID ? (
+      <EventActivationOverlay activeEvents={activeEvents} containerWidth={containerWidth}>
+        {activeEvents.some((event) => DATA_RECORDS_EVENT_IDS.includes(event.id)) ? (
           <FoliarAnalysisPanel
-            eventLabel={activeEvent.label}
+            activeEvents={activeEvents}
             selectedHuerto={selectedHuerto}
             selectedCuartel={selectedCuartel}
             selectedYears={selectedYears}
@@ -90,7 +91,7 @@ const DayLines = ({
           label={event.label}
           leftPercent={event.leftPercent}
           containerWidth={containerWidth}
-          isActive={activeEventId === event.id}
+          isActive={activeEventSet.has(event.id)}
           connector={event.connector}
           onToggle={onTimelineEventToggle}
         />

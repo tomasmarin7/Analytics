@@ -2,8 +2,8 @@ import "./EventActivationOverlay.css";
 import { EVENT_BULLET_HORIZONTAL_GAP_PX } from "./constants";
 import { resolveEventAnchorPx } from "./eventActivationMath";
 
-const EventActivationOverlay = ({ activeEvent, containerWidth, children }) => {
-  const anchorPx = resolveEventAnchorPx({ activeEvent, containerWidth });
+const EventActivationOverlay = ({ activeEvents, containerWidth, children }) => {
+  const anchorPx = resolveEventAnchorPx({ activeEvents, containerWidth });
   if (anchorPx === null) return null;
 
   const bulletLeftPx = anchorPx + EVENT_BULLET_HORIZONTAL_GAP_PX;

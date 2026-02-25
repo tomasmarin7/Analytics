@@ -1,4 +1,6 @@
 import "./TimelineEventMarker.css";
+import "../../../features/timelineEvents/budAnalysis/marker.css";
+import "../../../features/timelineEvents/prePruningCount/marker.css";
 import { buildDynamicConnectorPath, resolveFixedAnchorLocalX } from "./eventMarkerMath";
 
 type TimelineEventConnector = {
@@ -44,7 +46,7 @@ const TimelineEventMarker = ({
   return (
     <button
       type="button"
-      className={`timeline-event-marker ${isActive ? "timeline-event-marker--active" : ""}`}
+      className={`timeline-event-marker timeline-event-marker--${eventId} ${isActive ? "timeline-event-marker--active" : ""}`}
       style={{ left: `${leftPercent}%` }}
       onClick={() => onToggle?.(eventId)}
       aria-label={label}

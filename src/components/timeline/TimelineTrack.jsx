@@ -14,7 +14,7 @@ const TimelineTrack = ({
   isTodayVisible,
   todayLeftPercent,
   timelineEvents,
-  activeEventId,
+  activeEventIds,
   onTimelineEventToggle,
   selectedHuerto,
   selectedCuartel,
@@ -40,7 +40,7 @@ const TimelineTrack = ({
         isTodayVisible={isTodayVisible}
         todayLeftPercent={todayLeftPercent}
         timelineEvents={timelineEvents}
-        activeEventId={activeEventId}
+        activeEventIds={activeEventIds}
         onTimelineEventToggle={onTimelineEventToggle}
         selectedHuerto={selectedHuerto}
         selectedCuartel={selectedCuartel}

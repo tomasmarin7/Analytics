@@ -3,9 +3,18 @@ import { FOLIAR_COLUMNS } from "./foliarAnalysisConfig";
 
 const renderCellValue = (value) => (value === "" || value === null || value === undefined ? "-" : value);
 
-const FoliarAnalysisTableCard = ({ eventLabel, rowData, selectedYearsCount }) => (
+const FoliarAnalysisTableCard = ({ tabItems = [], rowData, selectedYearsCount }) => (
   <div className="foliar-analysis-table-card">
-    <span className="foliar-analysis-table-card__tab">{eventLabel}</span>
+    <div className="foliar-analysis-table-card__tabs">
+      {tabItems.map((tab) => (
+        <span
+          key={tab.id}
+          className={`foliar-analysis-table-card__tab foliar-analysis-table-card__tab--${tab.id}`}
+        >
+          {tab.label}
+        </span>
+      ))}
+    </div>
     <div className="foliar-analysis-table-card__inner">
       <div className="foliar-analysis-table-card__grid">
         {selectedYearsCount === 0 ? (

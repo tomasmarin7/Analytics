@@ -5,7 +5,7 @@ import { useTimelineController } from "./timeline/useTimelineController";
 import { useFertilizationInteraction } from "../features/fertilization";
 
 const TimelineControls = ({
-  activeEventId,
+  activeEventIds,
   onTimelineEventToggle,
   selectedHuerto,
   selectedCuartel,
@@ -61,7 +61,7 @@ const TimelineControls = ({
         isTodayVisible={isTodayVisible}
         todayLeftPercent={todayLeftPercent}
         timelineEvents={timelineEvents}
-        activeEventId={activeEventId}
+        activeEventIds={activeEventIds}
         onTimelineEventToggle={onTimelineEventToggle}
         selectedHuerto={selectedHuerto}
         selectedCuartel={selectedCuartel}

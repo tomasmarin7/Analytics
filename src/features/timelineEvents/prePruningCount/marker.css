@@ -1,0 +1,12 @@
+.timeline-event-marker--pre-pruning-count .timeline-event-marker__shape {
+  border: 4px solid #101112;
+  background: transparent;
+}
+
+.timeline-event-marker--pre-pruning-count .timeline-event-marker__stem {
+  height: 104px;
+}
+
+.timeline-event-marker--pre-pruning-count .timeline-event-marker__label {
+  top: calc(50% + 160px);
+}

@@ -10,10 +10,17 @@
   margin-top: var(--data-records-header-height);
 }
 
-.foliar-analysis-table-card__tab {
+.foliar-analysis-table-card__tabs {
   position: absolute;
   top: calc(-1 * var(--data-records-header-height));
   left: 0;
+  display: flex;
+  gap: 8px;
+  max-width: 100%;
+}
+
+.foliar-analysis-table-card__tab {
+  position: relative;
   height: var(--data-records-header-height);
   display: inline-flex;
   align-items: center;
@@ -26,6 +33,17 @@
   border-radius: 12px 12px 0 0;
   background: #b0b7a9;
   box-shadow: 0 1px 0 #b0b7a9;
+}
+
+.foliar-analysis-tabs-only {
+  position: relative;
+  margin-top: var(--data-records-header-height);
+  min-height: 0;
+}
+
+.foliar-analysis-tabs-only__tabs {
+  display: flex;
+  gap: 8px;
 }
 
 .foliar-analysis-table-card__inner {
@@ -106,7 +124,6 @@
   }
 
   .foliar-analysis-table-card__tab {
-    top: calc(-1 * var(--data-records-header-height));
     height: var(--data-records-header-height);
     font-size: 16px;
     padding: 0 12px;
