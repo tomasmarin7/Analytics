@@ -1,5 +1,5 @@
-import "./FertilizationButton.css";
 import FertilizationPlanTable from "./FertilizationPlanTable";
+import "../styles/FertilizationButton.css";
 
 const FertilizationButton = ({
   period,

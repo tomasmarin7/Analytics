@@ -1,20 +1,7 @@
 import { useMemo, useState } from "react";
-import fertilizationPlanRows from "../../data/fertilizationPlanRows.json";
-import "./FertilizationPlanTable.css";
-
-const FERTILIZATION_COLUMNS = [
-  { field: "temp", header: "Temp." },
-  { field: "boro", header: "Boro" },
-  { field: "calcio", header: "Calcio" },
-  { field: "cobre", header: "Cobre" },
-  { field: "fosforo", header: "Fósforo" },
-  { field: "hierro", header: "Hierro" },
-  { field: "magnesio", header: "Magnesio" },
-  { field: "manganeso", header: "Manganeso" },
-  { field: "nitrogeno", header: "Nitrógeno" },
-  { field: "potasio", header: "Potasio" },
-  { field: "zinc", header: "Zinc" },
-];
+import fertilizationPlanRows from "../../../data/fertilizationPlanRows.json";
+import { FERTILIZATION_COLUMNS } from "../config/tableColumns";
+import "../styles/FertilizationPlanTable.css";
 
 const renderCellValue = (value) => (value === "" || value === null || value === undefined ? "-" : value);
 
@@ -34,8 +21,7 @@ const FertilizationPlanTable = ({ selectedHuerto, selectedCuartel, selectedYears
   );
 
   const filteredRows = useMemo(() => {
-    if (!normalizedSelectedCuartel) return [];
-    if (selectedYearSet.size === 0) return [];
+    if (!normalizedSelectedCuartel || selectedYearSet.size === 0) return [];
 
     return fertilizationPlanRows
       .filter((row) => String(row.cuartel ?? "").trim().toUpperCase() === normalizedSelectedCuartel)
@@ -57,7 +43,8 @@ const FertilizationPlanTable = ({ selectedHuerto, selectedCuartel, selectedYears
     <div className="fertilization-plan-table__content">
       {showNoRecordsMessage ? (
         <div className="fertilization-plan-table__hint">
-          No hay registros del plan de fertilización para {selectedHuerto} {normalizedSelectedCuartel} y los años elegidos.
+          No hay registros del plan de fertilización para {selectedHuerto} {normalizedSelectedCuartel} y los años
+          elegidos.
         </div>
       ) : null}
 

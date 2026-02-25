@@ -1,11 +1,8 @@
 import { TIMELINE_ARIA_LABEL } from "./timeline/constants";
-import { DAY_MS } from "./timeline/constants";
-import { useCallback, useEffect, useRef, useState } from "react";
 import RangeSlider from "./rangeSlider/RangeSlider";
 import TimelineTrack from "./timeline/TimelineTrack";
 import { useTimelineController } from "./timeline/useTimelineController";
-
-const ZOOM_ANIMATION_MS = 380;
+import { useFertilizationInteraction } from "../features/fertilization";
 
 const TimelineControls = ({
   activeEventId,
@@ -15,8 +12,6 @@ const TimelineControls = ({
   selectedYears,
   onSelectedYearsChange,
 }) => {
-  const [raisedPeriodId, setRaisedPeriodId] = useState(null);
-  const animationTimeoutRef = useRef(null);
   const {
     sliderRef,
     dayLines,
@@ -38,80 +33,20 @@ const TimelineControls = ({
     setVisibleRangeByDates,
   } = useTimelineController();
 
-  useEffect(() => {
-    return () => {
-      if (!animationTimeoutRef.current) return;
-      clearTimeout(animationTimeoutRef.current);
-      animationTimeoutRef.current = null;
-    };
-  }, []);
-
-  const clearRaisedPeriod = useCallback(() => {
-    if (animationTimeoutRef.current) {
-      clearTimeout(animationTimeoutRef.current);
-      animationTimeoutRef.current = null;
-    }
-    setRaisedPeriodId(null);
-  }, []);
-
-  const handleFertilizationClick = (period) => {
-    const fallbackYear = new Date().getFullYear();
-    const defaultStartMs = Date.UTC(fallbackYear, 0, 1);
-    const defaultEndMs = Date.UTC(fallbackYear, 3, 1);
-    const nextStartMs = period?.focusStartMs ?? defaultStartMs;
-    const nextEndMs = period?.focusEndMs ?? defaultEndMs;
-
-    const isFocusedOnPeriod =
-      Math.abs(viewStartMs - nextStartMs) < DAY_MS && Math.abs(viewEndMs - nextEndMs) < DAY_MS;
-
-    const nextRaisedPeriodId = isFocusedOnPeriod ? null : period?.id ?? null;
-
-    if (animationTimeoutRef.current) {
-      clearTimeout(animationTimeoutRef.current);
-      animationTimeoutRef.current = null;
-    }
-
-    if (isFocusedOnPeriod) {
-      setRaisedPeriodId(null);
-
-      animationTimeoutRef.current = setTimeout(() => {
-        setVisibleRangeByDates({
-          startMs: yearStartMs,
-          endMs: yearEndMs,
-          animate: true,
-        });
-        animationTimeoutRef.current = null;
-      }, ZOOM_ANIMATION_MS);
-      return;
-    }
-
-    setVisibleRangeByDates({
-      startMs: nextStartMs,
-      endMs: nextEndMs,
-      animate: true,
-    });
-
-    animationTimeoutRef.current = setTimeout(() => {
-      setRaisedPeriodId(nextRaisedPeriodId);
-      animationTimeoutRef.current = null;
-    }, ZOOM_ANIMATION_MS);
-  };
-
-  const handleStartDrag =
-    (mode) =>
-    (event) => {
-      clearRaisedPeriod();
-      startDrag(mode)(event);
-    };
-
-  const handleHandleKeyDown =
-    (handle) =>
-    (event) => {
-      if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
-        clearRaisedPeriod();
-      }
-      onHandleKeyDown(handle)(event);
-    };
+  const {
+    raisedPeriodId,
+    handleFertilizationClick,
+    handleStartDrag,
+    handleHandleKeyDown,
+  } = useFertilizationInteraction({
+    viewStartMs,
+    viewEndMs,
+    yearStartMs,
+    yearEndMs,
+    setVisibleRangeByDates,
+    startDrag,
+    onHandleKeyDown,
+  });
 
   return (
     <section className="lower-dots-bridge" aria-label={TIMELINE_ARIA_LABEL}>

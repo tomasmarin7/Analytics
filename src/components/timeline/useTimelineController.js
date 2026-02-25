@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DAY_MS, HANDLE_EDGE_OFFSET_PX, MIN_VISIBLE_DAYS } from "./constants";
-import { createDefaultPeriods } from "../decisionButtons/periods";
+import { createDefaultPeriods } from "../../features/fertilization";
 import { TIMELINE_EVENT_DEFINITIONS } from "./eventMarker/eventsConfig";
 import { clamp, getDayLines, getLineVisualLevel, getMonthMarkers, getVisiblePeriods, getYearDomain, toRatio } from "./timelineMath";
 

@@ -8,3 +8,8 @@ export const createDefaultPeriods = (year) => [
     focusEndMs: Date.UTC(year, 3, 1),
   },
 ];
+
+export const getFallbackFocusRange = (year) => ({
+  startMs: Date.UTC(year, 0, 1),
+  endMs: Date.UTC(year, 3, 1),
+});

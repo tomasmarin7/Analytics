@@ -1,6 +1,6 @@
 import DayLines from "./DayLines";
 import MonthLabels from "./MonthLabels";
-import PeriodLayer from "../decisionButtons/PeriodLayer";
+import { PeriodLayer } from "../../features/fertilization";
 import "./Timeline.css";
 
 const TimelineTrack = ({

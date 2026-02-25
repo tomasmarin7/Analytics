@@ -1,4 +1,4 @@
-import { PERIODS_ARIA_LABEL } from "../timeline/constants";
+import { PERIODS_ARIA_LABEL } from "../../../components/timeline/constants";
 import FertilizationButton from "./FertilizationButton";
 
 const PeriodLayer = ({
