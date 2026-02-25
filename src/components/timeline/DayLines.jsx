@@ -19,6 +19,8 @@ const DayLines = ({
   onTimelineEventToggle,
   selectedHuerto,
   selectedCuartel,
+  selectedYears,
+  onSelectedYearsChange,
 }) => {
   const linesRef = useRef(null);
   const [containerWidth, setContainerWidth] = useState(0);
@@ -75,6 +77,8 @@ const DayLines = ({
             eventLabel={activeEvent.label}
             selectedHuerto={selectedHuerto}
             selectedCuartel={selectedCuartel}
+            selectedYears={selectedYears}
+            onSelectedYearsChange={onSelectedYearsChange}
           />
         ) : null}
       </EventActivationOverlay>

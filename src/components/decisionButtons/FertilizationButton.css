@@ -1,7 +1,27 @@
-.lower-dots-bridge__fertilization-button {
+.lower-dots-bridge__fertilization-slot {
+  --fertilization-slot-height: 96px;
   position: absolute;
-  top: 0;
-  height: 96px;
+  bottom: 0;
+  height: var(--fertilization-slot-height);
+  pointer-events: none;
+  transition: height 380ms ease;
+}
+
+.lower-dots-bridge__fertilization-slot--raised {
+  --fertilization-slot-height: 500px;
+}
+
+.lower-dots-bridge__fertilization-button {
+  --fertilization-height: 96px;
+  --fertilization-offset-y: 0px;
+  --fertilization-highlight-top-right: rgba(196, 205, 187, 0.42);
+  --fertilization-shadow-bottom-right: rgba(66, 78, 67, 0.44);
+  --fertilization-center-shadow: rgba(58, 70, 60, 0.16);
+  position: absolute;
+  left: 0;
+  width: 100%;
+  bottom: 0;
+  height: var(--fertilization-height);
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -9,22 +29,34 @@
   padding: 16px 24px 14px;
   border: none;
   border-radius: 16px;
+  overflow: hidden;
   background:
     radial-gradient(120% 130% at 8% 6%, rgba(84, 97, 87, 0.62) 0%, rgba(84, 97, 87, 0) 48%),
-    radial-gradient(130% 120% at 92% 88%, rgba(223, 229, 214, 0.54) 0%, rgba(223, 229, 214, 0) 56%),
+    radial-gradient(118% 122% at 92% 8%, var(--fertilization-highlight-top-right) 0%, rgba(196, 205, 187, 0) 56%),
+    radial-gradient(140% 126% at 94% 94%, var(--fertilization-shadow-bottom-right) 0%, rgba(66, 78, 67, 0) 60%),
+    radial-gradient(96% 102% at 50% 52%, var(--fertilization-center-shadow) 0%, rgba(58, 70, 60, 0) 62%),
     linear-gradient(135deg, #7e897d 0%, #a5b09f 46%, #c7cebf 100%);
   color: #222527;
   cursor: pointer;
   pointer-events: auto;
-  transition: transform 140ms ease;
+  transform: translateY(var(--fertilization-offset-y));
+  transition: height 380ms ease, transform 140ms ease;
+  z-index: 1;
+}
+
+.lower-dots-bridge__fertilization-button--raised {
+  --fertilization-height: 500px;
+  --fertilization-highlight-top-right: rgba(154, 166, 147, 0.34);
+  --fertilization-shadow-bottom-right: rgba(42, 53, 43, 0.66);
+  --fertilization-center-shadow: rgba(36, 46, 37, 0.28);
 }
 
 .lower-dots-bridge__fertilization-button:hover {
-  transform: translateY(-1px);
+  --fertilization-offset-y: -1px;
 }
 
 .lower-dots-bridge__fertilization-button:active {
-  transform: translateY(0);
+  --fertilization-offset-y: 0px;
 }
 
 .lower-dots-bridge__fertilization-button:focus-visible {
@@ -41,4 +73,17 @@
   letter-spacing: 0.005em;
   margin: 0;
   text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lower-dots-bridge__fertilization-panel {
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  top: 64px;
+  bottom: 16px;
+  pointer-events: auto;
+  z-index: 2;
 }

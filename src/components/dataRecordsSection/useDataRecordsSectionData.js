@@ -11,8 +11,12 @@ export const useDataRecordsSectionData = ({
   rawRows,
   mapRow,
   scoreFields,
+  selectedYears: controlledSelectedYears,
+  onSelectedYearsChange,
 }) => {
-  const [selectedYears, setSelectedYears] = useState([]);
+  const [internalSelectedYears, setInternalSelectedYears] = useState([]);
+  const selectedYears = controlledSelectedYears ?? internalSelectedYears;
+  const setSelectedYears = onSelectedYearsChange ?? setInternalSelectedYears;
   const normalizedSelectedCuartel = String(selectedCuartel ?? "").trim().toUpperCase();
 
   const mappedRows = useMemo(() => rawRows.map(mapRow), [rawRows, mapRow]);

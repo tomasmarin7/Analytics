@@ -10,6 +10,7 @@ const TimelineTrack = ({
   monthMarkers,
   visiblePeriods,
   onFertilizationClick,
+  raisedPeriodId,
   isTodayVisible,
   todayLeftPercent,
   timelineEvents,
@@ -17,12 +18,21 @@ const TimelineTrack = ({
   onTimelineEventToggle,
   selectedHuerto,
   selectedCuartel,
+  selectedYears,
+  onSelectedYearsChange,
 }) => (
   <div className="lower-dots-bridge__inner">
     <span className="lower-dots-bridge__dot" aria-hidden="true" />
 
     <div className="lower-dots-bridge__track" aria-hidden="true">
-      <PeriodLayer periods={visiblePeriods} onFertilizationClick={onFertilizationClick} />
+      <PeriodLayer
+        periods={visiblePeriods}
+        onFertilizationClick={onFertilizationClick}
+        raisedPeriodId={raisedPeriodId}
+        selectedHuerto={selectedHuerto}
+        selectedCuartel={selectedCuartel}
+        selectedYears={selectedYears}
+      />
       <DayLines
         dayLines={dayLines}
         lineVisualLevel={lineVisualLevel}
@@ -34,6 +44,8 @@ const TimelineTrack = ({
         onTimelineEventToggle={onTimelineEventToggle}
         selectedHuerto={selectedHuerto}
         selectedCuartel={selectedCuartel}
+        selectedYears={selectedYears}
+        onSelectedYearsChange={onSelectedYearsChange}
       />
       <MonthLabels markers={monthMarkers} />
     </div>

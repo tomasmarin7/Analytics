@@ -9,6 +9,8 @@ const DataRecordsSection = ({
   rawRows,
   mapRow,
   scoreFields,
+  selectedYears: controlledSelectedYears,
+  onSelectedYearsChange,
   children,
 }) => {
   const [isYearMenuOpen, setIsYearMenuOpen] = useState(false);
@@ -26,6 +28,8 @@ const DataRecordsSection = ({
     rawRows,
     mapRow,
     scoreFields,
+    selectedYears: controlledSelectedYears,
+    onSelectedYearsChange,
   });
 
   useEffect(() => {
