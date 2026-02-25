@@ -1,0 +1,54 @@
+.data-records-section__years {
+  position: relative;
+  display: block;
+  margin-top: var(--data-records-header-height);
+  padding-top: 0;
+  overflow: visible;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.data-records-section__years-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-brand);
+  color: #1f2225;
+  margin: 0;
+}
+
+.data-records-section__years-table thead th {
+  width: 100%;
+  height: var(--data-records-table-header-h);
+  padding: 0 6px;
+  font-family: var(--font-brand);
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2225;
+  text-align: center;
+  border-bottom: 1px solid transparent;
+  vertical-align: middle;
+}
+
+.data-records-section__years-table tbody td {
+  height: var(--data-records-table-row-h);
+  padding: 0 6px;
+  font-family: var(--font-brand);
+  font-size: 20px;
+  line-height: 1;
+  font-weight: 400;
+  color: #141619;
+  text-align: center;
+  border-bottom: 1px solid transparent;
+  vertical-align: middle;
+}
+
+@media (max-width: 900px) {
+  .data-records-section__years-table thead th {
+    font-size: 14px;
+  }
+
+  .data-records-section__years-table tbody td {
+    font-size: 16px;
+  }
+}

@@ -1,0 +1,135 @@
+.data-records-section__year-picker {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  margin: 0;
+  z-index: 2147483647;
+}
+
+.data-records-section__year-trigger {
+  position: relative;
+  z-index: 2;
+  border: 0;
+  border-radius: 999px;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  padding: 0;
+  background: rgba(58, 61, 64, 0.72);
+  cursor: pointer;
+  margin: 0;
+  align-self: center;
+  transition: transform 140ms ease, background-color 140ms ease, box-shadow 140ms ease;
+  overflow: visible;
+}
+
+.data-records-section__year-trigger::before {
+  content: "";
+  position: absolute;
+  inset: -12px;
+  border-radius: 999px;
+  background: transparent;
+}
+
+.data-records-section__year-trigger:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.data-records-section__year-trigger:hover {
+  background: rgba(58, 61, 64, 0.9);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.22);
+}
+
+.data-records-section__year-trigger:active {
+  transform: translateY(0);
+}
+
+.data-records-section__year-trigger:focus-visible {
+  outline: 2px solid rgba(255, 183, 0, 0.9);
+  outline-offset: 2px;
+}
+
+.data-records-section__year-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-25%);
+  z-index: 1;
+  background: #cfcfd0;
+  border-radius: 20px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+  padding: 18px 16px 16px;
+  min-width: 320px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px 12px;
+}
+
+.data-records-section__year-menu::before {
+  content: "";
+  position: absolute;
+  top: -50px;
+  left: 25%;
+  transform: translateX(-50%);
+  width: 74px;
+  height: 56px;
+  background: #cfcfd0;
+  border-radius: 18px 18px 0 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.data-records-section__year-menu-item {
+  border: 0;
+  background: transparent;
+  border-radius: 999px;
+  height: 46px;
+  padding: 0 14px;
+  min-width: 0;
+  cursor: pointer;
+  font-family: var(--font-brand);
+  font-size: 28px;
+  line-height: 1;
+  font-weight: 500;
+  color: #141619;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.data-records-section__year-menu-item:hover {
+  background: rgba(143, 143, 145, 0.35);
+}
+
+.data-records-section__year-menu-item:focus-visible {
+  outline: 2px solid rgba(58, 61, 64, 0.75);
+  outline-offset: 1px;
+}
+
+.data-records-section__year-menu-item--selected {
+  background: #8f8f91;
+  color: #141619;
+}
+
+@media (max-width: 900px) {
+  .data-records-section__year-trigger {
+    width: 24px;
+    height: 24px;
+    flex-basis: 24px;
+  }
+
+  .data-records-section__year-menu {
+    min-width: 220px;
+    padding: 12px;
+    gap: 8px;
+  }
+
+  .data-records-section__year-menu-item {
+    height: 34px;
+    font-size: 18px;
+  }
+}

@@ -1,0 +1,47 @@
+@import "./YearSelector/YearSelector.css";
+@import "./YearIndexColumn/YearIndexColumn.css";
+
+.data-records-section {
+  --data-records-header-height: 34px;
+  --data-records-table-header-h: 44px;
+  --data-records-table-row-h: 42px;
+  position: relative;
+  z-index: 200000;
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  padding: 18px;
+}
+
+.data-records-section__context {
+  position: relative;
+  flex: 0 0 130px;
+  border-radius: 18px;
+  background: rgba(158, 160, 162, 0.45);
+  padding: 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow: visible;
+  isolation: isolate;
+}
+
+.data-records-section__context--menu-open {
+  z-index: 2147483646;
+}
+
+@media (max-width: 900px) {
+  .data-records-section {
+    --data-records-header-height: 26px;
+    --data-records-table-header-h: 34px;
+    --data-records-table-row-h: 32px;
+    flex-direction: column;
+    padding: 12px;
+  }
+
+  .data-records-section__context {
+    flex-basis: auto;
+  }
+}
