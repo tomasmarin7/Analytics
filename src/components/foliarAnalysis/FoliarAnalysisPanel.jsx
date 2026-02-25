@@ -52,6 +52,27 @@ const buildTableRows = ({
     .values()].sort(sortRows ?? defaultSortRows);
 };
 
+const alignRowsToYearLayout = (rows, layoutRows, { showOnlyFirstRowPerYear = false } = {}) => {
+  if (!layoutRows.length) return [];
+
+  const firstRowByYear = rows.reduce((acc, row) => {
+    if (!acc.has(row.year)) acc.set(row.year, row);
+    return acc;
+  }, new Map());
+
+  const renderedYears = new Set();
+  return layoutRows.map((layoutRow) => {
+    const sourceRow = firstRowByYear.get(layoutRow.year);
+    if (!sourceRow) return { year: layoutRow.year };
+
+    if (!showOnlyFirstRowPerYear) return sourceRow;
+
+    if (renderedYears.has(layoutRow.year)) return { year: layoutRow.year };
+    renderedYears.add(layoutRow.year);
+    return sourceRow;
+  });
+};
+
 const FoliarAnalysisPanel = ({
   activeEvents = [],
   selectedCuartel,
@@ -62,7 +83,7 @@ const FoliarAnalysisPanel = ({
   const hasFoliarAnalysis = activeEvents.some((event) => event.id === FOLIAR_ANALYSIS_EVENT_ID);
   const hasBudAnalysis = activeEvents.some((event) => event.id === BUD_ANALYSIS_EVENT_ID);
   const hasDataTable = hasFoliarAnalysis || hasBudAnalysis;
-  const primaryTableType = hasFoliarAnalysis ? "foliar" : hasBudAnalysis ? "bud" : null;
+  const primaryTableType = hasBudAnalysis ? "bud" : hasFoliarAnalysis ? "foliar" : null;
 
   const foliarRowData = useMemo(
     () =>
@@ -76,20 +97,6 @@ const FoliarAnalysisPanel = ({
     [selectedCuartel, selectedYears]
   );
 
-  const budRowData = useMemo(
-    () =>
-      buildTableRows({
-        selectedCuartel,
-        selectedYears,
-        rawRows: budAnalysisRows,
-        mapRow: mapBudRow,
-        scoreFields: BUD_SCORE_FIELDS,
-        keepAllRowsPerYear: true,
-        sortRows: sortBudRows,
-      }),
-    [selectedCuartel, selectedYears]
-  );
-
   const tableItems = [
     hasFoliarAnalysis
       ? {
@@ -97,7 +104,6 @@ const FoliarAnalysisPanel = ({
           type: "foliar",
           tabItem: tabByEventId[FOLIAR_ANALYSIS_EVENT_ID] ?? null,
           columns: FOLIAR_COLUMNS,
-          rowData: foliarRowData,
           ariaLabel: "Tabla de análisis foliar",
         }
       : null,
@@ -107,7 +113,6 @@ const FoliarAnalysisPanel = ({
           type: "bud",
           tabItem: tabByEventId[BUD_ANALYSIS_EVENT_ID] ?? null,
           columns: BUD_COLUMNS,
-          rowData: budRowData,
           ariaLabel: "Tabla de análisis de yemas",
         }
       : null,
@@ -145,20 +150,27 @@ const FoliarAnalysisPanel = ({
       selectedYears={selectedYears}
       onSelectedYearsChange={onSelectedYearsChange}
     >
-      {({ selectedYearsCount }) =>
-        tablesToRender.map((table) => (
+      {({ selectedYearsCount, rowData: sectionRowData }) => {
+        const rowsByTableType = {
+          bud: hasBudAnalysis ? sectionRowData : [],
+          foliar: hasBudAnalysis
+            ? alignRowsToYearLayout(foliarRowData, sectionRowData, { showOnlyFirstRowPerYear: true })
+            : foliarRowData,
+        };
+
+        return tablesToRender.map((table) => (
           <FoliarAnalysisTableCard
             key={table.id}
             tabItems={table.tabItem ? [table.tabItem] : []}
             hasDataTable={hasDataTable}
-            rowData={table.rowData}
+            rowData={rowsByTableType[table.type] ?? []}
             selectedYearsCount={selectedYearsCount}
             columns={table.columns}
             tableAriaLabel={table.ariaLabel}
             tableType={table.type}
           />
-        ))
-      }
+        ));
+      }}
     </DataRecordsSection>
   );
 };

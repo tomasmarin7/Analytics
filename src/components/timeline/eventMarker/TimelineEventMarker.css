@@ -74,6 +74,16 @@
   opacity: 0;
 }
 
+.timeline-event-marker--ghost {
+  pointer-events: none;
+}
+
+.timeline-event-marker--ghost .timeline-event-marker__shape,
+.timeline-event-marker--ghost .timeline-event-marker__stem,
+.timeline-event-marker--ghost .timeline-event-marker__label {
+  opacity: 0;
+}
+
 .timeline-event-marker__connector {
   position: absolute;
   left: 50%;

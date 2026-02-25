@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import TodayMarker from "./TodayMarker";
 import TimelineEventMarker from "./eventMarker/TimelineEventMarker";
 import { EventActivationOverlay } from "./eventActivation";
 import { EVENT_ACTIVATION_VERTICAL_TOP_PX } from "./eventActivation/constants";
@@ -21,6 +20,8 @@ const DayLines = ({
   selectedCuartel,
   selectedYears,
   onSelectedYearsChange,
+  dataRecordsZIndex = 2,
+  onRequestDataRecordsForeground,
 }) => {
   const linesRef = useRef(null);
   const [containerWidth, setContainerWidth] = useState(0);
@@ -42,7 +43,16 @@ const DayLines = ({
 
   const activeEventSet = new Set(activeEventIds ?? []);
   const activeEvents = timelineEvents.filter((event) => activeEventSet.has(event.id));
-  const visibleEvents = timelineEvents.filter((event) => event.isVisible);
+  const renderedMarkerEvents = timelineEvents
+    .filter((event) => event.isVisible || activeEventSet.has(event.id))
+    .map((event) => {
+      const markerLeftPercent = clamp(event.leftPercent, 0, 100);
+      return {
+        ...event,
+        markerLeftPx: (markerLeftPercent / 100) * containerWidth,
+        markerOutOfView: event.leftPercent !== markerLeftPercent,
+      };
+    });
 
   return (
     <div
@@ -70,9 +80,12 @@ const DayLines = ({
         return <span key={line.id} className={baseClass} style={{ transform: `scaleY(${scaleY})` }} />;
       })}
 
-      {isTodayVisible && <TodayMarker leftPercent={todayLeftPercent} />}
-
-      <EventActivationOverlay activeEvents={activeEvents} containerWidth={containerWidth}>
+      <EventActivationOverlay
+        activeEvents={activeEvents}
+        containerWidth={containerWidth}
+        overlayZIndex={dataRecordsZIndex}
+        onRequestForeground={onRequestDataRecordsForeground}
+      >
         {activeEvents.some((event) => DATA_RECORDS_EVENT_IDS.includes(event.id)) ? (
           <FoliarAnalysisPanel
             activeEvents={activeEvents}
@@ -84,14 +97,14 @@ const DayLines = ({
         ) : null}
       </EventActivationOverlay>
 
-      {visibleEvents.map((event) => (
+      {renderedMarkerEvents.map((event) => (
         <TimelineEventMarker
           key={event.id}
           eventId={event.id}
           label={event.label}
-          leftPercent={event.leftPercent}
-          containerWidth={containerWidth}
+          leftPx={event.markerLeftPx}
           isActive={activeEventSet.has(event.id)}
+          isOutOfView={event.markerOutOfView}
           connector={event.connector}
           onToggle={onTimelineEventToggle}
         />

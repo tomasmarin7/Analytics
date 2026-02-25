@@ -43,6 +43,18 @@
   vertical-align: middle;
 }
 
+.data-records-section__years-row--band-a td {
+  background: rgba(74, 79, 84, 0.18);
+}
+
+.data-records-section__years-row--band-b td {
+  background: rgba(63, 68, 73, 0.3);
+}
+
+.data-records-section__years-row--year-start td {
+  border-top: 1px solid rgba(31, 34, 37, 0.18);
+}
+
 @media (max-width: 900px) {
   .data-records-section__years-table thead th {
     font-size: 14px;

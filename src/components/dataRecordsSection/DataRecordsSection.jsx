@@ -28,6 +28,10 @@ const DataRecordsSection = ({
     thumbWidthPx: 0,
     thumbOffsetPx: 0,
   });
+  const [syncedTableMetrics, setSyncedTableMetrics] = useState({
+    headerHeightPx: null,
+    rowHeightPx: null,
+  });
 
   const {
     normalizedSelectedCuartel,
@@ -136,6 +140,35 @@ const DataRecordsSection = ({
     };
   }, []);
 
+  useEffect(() => {
+    const scrollElement = tablesScrollRef.current;
+    if (!scrollElement) return undefined;
+
+    const updateMetrics = () => {
+      const headerCell = scrollElement.querySelector(".foliar-analysis-table-card__table thead th");
+      const bodyCell = scrollElement.querySelector(".foliar-analysis-table-card__table tbody td");
+      if (!headerCell || !bodyCell) return;
+
+      const nextHeaderHeight = Math.round(headerCell.getBoundingClientRect().height);
+      const nextRowHeight = Math.round(bodyCell.getBoundingClientRect().height);
+
+      setSyncedTableMetrics((current) => {
+        if (current.headerHeightPx === nextHeaderHeight && current.rowHeightPx === nextRowHeight) return current;
+        return { headerHeightPx: nextHeaderHeight, rowHeightPx: nextRowHeight };
+      });
+    };
+
+    updateMetrics();
+    const resizeObserver = new ResizeObserver(updateMetrics);
+    resizeObserver.observe(scrollElement);
+    window.addEventListener("resize", updateMetrics);
+
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", updateMetrics);
+    };
+  }, [rowData.length]);
+
   const handleThumbPointerDown = (event) => {
     const scrollElement = tablesScrollRef.current;
     const scrollbarElement = pillScrollbarRef.current;
@@ -199,7 +232,15 @@ const DataRecordsSection = ({
   );
 
   return (
-    <div className={`data-records-section${layoutVariant ? ` data-records-section--${layoutVariant}` : ""}`}>
+    <div
+      className={`data-records-section${layoutVariant ? ` data-records-section--${layoutVariant}` : ""}`}
+      style={{
+        ...(syncedTableMetrics.headerHeightPx
+          ? { "--data-records-table-header-h": `${syncedTableMetrics.headerHeightPx}px` }
+          : null),
+        ...(syncedTableMetrics.rowHeightPx ? { "--data-records-table-row-h": `${syncedTableMetrics.rowHeightPx}px` } : null),
+      }}
+    >
       <aside
         className={`data-records-section__context${
           isYearMenuOpen ? " data-records-section__context--menu-open" : ""
@@ -213,7 +254,7 @@ const DataRecordsSection = ({
           onToggleMenu={() => setIsYearMenuOpen((current) => !current)}
           onToggleYear={toggleYear}
         />
-        <YearIndexColumn years={displayYears} yearHeaderLabel={yearHeaderLabel} />
+        <YearIndexColumn years={displayYears} rowYears={rowData.map((row) => row.year)} yearHeaderLabel={yearHeaderLabel} />
       </aside>
 
       <div className="data-records-section__tables-area">

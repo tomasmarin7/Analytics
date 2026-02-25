@@ -15,6 +15,7 @@ export const FOLIAR_SCORE_FIELDS = [
 ];
 
 export const FOLIAR_COLUMNS = [
+  { field: "variedad", header: "Variedad" },
   { field: "nitrogenoTotal", header: "Nitrógeno total (%)" },
   { field: "fosforo", header: "Fósforo (%)" },
   { field: "potasio", header: "Potasio (%)" },
@@ -34,6 +35,7 @@ export const mapFoliarRow = (row) => ({
   year: Number(row["Temp."]),
   temp: row["Temp."],
   cuartel: row.Cuartel,
+  variedad: row.Variedad,
   nitrogenoTotal: row["Nitrógeno total"],
   fosforo: row.fosforo,
   potasio: row.potasio,

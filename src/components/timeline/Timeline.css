@@ -159,6 +159,16 @@
   height: 24px;
 }
 
+.lower-dots-bridge__today-layer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: var(--bridge-lines-top-offset);
+  height: 26px;
+  pointer-events: none;
+  z-index: 2147483000;
+}
+
 .lower-dots-bridge__today-stem {
   position: absolute;
   bottom: -36px;

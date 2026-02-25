@@ -8,8 +8,10 @@ const PeriodLayer = ({
   selectedHuerto,
   selectedCuartel,
   selectedYears,
+  zIndex = 1,
+  onRequestForeground,
 }) => (
-  <div className="lower-dots-bridge__periods" aria-label={PERIODS_ARIA_LABEL}>
+  <div className="lower-dots-bridge__periods" style={{ zIndex }} aria-label={PERIODS_ARIA_LABEL}>
     {periods.map((period) => (
       <FertilizationButton
         key={period.id}
@@ -19,6 +21,7 @@ const PeriodLayer = ({
         selectedHuerto={selectedHuerto}
         selectedCuartel={selectedCuartel}
         selectedYears={selectedYears}
+        onRequestForeground={onRequestForeground}
       />
     ))}
   </div>

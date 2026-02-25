@@ -8,12 +8,14 @@ const FertilizationButton = ({
   selectedHuerto,
   selectedCuartel,
   selectedYears,
+  onRequestForeground,
 }) => (
   <div
     className={`lower-dots-bridge__fertilization-slot ${
       isRaised ? "lower-dots-bridge__fertilization-slot--raised" : ""
     }`}
     style={{ left: `${period.left}%`, width: `${period.width}%` }}
+    onPointerDown={onRequestForeground}
   >
     <button
       type="button"
@@ -22,12 +24,13 @@ const FertilizationButton = ({
       }`}
       title={period.label}
       onClick={() => onClick?.(period)}
+      onPointerDown={onRequestForeground}
     >
       <span className="lower-dots-bridge__fertilization-title">{period.label}</span>
     </button>
 
     {isRaised ? (
-      <div className="lower-dots-bridge__fertilization-panel">
+      <div className="lower-dots-bridge__fertilization-panel" onPointerDown={onRequestForeground}>
         <FertilizationPlanTable
           selectedHuerto={selectedHuerto}
           selectedCuartel={selectedCuartel}

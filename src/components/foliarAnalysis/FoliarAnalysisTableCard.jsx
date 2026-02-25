@@ -5,14 +5,6 @@ const renderCellValue = (value) => (value === "" || value === null || value === 
 const buildRowKey = (row, rowIndex) =>
   `${row.cuartel ?? "cuartel"}-${row.year ?? "year"}-${row.variedad ?? "variedad"}-${rowIndex}`;
 
-const BUD_FALLBACK_COLUMNS = [
-  { field: "variedad", header: "Variedad" },
-  { field: "yemasDardo", header: "Yemas/Dardo" },
-  { field: "floresYemaDardo", header: "Flores/Yema/Dardo" },
-  { field: "floresDardo", header: "Flores/Dardo" },
-  { field: "dano", header: "Daño (%)" },
-];
-
 const FoliarAnalysisTableCard = ({
   tabItems = [],
   hasDataTable,
@@ -23,8 +15,9 @@ const FoliarAnalysisTableCard = ({
   tableType = null,
 }) => {
   const hasTabs = tabItems.length > 0;
-  const effectiveColumns = tableType === "bud" ? BUD_FALLBACK_COLUMNS : columns;
-  const isBudTable = tableType === "bud";
+  let previousYear = null;
+  let previousVariedad = null;
+  let yearBandIndex = -1;
 
   return (
     <div
@@ -65,41 +58,43 @@ const FoliarAnalysisTableCard = ({
               >
                 <thead>
                   <tr>
-                    {isBudTable ? (
-                      <>
-                        <th scope="col">Variedad</th>
-                        <th scope="col">Yemas/Dardo</th>
-                        <th scope="col">Flores/Yema/Dardo</th>
-                        <th scope="col">Flores/Dardo</th>
-                        <th scope="col">Daño (%)</th>
-                      </>
-                    ) : (
-                      effectiveColumns.map((column) => (
-                        <th key={column.field} scope="col">
-                          {column.header}
-                        </th>
-                      ))
-                    )}
+                    {columns.map((column) => (
+                      <th key={column.field} scope="col">
+                        {column.header}
+                      </th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {rowData.map((row, rowIndex) => (
-                    <tr key={buildRowKey(row, rowIndex)}>
-                      {isBudTable ? (
-                        <>
-                          <td>{renderCellValue(row.variedad)}</td>
-                          <td>{renderCellValue(row.yemasDardo)}</td>
-                          <td>{renderCellValue(row.floresYemaDardo)}</td>
-                          <td>{renderCellValue(row.floresDardo)}</td>
-                          <td>{renderCellValue(row.dano)}</td>
-                        </>
-                      ) : (
-                        effectiveColumns.map((column) => (
+                  {rowData.map((row, rowIndex) => {
+                    const isYearStart = rowIndex === 0 || row.year !== previousYear;
+                    if (isYearStart) yearBandIndex += 1;
+                    const hasVariedad = row.variedad !== "" && row.variedad !== null && row.variedad !== undefined;
+                    const isVariedadStart =
+                      hasVariedad &&
+                      (isYearStart || rowIndex === 0 || String(row.variedad) !== String(previousVariedad ?? ""));
+                    const rowClassName = [
+                      "foliar-analysis-table-card__row",
+                      yearBandIndex % 2 === 0
+                        ? "foliar-analysis-table-card__row--year-band-a"
+                        : "foliar-analysis-table-card__row--year-band-b",
+                      isYearStart ? "foliar-analysis-table-card__row--year-start" : "",
+                      isVariedadStart ? "foliar-analysis-table-card__row--variedad-start" : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ");
+
+                    previousYear = row.year;
+                    previousVariedad = row.variedad;
+
+                    return (
+                      <tr key={buildRowKey(row, rowIndex)} className={rowClassName}>
+                        {columns.map((column) => (
                           <td key={`${buildRowKey(row, rowIndex)}-${column.field}`}>{renderCellValue(row[column.field])}</td>
-                        ))
-                      )}
-                    </tr>
-                  ))}
+                        ))}
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
