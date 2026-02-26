@@ -47,10 +47,10 @@
   z-index: 2;
   left: 50%;
   top: calc(50% + 40px);
-  width: calc(var(--month-line-width, 2px) + 1px);
+  width: var(--month-line-width, 2px);
   height: 70px;
   transform: translateX(-50%);
-  background: #222527;
+  background: rgba(34, 37, 39, 0.82);
   border-radius: 999px;
 }
 
@@ -61,11 +61,11 @@
   top: calc(50% + 126px);
   transform: translateX(-50%);
   font-family: var(--font-brand);
-  font-size: 21px;
+  font-size: 22px;
   line-height: 1.1;
   font-weight: 500;
   letter-spacing: 0.005em;
-  color: #222527;
+  color: rgba(24, 27, 30, 0.96);
   white-space: nowrap;
 }
 
@@ -100,8 +100,8 @@
 
 .timeline-event-marker__connector-svg path {
   fill: none;
-  stroke: #222527;
-  stroke-width: 3px;
+  stroke: rgba(34, 37, 39, 0.86);
+  stroke-width: 2px;
   stroke-linecap: round;
   stroke-linejoin: round;
 }

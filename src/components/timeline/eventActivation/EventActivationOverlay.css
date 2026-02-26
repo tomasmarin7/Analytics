@@ -19,10 +19,10 @@
   position: absolute;
   top: var(--event-fixed-vertical-top, -900px);
   transform: translateX(-50%);
-  width: 3px;
+  width: 2px;
   height: 1020px;
   border-radius: 999px;
-  background: #222527;
+  background: rgba(34, 37, 39, 0.82);
   z-index: 1;
 }
 

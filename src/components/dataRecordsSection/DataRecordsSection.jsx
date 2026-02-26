@@ -49,7 +49,7 @@ const DataRecordsSection = ({
   return (
     <div className="data-records-layout">
       {!hasSelectedCuartel ? (
-        <div className="data-records-layout__hint">Selecciona un cuartel antes de empezar</div>
+        <div className="data-records-layout__hint">Selecciona un cuartel para empezar</div>
       ) : (
         <YearChipsBar
           availableYears={availableYears}

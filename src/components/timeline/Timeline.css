@@ -76,9 +76,9 @@
 
 .lower-dots-bridge__lines {
   --timeline-lines-height: 26px;
-  --day-line-width: 1px;
+  --day-line-width: 0.9px;
   --day-line-height: 4px;
-  --month-line-width: 2px;
+  --month-line-width: 1.8px;
   --month-line-height: 56px;
   --day-line-opacity: 0.92;
   position: relative;
@@ -94,25 +94,25 @@
 }
 
 .lower-dots-bridge__lines--low {
-  --day-line-width: 1.15px;
+  --day-line-width: 1px;
   --day-line-height: 4.5px;
-  --month-line-width: 2.1px;
+  --month-line-width: 1.9px;
   --month-line-height: 56px;
   --day-line-opacity: 0.94;
 }
 
 .lower-dots-bridge__lines--mid {
-  --day-line-width: 1.3px;
+  --day-line-width: 1.15px;
   --day-line-height: 5.2px;
-  --month-line-width: 2.2px;
+  --month-line-width: 2px;
   --month-line-height: 56px;
   --day-line-opacity: 0.97;
 }
 
 .lower-dots-bridge__lines--high {
-  --day-line-width: 1.5px;
+  --day-line-width: 1.3px;
   --day-line-height: 5.8px;
-  --month-line-width: 2.35px;
+  --month-line-width: 2.1px;
   --month-line-height: 56px;
   --day-line-opacity: 1;
 }
@@ -144,11 +144,11 @@
   left: 50%;
   transform: translateX(-50%);
   font-family: var(--font-brand);
-  font-size: clamp(var(--font-size-sm), 1vw, var(--font-size-lg));
+  font-size: clamp(var(--font-size-sm), 0.95vw, var(--font-size-md));
   line-height: 1.15;
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-regular);
   letter-spacing: 0.01em;
-  color: #222527;
+  color: rgba(34, 37, 39, 0.72);
   white-space: nowrap;
 }
 

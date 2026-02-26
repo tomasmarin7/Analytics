@@ -10,9 +10,9 @@
   font-family: var(--font-brand);
   font-size: var(--font-size-xl);
   line-height: var(--line-height-normal);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-regular);
   letter-spacing: var(--letter-spacing-tight);
-  color: #1f2429;
+  color: rgba(31, 36, 41, 0.62);
 }
 
 .data-records-section {

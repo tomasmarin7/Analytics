@@ -14,7 +14,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   margin: 0;
   padding: 0;
   position: relative;
@@ -24,7 +24,7 @@
 .data-records-section__year-chip {
   border: 0;
   background: transparent;
-  color: #0d1217;
+  color: rgba(22, 26, 30, 0.74);
   font-family: var(--font-brand);
   font-size: clamp(26px, 2vw, 34px);
   line-height: var(--line-height-tight);
@@ -39,13 +39,13 @@
 }
 
 .data-records-section__year-chip:hover {
-  color: #000000;
+  color: rgba(17, 20, 23, 0.92);
   transform: translateY(-1px);
 }
 
 .data-records-section__year-chip--selected {
-  background: rgba(177, 181, 186, 0.96);
-  color: #0f141a;
+  background: rgba(177, 181, 186, 0.66);
+  color: rgba(18, 22, 26, 0.9);
 }
 
 @media (max-width: 900px) {

@@ -28,8 +28,8 @@
   --cerezo-soft-2: #bf6a7f;
   --cerezo-soft-3: #d48a9b;
   --bridge-edge-offset: 72px;
-  --bridge-line-color: rgba(34, 37, 39, 0.5);
-  --bridge-month-line-color: rgba(20, 22, 24, 0.85);
+  --bridge-line-color: rgba(34, 37, 39, 0.38);
+  --bridge-month-line-color: rgba(20, 22, 24, 0.72);
 }
 
 * {
