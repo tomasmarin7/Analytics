@@ -264,18 +264,16 @@ const FoliarAnalysisPanel = ({
       mapRow={mapYearSelectorRow}
       scoreFields={[]}
       keepAllRowsPerYear
-      yearHeaderLabel="Temp."
       selectedYears={selectedYears}
       onSelectedYearsChange={onSelectedYearsChange}
     >
-      {({ selectedYearsCount, yearSelectorProps }) => (
+      {({ selectedYearsCount }) => (
         <FoliarAnalysisTableCard
           hasDataTable={hasDataTable}
           rowData={unifiedRowData}
           selectedYearsCount={selectedYearsCount}
           columns={unifiedColumns}
           tableAriaLabel="Tabla unificada de análisis"
-          yearSelectorProps={yearSelectorProps}
         />
       )}
     </DataRecordsSection>

@@ -1,33 +1,33 @@
 .foliar-analysis-table-card {
-  --table-col-year-w: 92px;
+  --table-col-year-w: 126px;
   --table-col-variedad-w: 180px;
   --table-sticky-total-w: calc(var(--table-col-year-w) + var(--table-col-variedad-w));
   position: relative;
   min-width: 0;
   flex: 0 0 auto;
   width: 100%;
-  border-radius: 12px;
+  border-radius: 0;
   border: 0;
-  background: rgba(88, 93, 98, 0.14);
+  background: transparent;
   box-shadow: none;
-  padding: 8px;
+  padding: 0;
   display: flex;
   flex-direction: column;
 }
 
 .foliar-analysis-table-card__inner {
   width: 100%;
-  border-radius: 10px;
-  overflow: hidden;
+  border-radius: 0;
+  overflow: visible;
 }
 
 .foliar-analysis-table-card__grid {
   min-height: 120px;
   width: 100%;
-  border-radius: 10px;
-  overflow: hidden;
+  border-radius: 0;
+  overflow: visible;
   border: 0;
-  background: rgba(66, 73, 79, 0.18);
+  background: transparent;
 }
 
 .foliar-analysis-table-card__table-scroll {
@@ -35,8 +35,10 @@
   width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
+  border-radius: 10px;
   scrollbar-width: none;
   -ms-overflow-style: none;
+  z-index: 1;
 }
 
 .foliar-analysis-table-card__table-scroll::-webkit-scrollbar {
@@ -46,10 +48,13 @@
 .foliar-analysis-table-card__table {
   width: 100%;
   min-width: 900px;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   font-family: var(--font-brand);
-  font-size: 16px;
+  font-size: var(--font-size-md);
   color: #ffffff;
+  border-radius: 10px;
+  overflow: hidden;
 }
 
 .foliar-analysis-table-card__table thead th {
@@ -59,7 +64,8 @@
   background: rgba(59, 66, 72, 0.58);
   text-align: left;
   padding: 0 12px;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--letter-spacing-tight);
   border-bottom: 1px solid rgba(255, 255, 255, 0.14);
   white-space: nowrap;
   height: var(--data-records-table-header-h);
@@ -81,7 +87,18 @@
   max-width: var(--table-col-year-w);
   position: sticky;
   left: 0;
-  z-index: 4;
+  z-index: 8;
+}
+
+.foliar-analysis-table-card__table thead th:nth-child(1) {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+}
+
+.foliar-analysis-table-card__table tbody td:nth-child(1) {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.01em;
 }
 
 .foliar-analysis-table-card__table thead th:nth-child(2),
@@ -91,13 +108,15 @@
   max-width: var(--table-col-variedad-w);
   position: sticky;
   left: var(--table-col-year-w);
-  z-index: 4;
+  z-index: 8;
+  overflow: visible;
 }
 
 .foliar-analysis-table-card__table thead th:nth-child(1),
 .foliar-analysis-table-card__table thead th:nth-child(2) {
   background: rgba(100, 106, 112, 1);
   z-index: 6;
+  overflow: visible;
 }
 
 .foliar-analysis-table-card__table tbody td:nth-child(1),
@@ -107,7 +126,19 @@
 
 .foliar-analysis-table-card__table thead th:nth-child(2),
 .foliar-analysis-table-card__table tbody td:nth-child(2) {
-  box-shadow: 1px 0 0 rgba(255, 255, 255, 0.12), 8px 0 12px -9px rgba(8, 10, 12, 0.6);
+  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.1);
+}
+
+.foliar-analysis-table-card__table thead th:nth-child(2)::after,
+.foliar-analysis-table-card__table tbody td:nth-child(2)::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: -16px;
+  width: 16px;
+  height: 100%;
+  background: linear-gradient(to right, rgba(11, 14, 16, 0.22), rgba(11, 14, 16, 0));
+  pointer-events: none;
 }
 
 .foliar-analysis-table-card__table thead th.foliar-analysis-table-card__col--fertilization {
@@ -151,17 +182,21 @@
 
 .foliar-analysis-table-card__pill-scrollbar {
   position: relative;
-  margin-top: 8px;
+  margin-top: 0;
   margin-left: var(--table-sticky-total-w);
   width: calc(100% - var(--table-sticky-total-w));
-  height: 14px;
+  height: 0;
   pointer-events: none;
   opacity: 0;
+  overflow: hidden;
 }
 
 .foliar-analysis-table-card__pill-scrollbar--active {
+  margin-top: 8px;
+  height: 14px;
   pointer-events: auto;
   opacity: 1;
+  overflow: visible;
 }
 
 .foliar-analysis-table-card__pill-scrollbar-thumb {
@@ -194,16 +229,20 @@
   padding: 18px;
   text-align: center;
   font-family: var(--font-brand);
-  font-size: 14px;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-normal);
+  font-weight: var(--font-weight-regular);
   color: rgba(255, 255, 255, 0.9);
 }
 
-@media (max-width: 900px) {
-  .foliar-analysis-table-card {
-    border-radius: 14px;
-    padding: 8px;
-  }
+.foliar-analysis-table-card__empty-cell {
+  padding: 24px 12px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.84);
+  background: rgba(90, 96, 102, 0.2);
+}
 
+@media (max-width: 900px) {
   .foliar-analysis-table-card__table {
     min-width: 700px;
     font-size: 13px;

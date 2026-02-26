@@ -4,6 +4,23 @@
   --bg: #e5e5e5;
   --text-dark: #222527;
   --font-brand: "Lufga";
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-size-2xs: 12px;
+  --font-size-xs: 13px;
+  --font-size-sm: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 22px;
+  --font-size-2xl: 28px;
+  --font-size-3xl: 34px;
+  --line-height-tight: 1;
+  --line-height-normal: 1.15;
+  --line-height-relaxed: 1.3;
+  --letter-spacing-tight: -0.008em;
+  --letter-spacing-normal: 0;
   --header-height: 104px;
   --page-gutter: 32px;
   --side-popover-peek: 20px;
@@ -29,6 +46,8 @@ body,
 body {
   background: var(--bg);
   font-family: var(--font-brand);
+  font-weight: var(--font-weight-regular);
+  letter-spacing: var(--letter-spacing-normal);
 }
 
 .app {

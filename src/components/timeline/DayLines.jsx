@@ -43,6 +43,7 @@ const DayLines = ({
 
   const activeEventSet = new Set(activeEventIds ?? []);
   const activeEvents = timelineEvents.filter((event) => activeEventSet.has(event.id));
+  const hasDataRecordsContent = activeEvents.some((event) => DATA_RECORDS_EVENT_IDS.includes(event.id));
   const renderedMarkerEvents = timelineEvents
     .filter((event) => event.isVisible || activeEventSet.has(event.id))
     .map((event) => {
@@ -85,8 +86,9 @@ const DayLines = ({
         containerWidth={containerWidth}
         overlayZIndex={dataRecordsZIndex}
         onRequestForeground={onRequestDataRecordsForeground}
+        isDataRecordsContent={hasDataRecordsContent}
       >
-        {activeEvents.some((event) => DATA_RECORDS_EVENT_IDS.includes(event.id)) ? (
+        {hasDataRecordsContent ? (
           <FoliarAnalysisPanel
             activeEvents={activeEvents}
             selectedHuerto={selectedHuerto}

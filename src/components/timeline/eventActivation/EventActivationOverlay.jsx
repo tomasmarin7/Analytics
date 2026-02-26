@@ -7,20 +7,23 @@ const EventActivationOverlay = ({
   containerWidth,
   overlayZIndex = 2,
   onRequestForeground,
+  isDataRecordsContent = false,
   children,
 }) => {
   const anchorPx = resolveEventAnchorPx({ activeEvents, containerWidth });
   if (anchorPx === null) return null;
 
-  const bulletLeftPx = anchorPx + EVENT_BULLET_HORIZONTAL_GAP_PX;
+  const panelLeftPx = anchorPx + EVENT_BULLET_HORIZONTAL_GAP_PX;
   const hasInteractiveContent = Boolean(children);
 
   return (
     <>
       <div
-        className={`timeline-event-activation__bullet${hasInteractiveContent ? " timeline-event-activation__bullet--interactive" : ""}`}
+        className={`timeline-event-activation__panel${
+          hasInteractiveContent ? " timeline-event-activation__panel--interactive" : ""
+        }${isDataRecordsContent ? " timeline-event-activation__panel--data-records" : ""}`}
         style={{
-          left: `${bulletLeftPx}px`,
+          left: `${panelLeftPx}px`,
           right: 0,
           zIndex: overlayZIndex,
         }}

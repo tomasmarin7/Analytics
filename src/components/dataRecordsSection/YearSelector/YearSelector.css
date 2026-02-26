@@ -2,27 +2,38 @@
   position: relative;
   width: 100%;
   margin: 0;
-  z-index: 3;
+  z-index: 1;
 }
 
 .data-records-section__year-trigger {
   position: relative;
-  z-index: 1;
-  border: 0;
+  z-index: 2;
+  border: 1px solid rgba(233, 239, 244, 0.42);
   border-radius: 8px;
   width: 100%;
   height: calc(var(--data-records-table-header-h) - 12px);
-  padding: 0 10px;
-  background: rgba(255, 255, 255, 0.06);
+  padding: 0 10px 0 11px;
+  background: linear-gradient(180deg, rgba(115, 124, 133, 0.92), rgba(84, 92, 100, 0.92));
   cursor: pointer;
   font-family: var(--font-brand);
-  font-size: 15px;
+  font-size: 17px;
   line-height: 1;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.01em;
-  color: rgba(239, 243, 246, 0.96);
+  color: rgba(250, 252, 254, 0.99);
   text-align: left;
-  transition: background-color 120ms ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 8px rgba(12, 16, 20, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.24);
+  transition: background-color 120ms ease, border-color 120ms ease, transform 120ms ease;
+}
+
+.data-records-section__year-trigger::after {
+  content: "▾";
+  font-size: 13px;
+  line-height: 1;
+  opacity: 0.98;
 }
 
 .data-records-section__year-trigger:disabled {
@@ -31,20 +42,20 @@
 }
 
 .data-records-section__year-trigger:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: linear-gradient(180deg, rgba(126, 136, 145, 0.98), rgba(92, 100, 109, 0.98));
+  border-color: rgba(239, 243, 247, 0.64);
+  transform: translateY(-1px);
 }
 
 .data-records-section__year-trigger:focus-visible {
-  outline: 2px solid rgba(192, 198, 203, 0.95);
+  outline: 2px solid rgba(220, 226, 231, 0.92);
   outline-offset: 2px;
 }
 
 .data-records-section__year-menu {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
+  position: fixed;
   transform: none;
-  z-index: 4;
+  z-index: 2147483646;
   background: rgba(45, 49, 53, 0.98);
   border: 1px solid rgba(226, 229, 232, 0.16);
   border-radius: 12px;

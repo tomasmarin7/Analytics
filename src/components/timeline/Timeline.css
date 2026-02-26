@@ -56,8 +56,9 @@
 
 .lower-dots-bridge__period-label {
   font-family: var(--font-brand);
-  font-size: 12px;
-  line-height: 1;
+  font-size: var(--font-size-2xs);
+  line-height: var(--line-height-tight);
+  font-weight: var(--font-weight-regular);
   color: #ffffff;
   text-overflow: ellipsis;
   overflow: hidden;
@@ -143,9 +144,9 @@
   left: 50%;
   transform: translateX(-50%);
   font-family: var(--font-brand);
-  font-size: clamp(14px, 1vw, 18px);
+  font-size: clamp(var(--font-size-sm), 1vw, var(--font-size-lg));
   line-height: 1.15;
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   letter-spacing: 0.01em;
   color: #222527;
   white-space: nowrap;
@@ -203,11 +204,11 @@
   }
 
   .lower-dots-bridge__period-label {
-    font-size: 11px;
+    font-size: var(--font-size-2xs);
   }
 
   .lower-dots-bridge__month-label {
-    font-size: 12px;
+    font-size: var(--font-size-2xs);
   }
 
 }

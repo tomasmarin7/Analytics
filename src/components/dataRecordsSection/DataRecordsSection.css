@@ -1,4 +1,19 @@
-@import "./YearSelector/YearSelector.css";
+.data-records-layout {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.data-records-layout__hint {
+  font-family: var(--font-brand);
+  font-size: var(--font-size-xl);
+  line-height: var(--line-height-normal);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--letter-spacing-tight);
+  color: #1f2429;
+}
 
 .data-records-section {
   --data-records-header-height: 38px;
@@ -10,7 +25,7 @@
   width: 100%;
   height: auto;
   min-height: 0;
-  padding: 12px 14px 14px;
+  padding: 0;
 }
 
 .data-records-section__tables-area {
@@ -20,10 +35,6 @@
   display: flex;
   flex-direction: column;
   z-index: 1;
-}
-
-.data-records-section__tables-area--menu-open {
-  z-index: 2147483646;
 }
 
 .data-records-section__tables-scroll {
@@ -46,46 +57,24 @@
   display: none;
 }
 
-.data-records-section__pill-scrollbar {
-  display: none;
-}
-
-.data-records-section__pill-scrollbar--active {
-  pointer-events: auto;
-  opacity: 1;
-}
-
-.data-records-section__pill-scrollbar-thumb {
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 14px;
-  min-width: 58px;
-  border-radius: 999px;
-  background: rgba(70, 74, 79, 0.9);
-  cursor: grab;
-  transition: background-color 120ms ease;
-}
-
-.data-records-section__pill-scrollbar-thumb:hover {
-  background: rgba(82, 87, 92, 0.95);
-}
-
-.data-records-section__pill-scrollbar-thumb:active {
-  cursor: grabbing;
-  background: rgba(58, 63, 68, 0.96);
-}
-
 .data-records-section--bud-analysis {
   --data-records-table-row-h: 36px;
 }
 
 @media (max-width: 900px) {
+  .data-records-layout {
+    gap: 8px;
+  }
+
+  .data-records-layout__hint {
+    font-size: var(--font-size-lg);
+  }
+
   .data-records-section {
     --data-records-header-height: 32px;
     --data-records-table-header-h: 34px;
     --data-records-table-row-h: 32px;
-    padding: 10px 12px 12px;
+    padding: 0;
   }
 
   .data-records-section--bud-analysis {
@@ -98,13 +87,5 @@
 
   .data-records-section__tables-track {
     min-width: 100%;
-  }
-
-  .data-records-section__pill-scrollbar {
-    height: 12px;
-  }
-
-  .data-records-section__pill-scrollbar-thumb {
-    height: 12px;
   }
 }

@@ -1,6 +1,6 @@
 import "./FoliarAnalysisTableCard.css";
 import { useEffect, useMemo, useRef, useState } from "react";
-import YearSelector from "../dataRecordsSection/YearSelector/YearSelector";
+import { useVerticalWheelToHorizontalScroll } from "../shared/useVerticalWheelToHorizontalScroll";
 
 const renderCellValue = (value) => (value === "" || value === null || value === undefined ? "-" : value);
 
@@ -13,7 +13,6 @@ const FoliarAnalysisTableCard = ({
   selectedYearsCount,
   columns = [],
   tableAriaLabel = "Tabla de análisis",
-  yearSelectorProps = null,
 }) => {
   const tableScrollRef = useRef(null);
   const pillScrollbarRef = useRef(null);
@@ -26,27 +25,7 @@ const FoliarAnalysisTableCard = ({
   let previousYear = null;
   let yearBandIndex = -1;
 
-  useEffect(() => {
-    const scrollElement = tableScrollRef.current;
-    if (!scrollElement) return undefined;
-
-    const handleWheel = (event) => {
-      const hasHorizontalOverflow = scrollElement.scrollWidth > scrollElement.clientWidth;
-      if (!hasHorizontalOverflow) return;
-
-      const horizontalDelta = Math.abs(event.deltaX);
-      const verticalDelta = Math.abs(event.deltaY);
-      if (verticalDelta <= horizontalDelta) return;
-
-      event.preventDefault();
-      scrollElement.scrollLeft += event.deltaY;
-    };
-
-    scrollElement.addEventListener("wheel", handleWheel, { passive: false });
-    return () => {
-      scrollElement.removeEventListener("wheel", handleWheel);
-    };
-  }, []);
+  useVerticalWheelToHorizontalScroll(tableScrollRef);
 
   useEffect(() => {
     const scrollElement = tableScrollRef.current;
@@ -166,10 +145,6 @@ const FoliarAnalysisTableCard = ({
             <div className="foliar-analysis-table-card__empty-message">
               No hay tabla disponible para los eventos seleccionados.
             </div>
-          ) : selectedYearsCount === 0 ? (
-            <div className="foliar-analysis-table-card__empty-message">Selecciona al menos un año para formar la tabla.</div>
-          ) : rowData.length === 0 ? (
-            <div className="foliar-analysis-table-card__empty-message">No hay registros para los años seleccionados.</div>
           ) : (
             <>
               <div ref={tableScrollRef} className="foliar-analysis-table-card__table-scroll">
@@ -182,17 +157,26 @@ const FoliarAnalysisTableCard = ({
                           scope="col"
                           className={column.tone ? `foliar-analysis-table-card__col--${column.tone}` : ""}
                         >
-                          {column.field === "year" && yearSelectorProps ? (
-                            <YearSelector {...yearSelectorProps} />
-                          ) : (
-                            column.header
-                          )}
+                          {column.header}
                         </th>
                       ))}
                     </tr>
                   </thead>
                   <tbody>
-                    {rowData.map((row, rowIndex) => {
+                    {selectedYearsCount === 0 ? (
+                      <tr>
+                        <td colSpan={columns.length} className="foliar-analysis-table-card__empty-cell">
+                          Selecciona al menos un año para formar la tabla.
+                        </td>
+                      </tr>
+                    ) : rowData.length === 0 ? (
+                      <tr>
+                        <td colSpan={columns.length} className="foliar-analysis-table-card__empty-cell">
+                          No hay registros para los años seleccionados.
+                        </td>
+                      </tr>
+                    ) : (
+                      rowData.map((row, rowIndex) => {
                       const isYearStart = rowIndex === 0 || row.year !== previousYear;
                       if (isYearStart) yearBandIndex += 1;
                       const rowClassName = [
@@ -223,7 +207,8 @@ const FoliarAnalysisTableCard = ({
                           })}
                         </tr>
                       );
-                    })}
+                      })
+                    )}
                   </tbody>
                 </table>
               </div>

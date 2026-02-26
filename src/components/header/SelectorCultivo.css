@@ -25,8 +25,10 @@
 
 .selector-cultivo__label {
   font-family: var(--font-brand);
-  font-size: 18px;
-  line-height: 1;
+  font-size: var(--font-size-lg);
+  line-height: var(--line-height-tight);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--letter-spacing-tight);
   color: #ffffff;
 }
 
@@ -43,6 +45,6 @@
   }
 
   .selector-cultivo__label {
-    font-size: 16px;
+    font-size: var(--font-size-md);
   }
 }

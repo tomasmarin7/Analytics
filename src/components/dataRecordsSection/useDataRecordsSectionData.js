@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const countDataPoints = (row, fields) =>
   fields.reduce((total, field) => {
@@ -46,6 +46,10 @@ export const useDataRecordsSectionData = ({
     () => selectedYears.filter((year) => availableYears.includes(year)).sort((a, b) => a - b),
     [selectedYears, availableYears]
   );
+
+  useEffect(() => {
+    setSelectedYears([]);
+  }, [normalizedSelectedCuartel, setSelectedYears]);
 
   const filteredRows = useMemo(
     () => cuartelRows.filter((row) => selectedYearsForCuartel.includes(row.year)),
@@ -96,6 +100,7 @@ export const useDataRecordsSectionData = ({
     normalizedSelectedCuartel,
     availableYears,
     selectedYears,
+    selectedYearsForCuartel,
     rowData,
     displayYears,
     toggleYear,
