@@ -1,6 +1,6 @@
 .timeline-event-marker--bud-analysis .timeline-event-marker__shape {
   background:
-    radial-gradient(126% 136% at 8% 6%, rgba(79, 111, 83, 0.58) 0%, rgba(79, 111, 83, 0) 44%),
-    radial-gradient(150% 136% at 92% 90%, rgba(133, 84, 65, 0.64) 0%, rgba(133, 84, 65, 0) 72%),
-    linear-gradient(135deg, #5b7760 0%, #7a6f62 42%, #8f5f4d 100%);
+    radial-gradient(124% 132% at 10% 8%, rgba(137, 87, 67, 0.62) 0%, rgba(137, 87, 67, 0) 46%),
+    radial-gradient(146% 138% at 90% 92%, rgba(226, 206, 192, 0.52) 0%, rgba(226, 206, 192, 0) 68%),
+    linear-gradient(135deg, #8a5a4b 0%, #a67460 46%, #d9c4b6 100%);
 }

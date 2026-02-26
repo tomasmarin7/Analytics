@@ -1,86 +1,46 @@
 .foliar-analysis-table-card {
+  --table-col-year-w: 92px;
+  --table-col-variedad-w: 180px;
+  --table-sticky-total-w: calc(var(--table-col-year-w) + var(--table-col-variedad-w));
   position: relative;
   min-width: 0;
   flex: 0 0 auto;
-  border-radius: 0 16px 16px 16px;
-  background: rgba(58, 62, 66, 0.28);
-  padding: 12px 10px 8px;
+  width: 100%;
+  border-radius: 12px;
+  border: 0;
+  background: rgba(88, 93, 98, 0.14);
+  box-shadow: none;
+  padding: 8px;
   display: flex;
   flex-direction: column;
-  margin-top: 0;
-  min-width: 920px;
-}
-
-.foliar-analysis-table-card--with-tabs {
-  margin-top: var(--data-records-header-height);
-}
-
-.foliar-analysis-table-card--bud {
-  background: #8a5a4b;
-}
-
-.foliar-analysis-table-card--pre-pruning-count {
-  background: rgba(186, 192, 198, 0.22);
-  border: 1px solid rgba(16, 17, 18, 0.6);
-}
-
-.foliar-analysis-table-card--pre-pruning-count .foliar-analysis-table-card__table-scroll {
-  background: rgba(205, 210, 216, 0.26);
-  border: 1px solid rgba(16, 17, 18, 0.5);
-}
-
-.foliar-analysis-table-card__tabs {
-  position: absolute;
-  top: calc(-1 * var(--data-records-header-height));
-  left: 0;
-  display: flex;
-  gap: 8px;
-  max-width: 100%;
-}
-
-.foliar-analysis-table-card__tab {
-  position: relative;
-  height: var(--data-records-header-height);
-  display: inline-flex;
-  align-items: center;
-  padding: 0 16px;
-  font-family: var(--font-brand);
-  font-size: 20px;
-  line-height: 1.1;
-  font-weight: 400;
-  color: #141619;
-  border-radius: 12px 12px 0 0;
-  background: #b0b7a9;
-  box-shadow: 0 1px 0 #b0b7a9;
 }
 
 .foliar-analysis-table-card__inner {
   width: 100%;
-  height: auto;
   border-radius: 10px;
   overflow: hidden;
-  background: transparent;
-  padding: 0;
 }
 
 .foliar-analysis-table-card__grid {
   min-height: 120px;
-  flex: 0 0 auto;
   width: 100%;
-  border-radius: 0;
+  border-radius: 10px;
   overflow: hidden;
+  border: 0;
+  background: rgba(66, 73, 79, 0.18);
 }
 
 .foliar-analysis-table-card__table-scroll {
+  position: relative;
   width: 100%;
-  height: auto;
-  overflow: auto;
-  border-radius: 10px;
-  background: rgba(19, 25, 20, 0.28);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
-.foliar-analysis-table-card--bud .foliar-analysis-table-card__table-scroll {
-  background: rgba(138, 90, 75, 0.38);
+.foliar-analysis-table-card__table-scroll::-webkit-scrollbar {
+  display: none;
 }
 
 .foliar-analysis-table-card__table {
@@ -88,26 +48,17 @@
   min-width: 900px;
   border-collapse: collapse;
   font-family: var(--font-brand);
-  font-size: 18px;
+  font-size: 16px;
   color: #ffffff;
-}
-
-.foliar-analysis-table-card__table--bud {
-  min-width: 860px;
-}
-
-.foliar-analysis-table-card__table--pre-pruning-count {
-  min-width: 1240px;
-  color: #141619;
 }
 
 .foliar-analysis-table-card__table thead th {
   position: sticky;
   top: 0;
   z-index: 1;
-  background: rgba(17, 24, 18, 0.86);
+  background: rgba(59, 66, 72, 0.58);
   text-align: left;
-  padding: 8px 12px;
+  padding: 0 12px;
   font-weight: 500;
   border-bottom: 1px solid rgba(255, 255, 255, 0.14);
   white-space: nowrap;
@@ -115,92 +66,132 @@
   vertical-align: middle;
 }
 
-.foliar-analysis-table-card__table--pre-pruning-count thead th {
-  background: rgba(17, 24, 18, 0.86);
-  color: #ffffff;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
-}
-
 .foliar-analysis-table-card__table tbody td {
-  padding: 8px 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  padding: 0 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   white-space: nowrap;
   height: var(--data-records-table-row-h);
   vertical-align: middle;
 }
 
-.foliar-analysis-table-card__table--pre-pruning-count tbody td {
-  border-bottom: 1px solid rgba(16, 17, 18, 0.5);
+.foliar-analysis-table-card__table thead th:nth-child(1),
+.foliar-analysis-table-card__table tbody td:nth-child(1) {
+  width: var(--table-col-year-w);
+  min-width: var(--table-col-year-w);
+  max-width: var(--table-col-year-w);
+  position: sticky;
+  left: 0;
+  z-index: 4;
+}
+
+.foliar-analysis-table-card__table thead th:nth-child(2),
+.foliar-analysis-table-card__table tbody td:nth-child(2) {
+  width: var(--table-col-variedad-w);
+  min-width: var(--table-col-variedad-w);
+  max-width: var(--table-col-variedad-w);
+  position: sticky;
+  left: var(--table-col-year-w);
+  z-index: 4;
+}
+
+.foliar-analysis-table-card__table thead th:nth-child(1),
+.foliar-analysis-table-card__table thead th:nth-child(2) {
+  background: rgba(100, 106, 112, 1);
+  z-index: 6;
+}
+
+.foliar-analysis-table-card__table tbody td:nth-child(1),
+.foliar-analysis-table-card__table tbody td:nth-child(2) {
+  background: rgba(101, 107, 113, 1);
+}
+
+.foliar-analysis-table-card__table thead th:nth-child(2),
+.foliar-analysis-table-card__table tbody td:nth-child(2) {
+  box-shadow: 1px 0 0 rgba(255, 255, 255, 0.12), 8px 0 12px -9px rgba(8, 10, 12, 0.6);
+}
+
+.foliar-analysis-table-card__table thead th.foliar-analysis-table-card__col--fertilization {
+  background: rgba(90, 122, 88, 0.5);
+  color: rgba(241, 248, 241, 0.98);
+}
+
+.foliar-analysis-table-card__table tbody td.foliar-analysis-table-card__col--fertilization {
+  background: rgba(80, 111, 77, 0.2);
+}
+
+.foliar-analysis-table-card__table thead th.foliar-analysis-table-card__col--bud-analysis {
+  background: rgba(126, 86, 73, 0.5);
+  color: rgba(252, 244, 240, 0.98);
+}
+
+.foliar-analysis-table-card__table tbody td.foliar-analysis-table-card__col--bud-analysis {
+  background: rgba(121, 84, 71, 0.2);
+}
+
+.foliar-analysis-table-card__table thead th.foliar-analysis-table-card__col--count {
+  background: rgba(138, 143, 149, 0.5);
+  color: rgba(247, 249, 252, 0.98);
+}
+
+.foliar-analysis-table-card__table tbody td.foliar-analysis-table-card__col--count {
+  background: rgba(133, 139, 146, 0.2);
 }
 
 .foliar-analysis-table-card__row--year-band-a {
-  background: rgba(22, 31, 25, 0.68);
+  background: rgba(62, 69, 75, 0.34);
 }
 
 .foliar-analysis-table-card__row--year-band-b {
-  background: rgba(19, 25, 20, 0.28);
-}
-
-.foliar-analysis-table-card__table--bud .foliar-analysis-table-card__row--year-band-a {
-  background: rgba(111, 72, 56, 0.72);
-}
-
-.foliar-analysis-table-card__table--bud .foliar-analysis-table-card__row--year-band-b {
-  background: rgba(138, 90, 75, 0.38);
-}
-
-.foliar-analysis-table-card__table--pre-pruning-count .foliar-analysis-table-card__row--year-band-a {
-  background: rgba(174, 182, 191, 0.62);
-}
-
-.foliar-analysis-table-card__table--pre-pruning-count .foliar-analysis-table-card__row--year-band-b {
-  background: rgba(205, 210, 216, 0.26);
+  background: rgba(77, 84, 90, 0.2);
 }
 
 .foliar-analysis-table-card__row--year-start td {
-  border-top: 1px solid rgba(255, 255, 255, 0.24);
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
 }
 
-.foliar-analysis-table-card__table--pre-pruning-count .foliar-analysis-table-card__row--year-start td {
-  border-top: 1px solid rgba(16, 17, 18, 0.56);
-}
-
-.foliar-analysis-table-card__row--variedad-start td {
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
-}
-
-.foliar-analysis-table-card__table--pre-pruning-count .foliar-analysis-table-card__row--variedad-start td {
-  box-shadow: inset 0 1px 0 rgba(16, 17, 18, 0.35);
-}
-
-.foliar-analysis-table-card--pre-pruning-count .foliar-analysis-table-card__empty-message {
-  color: rgba(20, 22, 25, 0.85);
-}
-
-.foliar-analysis-table-card__table--bud .foliar-analysis-table-card__row--variedad-start td:first-child {
+.foliar-analysis-table-card__pill-scrollbar {
   position: relative;
-  padding-left: 20px;
+  margin-top: 8px;
+  margin-left: var(--table-sticky-total-w);
+  width: calc(100% - var(--table-sticky-total-w));
+  height: 14px;
+  pointer-events: none;
+  opacity: 0;
 }
 
-.foliar-analysis-table-card__table--bud .foliar-analysis-table-card__row--variedad-start td:first-child::before {
-  content: "";
+.foliar-analysis-table-card__pill-scrollbar--active {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.foliar-analysis-table-card__pill-scrollbar-thumb {
   position: absolute;
-  left: 10px;
-  top: 9px;
-  bottom: 9px;
-  width: 2px;
-  border-radius: 2px;
-  background: rgba(255, 255, 255, 0.42);
+  left: 0;
+  top: 0;
+  height: 14px;
+  min-width: 58px;
+  border-radius: 999px;
+  background: rgba(70, 74, 79, 0.9);
+  cursor: grab;
+  transition: background-color 120ms ease;
+}
+
+.foliar-analysis-table-card__pill-scrollbar-thumb:hover {
+  background: rgba(82, 87, 92, 0.95);
+}
+
+.foliar-analysis-table-card__pill-scrollbar-thumb:active {
+  cursor: grabbing;
+  background: rgba(58, 63, 68, 0.96);
 }
 
 .foliar-analysis-table-card__empty-message {
   width: 100%;
-  height: 100%;
   min-height: 120px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px;
+  padding: 18px;
   text-align: center;
   font-family: var(--font-brand);
   font-size: 14px;
@@ -209,21 +200,12 @@
 
 @media (max-width: 900px) {
   .foliar-analysis-table-card {
-    min-width: 720px;
-  }
-
-  .foliar-analysis-table-card--with-tabs {
-    margin-top: var(--data-records-header-height);
-  }
-
-  .foliar-analysis-table-card__tab {
-    height: var(--data-records-header-height);
-    font-size: 16px;
-    padding: 0 12px;
-    border-radius: 10px 10px 0 0;
+    border-radius: 14px;
+    padding: 8px;
   }
 
   .foliar-analysis-table-card__table {
-    font-size: 14px;
+    min-width: 700px;
+    font-size: 13px;
   }
 }

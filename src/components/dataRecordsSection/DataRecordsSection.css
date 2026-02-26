@@ -1,59 +1,45 @@
 @import "./YearSelector/YearSelector.css";
-@import "./YearIndexColumn/YearIndexColumn.css";
 
 .data-records-section {
-  --data-records-header-height: 34px;
+  --data-records-header-height: 38px;
   --data-records-table-header-h: 44px;
   --data-records-table-row-h: 42px;
-  --data-records-context-width: 130px;
   position: relative;
   z-index: 200000;
-  display: flex;
-  gap: 12px;
+  display: block;
   width: 100%;
   height: auto;
   min-height: 0;
-  padding: 18px;
-}
-
-.data-records-section__context {
-  position: relative;
-  flex: 0 0 var(--data-records-context-width);
-  border-radius: 18px;
-  background: rgba(158, 160, 162, 0.45);
-  padding: 12px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  overflow: visible;
-  isolation: isolate;
-}
-
-.data-records-section__context--menu-open {
-  z-index: 2147483646;
+  padding: 12px 14px 14px;
 }
 
 .data-records-section__tables-area {
-  flex: 1 1 auto;
+  position: relative;
+  min-height: 0;
   min-width: 0;
   display: flex;
   flex-direction: column;
+  z-index: 1;
+}
+
+.data-records-section__tables-area--menu-open {
+  z-index: 2147483646;
 }
 
 .data-records-section__tables-scroll {
   flex: 1 1 auto;
   min-width: 0;
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow-x: hidden;
+  overflow-y: visible;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
 
 .data-records-section__tables-track {
-  min-width: max-content;
+  min-width: 100%;
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: 0;
 }
 
 .data-records-section__tables-scroll::-webkit-scrollbar {
@@ -61,11 +47,7 @@
 }
 
 .data-records-section__pill-scrollbar {
-  position: relative;
-  margin-top: 10px;
-  height: 14px;
-  pointer-events: none;
-  opacity: 0;
+  display: none;
 }
 
 .data-records-section__pill-scrollbar--active {
@@ -80,36 +62,30 @@
   height: 14px;
   min-width: 58px;
   border-radius: 999px;
-  background: #888d92;
+  background: rgba(70, 74, 79, 0.9);
   cursor: grab;
   transition: background-color 120ms ease;
 }
 
 .data-records-section__pill-scrollbar-thumb:hover {
-  background: #7e8388;
+  background: rgba(82, 87, 92, 0.95);
 }
 
 .data-records-section__pill-scrollbar-thumb:active {
   cursor: grabbing;
-  background: #74797e;
+  background: rgba(58, 63, 68, 0.96);
 }
 
 .data-records-section--bud-analysis {
-  --data-records-table-row-h: 34px;
-  --data-records-context-width: 150px;
+  --data-records-table-row-h: 36px;
 }
 
 @media (max-width: 900px) {
   .data-records-section {
-    --data-records-header-height: 26px;
+    --data-records-header-height: 32px;
     --data-records-table-header-h: 34px;
     --data-records-table-row-h: 32px;
-    flex-direction: column;
-    padding: 12px;
-  }
-
-  .data-records-section__context {
-    flex-basis: auto;
+    padding: 10px 12px 12px;
   }
 
   .data-records-section--bud-analysis {
@@ -117,7 +93,7 @@
   }
 
   .data-records-section__tables-scroll {
-    overflow-x: auto;
+    overflow-x: hidden;
   }
 
   .data-records-section__tables-track {

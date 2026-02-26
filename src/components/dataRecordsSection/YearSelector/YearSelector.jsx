@@ -7,6 +7,7 @@ const YearSelector = ({
   isYearMenuOpen,
   onToggleMenu,
   onToggleYear,
+  triggerLabel = "Temp.",
 }) => (
   <div ref={yearPickerRef} className="data-records-section__year-picker">
     <button
@@ -14,9 +15,11 @@ const YearSelector = ({
       className="data-records-section__year-trigger"
       onClick={onToggleMenu}
       disabled={!availableYears.length}
-      aria-label="Seleccionar años"
-      title="Seleccionar años"
-    />
+      aria-label="Seleccionar temporadas"
+      title="Seleccionar temporadas"
+    >
+      {triggerLabel}
+    </button>
 
     {isYearMenuOpen && availableYears.length > 0 && (
       <div className="data-records-section__year-menu">

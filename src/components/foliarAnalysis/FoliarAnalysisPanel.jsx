@@ -17,8 +17,23 @@ import {
   mapPrePruningCountRow,
   sortPrePruningCountRows,
 } from "./prePruningCountConfig";
-import "../../features/timelineEvents/budAnalysis/tab.css";
-import "../../features/timelineEvents/prePruningCount/tab.css";
+
+const YEAR_SELECTOR_RAW_ROWS = [
+  ...foliarAnalysisRows,
+  ...budAnalysisRows,
+  ...prePruningCountRows,
+];
+
+const mapYearSelectorRow = (row) => ({
+  year: Number(row["Temp."]),
+  cuartel: row.Cuartel,
+});
+
+const TONE_BY_DATASET_ID = {
+  foliar: "fertilization",
+  bud: "bud-analysis",
+  "pre-pruning-count": "count",
+};
 
 const countDataPoints = (row, fields) =>
   fields.reduce((total, field) => {
@@ -47,6 +62,8 @@ const buildTableRows = ({
 
   const defaultSortRows = (a, b) => {
     if (a.year !== b.year) return a.year - b.year;
+    const variedadComparison = String(a.variedad ?? "").localeCompare(String(b.variedad ?? ""));
+    if (variedadComparison !== 0) return variedadComparison;
     return String(a.cuartel).localeCompare(String(b.cuartel));
   };
 
@@ -63,27 +80,6 @@ const buildTableRows = ({
     .values()].sort(sortRows ?? defaultSortRows);
 };
 
-const alignRowsToYearLayout = (rows, layoutRows, { showOnlyFirstRowPerYear = false } = {}) => {
-  if (!layoutRows.length) return [];
-
-  const firstRowByYear = rows.reduce((acc, row) => {
-    if (!acc.has(row.year)) acc.set(row.year, row);
-    return acc;
-  }, new Map());
-
-  const renderedYears = new Set();
-  return layoutRows.map((layoutRow) => {
-    const sourceRow = firstRowByYear.get(layoutRow.year);
-    if (!sourceRow) return { year: layoutRow.year };
-
-    if (!showOnlyFirstRowPerYear) return sourceRow;
-
-    if (renderedYears.has(layoutRow.year)) return { year: layoutRow.year };
-    renderedYears.add(layoutRow.year);
-    return sourceRow;
-  });
-};
-
 const FoliarAnalysisPanel = ({
   activeEvents = [],
   selectedCuartel,
@@ -98,149 +94,190 @@ const FoliarAnalysisPanel = ({
         .toLowerCase()
         .includes("conteo")
   );
-  const tabByEventId = Object.fromEntries(activeEvents.map((event) => [event.id, { id: event.id, label: event.label }]));
-  const hasFoliarAnalysis = activeEvents.some((event) => event.id === FOLIAR_ANALYSIS_EVENT_ID);
-  const hasBudAnalysis = activeEvents.some((event) => event.id === BUD_ANALYSIS_EVENT_ID);
-  const hasPrePruningCount = Boolean(prePruningEvent);
-  const hasDataTable = hasFoliarAnalysis || hasBudAnalysis || hasPrePruningCount;
-  const primaryTableType = hasPrePruningCount ? "pre-pruning-count" : hasBudAnalysis ? "bud" : hasFoliarAnalysis ? "foliar" : null;
 
-  const foliarRowData = useMemo(
-    () =>
-      buildTableRows({
-        selectedCuartel,
-        selectedYears,
-        rawRows: foliarAnalysisRows,
-        mapRow: mapFoliarRow,
-        scoreFields: FOLIAR_SCORE_FIELDS,
-      }),
-    [selectedCuartel, selectedYears]
-  );
-
-  const tableItems = [
-    hasFoliarAnalysis
+  const activeDatasets = [
+    activeEvents.some((event) => event.id === FOLIAR_ANALYSIS_EVENT_ID)
       ? {
           id: "foliar",
-          type: "foliar",
-          tabItem: tabByEventId[FOLIAR_ANALYSIS_EVENT_ID] ?? null,
+          label: "Foliar",
           columns: FOLIAR_COLUMNS,
-          ariaLabel: "Tabla de análisis foliar",
+          rawRows: foliarAnalysisRows,
+          mapRow: mapFoliarRow,
+          scoreFields: FOLIAR_SCORE_FIELDS,
         }
       : null,
-    hasBudAnalysis
+    activeEvents.some((event) => event.id === BUD_ANALYSIS_EVENT_ID)
       ? {
           id: "bud",
-          type: "bud",
-          tabItem: tabByEventId[BUD_ANALYSIS_EVENT_ID] ?? null,
+          label: "Yemas",
           columns: BUD_COLUMNS,
-          ariaLabel: "Tabla de análisis de yemas",
+          rawRows: budAnalysisRows,
+          mapRow: mapBudRow,
+          scoreFields: BUD_SCORE_FIELDS,
+          keepAllRowsPerYear: true,
+          sortRows: sortBudRows,
         }
       : null,
-    hasPrePruningCount
+    prePruningEvent
       ? {
           id: "pre-pruning-count",
-          type: "pre-pruning-count",
-          tabItem: prePruningEvent ? { id: prePruningEvent.id, label: prePruningEvent.label } : null,
+          label: "Pre poda",
           columns: PRE_PRUNING_COUNT_COLUMNS,
-          ariaLabel: "Tabla de conteo pre poda",
-        }
-      : null,
-  ].filter(Boolean);
-  const hasOnlyFoliarTable = tableItems.length === 1 && tableItems[0]?.type === "foliar";
-  const normalizedTableItems = tableItems.map((table) =>
-    table.type === "foliar" && hasOnlyFoliarTable
-      ? { ...table, columns: table.columns.filter((column) => column.field !== "variedad") }
-      : table
-  );
-  const tablesToRender =
-    normalizedTableItems.length > 0
-      ? normalizedTableItems
-      : [{ id: "no-data-table", type: null, tabItem: null, columns: [], rowData: [], ariaLabel: "Tabla de análisis" }];
-
-  const primaryTableConfig =
-    primaryTableType === "pre-pruning-count"
-      ? {
           rawRows: prePruningCountRows,
           mapRow: mapPrePruningCountRow,
           scoreFields: PRE_PRUNING_COUNT_SCORE_FIELDS,
           keepAllRowsPerYear: true,
-          groupDisplayYears: true,
           sortRows: sortPrePruningCountRows,
         }
-      : primaryTableType === "foliar"
-      ? { rawRows: foliarAnalysisRows, mapRow: mapFoliarRow, scoreFields: FOLIAR_SCORE_FIELDS }
-      : primaryTableType === "bud"
-        ? {
-            rawRows: budAnalysisRows,
-            mapRow: mapBudRow,
-            scoreFields: BUD_SCORE_FIELDS,
-            keepAllRowsPerYear: true,
-            groupDisplayYears: true,
-            sortRows: sortBudRows,
+      : null,
+  ].filter(Boolean);
+
+  const hasDataTable = activeDatasets.length > 0;
+  const unifiedColumns = useMemo(
+    () => [
+      { field: "year", header: "Temp." },
+      { field: "variedad", header: "Variedad" },
+      ...activeDatasets.flatMap((dataset) =>
+        dataset.columns
+          .filter((column) => column.field !== "variedad")
+          .map((column) => ({
+            field: `${dataset.id}::${column.field}`,
+            header: column.header,
+            tone: TONE_BY_DATASET_ID[dataset.id] ?? null,
+          }))
+      ),
+    ],
+    [activeDatasets]
+  );
+
+  const rowsByDataset = useMemo(
+    () =>
+      Object.fromEntries(
+        activeDatasets.map((dataset) => [
+          dataset.id,
+          buildTableRows({
+            selectedCuartel,
+            selectedYears,
+            rawRows: dataset.rawRows,
+            mapRow: dataset.mapRow,
+            scoreFields: dataset.scoreFields,
+            keepAllRowsPerYear: dataset.keepAllRowsPerYear,
+            sortRows: dataset.sortRows,
+          }),
+        ])
+      ),
+    [activeDatasets, selectedCuartel, selectedYears]
+  );
+
+  const unifiedRowData = useMemo(() => {
+    if (!hasDataTable) return [];
+
+    const varietiesByYear = new Map();
+    const preferredVarietyByYear = new Map();
+    activeDatasets.forEach((dataset) => {
+      const datasetRows = rowsByDataset[dataset.id] ?? [];
+      const datasetVarietiesByYear = datasetRows.reduce((acc, row) => {
+        const year = row.year;
+        const normalizedVariety = String(row.variedad ?? "").trim();
+        if (!normalizedVariety) return acc;
+        const varietiesForYear = acc.get(year) ?? new Map();
+        const normalizedKey = normalizedVariety.toLowerCase();
+        if (!varietiesForYear.has(normalizedKey)) {
+          varietiesForYear.set(normalizedKey, normalizedVariety);
+        }
+        acc.set(year, varietiesForYear);
+        return acc;
+      }, new Map());
+
+      datasetVarietiesByYear.forEach((datasetVarieties, year) => {
+        const sharedVarieties = varietiesByYear.get(year) ?? new Map();
+        datasetVarieties.forEach((label, normalized) => {
+          if (!sharedVarieties.has(normalized)) sharedVarieties.set(normalized, label);
+        });
+        varietiesByYear.set(year, sharedVarieties);
+      });
+    });
+
+    varietiesByYear.forEach((varieties, year) => {
+        if (varieties.size !== 1) return;
+        const [onlyVariety] = varieties.keys();
+        const current = preferredVarietyByYear.get(year);
+        if (!current) preferredVarietyByYear.set(year, onlyVariety);
+    });
+
+    const rowsByKey = new Map();
+
+    activeDatasets.forEach((dataset) => {
+      const datasetRows = rowsByDataset[dataset.id] ?? [];
+      datasetRows.forEach((row) => {
+        const normalizedVariedad = String(row.variedad ?? "").trim().toLowerCase();
+        const mergeIntoRow = (resolvedVariedad, varietyLabel) => {
+          const key = `${row.year ?? ""}::${resolvedVariedad}`;
+          const currentRow = rowsByKey.get(key) ?? {
+            year: row.year,
+            variedad: varietyLabel ?? row.variedad,
+          };
+
+          if ((!currentRow.variedad || currentRow.variedad === "-") && row.variedad) {
+            currentRow.variedad = row.variedad;
           }
-        : { rawRows: foliarAnalysisRows, mapRow: mapFoliarRow, scoreFields: FOLIAR_SCORE_FIELDS };
+
+          dataset.columns.forEach((column) => {
+            if (column.field === "variedad") return;
+            currentRow[`${dataset.id}::${column.field}`] = row[column.field];
+          });
+
+          rowsByKey.set(key, currentRow);
+        };
+
+        if (normalizedVariedad) {
+          const yearVarieties = varietiesByYear.get(row.year);
+          const label = yearVarieties?.get(normalizedVariedad) ?? row.variedad;
+          mergeIntoRow(normalizedVariedad, label);
+          return;
+        }
+
+        const yearVarieties = varietiesByYear.get(row.year);
+        if (yearVarieties && yearVarieties.size > 1) {
+          yearVarieties.forEach((label, normalized) => {
+            mergeIntoRow(normalized, label);
+          });
+          return;
+        }
+
+        const resolvedVariedad = preferredVarietyByYear.get(row.year) || "";
+        const varietyLabel = resolvedVariedad ? yearVarieties?.get(resolvedVariedad) : row.variedad;
+        mergeIntoRow(resolvedVariedad, varietyLabel);
+      });
+    });
+
+    return [...rowsByKey.values()].sort((a, b) => {
+      if (a.year !== b.year) return a.year - b.year;
+      return String(a.variedad ?? "").localeCompare(String(b.variedad ?? ""));
+    });
+  }, [activeDatasets, hasDataTable, rowsByDataset]);
 
   return (
     <DataRecordsSection
       selectedCuartel={selectedCuartel}
-      rawRows={primaryTableConfig.rawRows}
-      mapRow={primaryTableConfig.mapRow}
-      scoreFields={primaryTableConfig.scoreFields}
-      keepAllRowsPerYear={primaryTableConfig.keepAllRowsPerYear}
-      groupDisplayYears={primaryTableConfig.groupDisplayYears}
-      sortRows={primaryTableConfig.sortRows}
+      rawRows={YEAR_SELECTOR_RAW_ROWS}
+      mapRow={mapYearSelectorRow}
+      scoreFields={[]}
+      keepAllRowsPerYear
       yearHeaderLabel="Temp."
-      layoutVariant={primaryTableType === "bud" ? "bud-analysis" : undefined}
       selectedYears={selectedYears}
       onSelectedYearsChange={onSelectedYearsChange}
     >
-      {({ selectedYearsCount, rowData: sectionRowData }) => {
-        const rowsByTableType = {
-          bud: hasBudAnalysis && primaryTableType === "bud" ? sectionRowData : [],
-          "pre-pruning-count":
-            hasPrePruningCount && primaryTableType === "pre-pruning-count" ? sectionRowData : [],
-          foliar: primaryTableType === "bud" || primaryTableType === "pre-pruning-count"
-            ? alignRowsToYearLayout(foliarRowData, sectionRowData, { showOnlyFirstRowPerYear: true })
-            : foliarRowData,
-        };
-
-        if (hasBudAnalysis && primaryTableType !== "bud") {
-          rowsByTableType.bud = buildTableRows({
-            selectedCuartel,
-            selectedYears,
-            rawRows: budAnalysisRows,
-            mapRow: mapBudRow,
-            scoreFields: BUD_SCORE_FIELDS,
-            keepAllRowsPerYear: true,
-            sortRows: sortBudRows,
-          });
-        }
-
-        if (hasPrePruningCount && primaryTableType !== "pre-pruning-count") {
-          rowsByTableType["pre-pruning-count"] = buildTableRows({
-            selectedCuartel,
-            selectedYears,
-            rawRows: prePruningCountRows,
-            mapRow: mapPrePruningCountRow,
-            scoreFields: PRE_PRUNING_COUNT_SCORE_FIELDS,
-            keepAllRowsPerYear: true,
-            sortRows: sortPrePruningCountRows,
-          });
-        }
-
-        return tablesToRender.map((table) => (
-          <FoliarAnalysisTableCard
-            key={table.id}
-            tabItems={table.tabItem ? [table.tabItem] : []}
-            hasDataTable={hasDataTable}
-            rowData={rowsByTableType[table.type] ?? []}
-            selectedYearsCount={selectedYearsCount}
-            columns={table.columns}
-            tableAriaLabel={table.ariaLabel}
-            tableType={table.type}
-          />
-        ));
-      }}
+      {({ selectedYearsCount, yearSelectorProps }) => (
+        <FoliarAnalysisTableCard
+          hasDataTable={hasDataTable}
+          rowData={unifiedRowData}
+          selectedYearsCount={selectedYearsCount}
+          columns={unifiedColumns}
+          tableAriaLabel="Tabla unificada de análisis"
+          yearSelectorProps={yearSelectorProps}
+        />
+      )}
     </DataRecordsSection>
   );
 };

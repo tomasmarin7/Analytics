@@ -1,4 +1,6 @@
 import "./FoliarAnalysisTableCard.css";
+import { useEffect, useMemo, useRef, useState } from "react";
+import YearSelector from "../dataRecordsSection/YearSelector/YearSelector";
 
 const renderCellValue = (value) => (value === "" || value === null || value === undefined ? "-" : value);
 
@@ -6,37 +8,158 @@ const buildRowKey = (row, rowIndex) =>
   `${row.cuartel ?? "cuartel"}-${row.year ?? "year"}-${row.variedad ?? "variedad"}-${rowIndex}`;
 
 const FoliarAnalysisTableCard = ({
-  tabItems = [],
   hasDataTable,
   rowData,
   selectedYearsCount,
   columns = [],
   tableAriaLabel = "Tabla de análisis",
-  tableType = null,
+  yearSelectorProps = null,
 }) => {
-  const hasTabs = tabItems.length > 0;
+  const tableScrollRef = useRef(null);
+  const pillScrollbarRef = useRef(null);
+  const dragStateRef = useRef(null);
+  const [horizontalScrollState, setHorizontalScrollState] = useState({
+    isScrollable: false,
+    thumbWidthPx: 0,
+    thumbOffsetPx: 0,
+  });
   let previousYear = null;
-  let previousVariedad = null;
   let yearBandIndex = -1;
 
+  useEffect(() => {
+    const scrollElement = tableScrollRef.current;
+    if (!scrollElement) return undefined;
+
+    const handleWheel = (event) => {
+      const hasHorizontalOverflow = scrollElement.scrollWidth > scrollElement.clientWidth;
+      if (!hasHorizontalOverflow) return;
+
+      const horizontalDelta = Math.abs(event.deltaX);
+      const verticalDelta = Math.abs(event.deltaY);
+      if (verticalDelta <= horizontalDelta) return;
+
+      event.preventDefault();
+      scrollElement.scrollLeft += event.deltaY;
+    };
+
+    scrollElement.addEventListener("wheel", handleWheel, { passive: false });
+    return () => {
+      scrollElement.removeEventListener("wheel", handleWheel);
+    };
+  }, []);
+
+  useEffect(() => {
+    const scrollElement = tableScrollRef.current;
+    const scrollbarElement = pillScrollbarRef.current;
+    if (!scrollElement || !scrollbarElement) return undefined;
+
+    const updateHorizontalScrollState = () => {
+      const viewportWidth = scrollElement.clientWidth;
+      const contentWidth = scrollElement.scrollWidth;
+      const trackWidth = scrollbarElement.clientWidth;
+
+      if (contentWidth <= viewportWidth || trackWidth <= 0) {
+        setHorizontalScrollState({
+          isScrollable: false,
+          thumbWidthPx: 0,
+          thumbOffsetPx: 0,
+        });
+        return;
+      }
+
+      const thumbWidthPx = Math.max(58, (viewportWidth / contentWidth) * trackWidth);
+      const maxThumbOffsetPx = Math.max(0, trackWidth - thumbWidthPx);
+      const maxScrollLeft = contentWidth - viewportWidth;
+      const thumbOffsetPx =
+        maxScrollLeft <= 0 ? 0 : (scrollElement.scrollLeft / maxScrollLeft) * maxThumbOffsetPx;
+
+      setHorizontalScrollState({
+        isScrollable: true,
+        thumbWidthPx,
+        thumbOffsetPx,
+      });
+    };
+
+    updateHorizontalScrollState();
+
+    const resizeObserver = new ResizeObserver(updateHorizontalScrollState);
+    resizeObserver.observe(scrollElement);
+    resizeObserver.observe(scrollbarElement);
+
+    scrollElement.addEventListener("scroll", updateHorizontalScrollState, { passive: true });
+    window.addEventListener("resize", updateHorizontalScrollState);
+
+    return () => {
+      resizeObserver.disconnect();
+      scrollElement.removeEventListener("scroll", updateHorizontalScrollState);
+      window.removeEventListener("resize", updateHorizontalScrollState);
+    };
+  }, [rowData.length, columns.length]);
+
+  const handleThumbPointerDown = (event) => {
+    const scrollElement = tableScrollRef.current;
+    const scrollbarElement = pillScrollbarRef.current;
+    if (!scrollElement || !scrollbarElement || !horizontalScrollState.isScrollable) return;
+
+    const maxScrollLeft = scrollElement.scrollWidth - scrollElement.clientWidth;
+    const maxThumbOffsetPx = scrollbarElement.clientWidth - horizontalScrollState.thumbWidthPx;
+    if (maxScrollLeft <= 0 || maxThumbOffsetPx <= 0) return;
+
+    dragStateRef.current = {
+      pointerId: event.pointerId,
+      startClientX: event.clientX,
+      startScrollLeft: scrollElement.scrollLeft,
+      maxScrollLeft,
+      maxThumbOffsetPx,
+    };
+
+    event.currentTarget.setPointerCapture(event.pointerId);
+    event.preventDefault();
+  };
+
+  const handleThumbPointerMove = (event) => {
+    const scrollElement = tableScrollRef.current;
+    const dragState = dragStateRef.current;
+    if (!scrollElement || !dragState || dragState.pointerId !== event.pointerId) return;
+
+    const deltaX = event.clientX - dragState.startClientX;
+    const scrollDelta = (deltaX / dragState.maxThumbOffsetPx) * dragState.maxScrollLeft;
+    scrollElement.scrollLeft = dragState.startScrollLeft + scrollDelta;
+  };
+
+  const handleThumbPointerUp = (event) => {
+    const dragState = dragStateRef.current;
+    if (!dragState || dragState.pointerId !== event.pointerId) return;
+    dragStateRef.current = null;
+  };
+
+  const handlePillScrollbarPointerDown = (event) => {
+    if (event.target !== event.currentTarget) return;
+
+    const scrollElement = tableScrollRef.current;
+    const scrollbarElement = pillScrollbarRef.current;
+    if (!scrollElement || !scrollbarElement || !horizontalScrollState.isScrollable) return;
+
+    const trackRect = scrollbarElement.getBoundingClientRect();
+    const clickOffset = event.clientX - trackRect.left;
+    const desiredThumbCenter = clickOffset - horizontalScrollState.thumbWidthPx / 2;
+    const maxThumbOffsetPx = Math.max(0, trackRect.width - horizontalScrollState.thumbWidthPx);
+    const clampedThumbOffsetPx = Math.min(maxThumbOffsetPx, Math.max(0, desiredThumbCenter));
+    const maxScrollLeft = scrollElement.scrollWidth - scrollElement.clientWidth;
+    const nextScrollLeft = maxThumbOffsetPx <= 0 ? 0 : (clampedThumbOffsetPx / maxThumbOffsetPx) * maxScrollLeft;
+    scrollElement.scrollLeft = nextScrollLeft;
+  };
+
+  const thumbStyle = useMemo(
+    () => ({
+      width: `${horizontalScrollState.thumbWidthPx}px`,
+      transform: `translateX(${horizontalScrollState.thumbOffsetPx}px)`,
+    }),
+    [horizontalScrollState.thumbOffsetPx, horizontalScrollState.thumbWidthPx]
+  );
+
   return (
-    <div
-      className={`foliar-analysis-table-card${
-        tableType ? ` foliar-analysis-table-card--${tableType}` : ""
-      }${hasTabs ? " foliar-analysis-table-card--with-tabs" : ""}`}
-    >
-      {hasTabs ? (
-        <div className="foliar-analysis-table-card__tabs">
-          {tabItems.map((tab) => (
-            <span
-              key={tab.id}
-              className={`foliar-analysis-table-card__tab foliar-analysis-table-card__tab--${tab.id}`}
-            >
-              {tab.label}
-            </span>
-          ))}
-        </div>
-      ) : null}
+    <div className="foliar-analysis-table-card">
       <div className="foliar-analysis-table-card__inner">
         <div className="foliar-analysis-table-card__grid">
           {!hasDataTable ? (
@@ -48,56 +171,80 @@ const FoliarAnalysisTableCard = ({
           ) : rowData.length === 0 ? (
             <div className="foliar-analysis-table-card__empty-message">No hay registros para los años seleccionados.</div>
           ) : (
-            <div className="foliar-analysis-table-card__table-scroll">
-              <table
-                className={`foliar-analysis-table-card__table${
-                  tableType ? ` foliar-analysis-table-card__table--${tableType}` : ""
+            <>
+              <div ref={tableScrollRef} className="foliar-analysis-table-card__table-scroll">
+                <table className="foliar-analysis-table-card__table" role="table" aria-label={tableAriaLabel}>
+                  <thead>
+                    <tr>
+                      {columns.map((column) => (
+                        <th
+                          key={column.field}
+                          scope="col"
+                          className={column.tone ? `foliar-analysis-table-card__col--${column.tone}` : ""}
+                        >
+                          {column.field === "year" && yearSelectorProps ? (
+                            <YearSelector {...yearSelectorProps} />
+                          ) : (
+                            column.header
+                          )}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rowData.map((row, rowIndex) => {
+                      const isYearStart = rowIndex === 0 || row.year !== previousYear;
+                      if (isYearStart) yearBandIndex += 1;
+                      const rowClassName = [
+                        "foliar-analysis-table-card__row",
+                        yearBandIndex % 2 === 0
+                          ? "foliar-analysis-table-card__row--year-band-a"
+                          : "foliar-analysis-table-card__row--year-band-b",
+                        isYearStart ? "foliar-analysis-table-card__row--year-start" : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" ");
+
+                      previousYear = row.year;
+
+                      return (
+                        <tr key={buildRowKey(row, rowIndex)} className={rowClassName}>
+                          {columns.map((column) => {
+                            const cellValue =
+                              column.field === "year" && !isYearStart ? "" : row[column.field];
+                            return (
+                              <td
+                                key={`${buildRowKey(row, rowIndex)}-${column.field}`}
+                                className={column.tone ? `foliar-analysis-table-card__col--${column.tone}` : ""}
+                              >
+                                {renderCellValue(cellValue)}
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              <div
+                ref={pillScrollbarRef}
+                className={`foliar-analysis-table-card__pill-scrollbar${
+                  horizontalScrollState.isScrollable ? " foliar-analysis-table-card__pill-scrollbar--active" : ""
                 }`}
-                role="table"
-                aria-label={tableAriaLabel}
+                onPointerDown={handlePillScrollbarPointerDown}
+                aria-hidden="true"
               >
-                <thead>
-                  <tr>
-                    {columns.map((column) => (
-                      <th key={column.field} scope="col">
-                        {column.header}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {rowData.map((row, rowIndex) => {
-                    const isYearStart = rowIndex === 0 || row.year !== previousYear;
-                    if (isYearStart) yearBandIndex += 1;
-                    const hasVariedad = row.variedad !== "" && row.variedad !== null && row.variedad !== undefined;
-                    const isVariedadStart =
-                      hasVariedad &&
-                      (isYearStart || rowIndex === 0 || String(row.variedad) !== String(previousVariedad ?? ""));
-                    const rowClassName = [
-                      "foliar-analysis-table-card__row",
-                      yearBandIndex % 2 === 0
-                        ? "foliar-analysis-table-card__row--year-band-a"
-                        : "foliar-analysis-table-card__row--year-band-b",
-                      isYearStart ? "foliar-analysis-table-card__row--year-start" : "",
-                      isVariedadStart ? "foliar-analysis-table-card__row--variedad-start" : "",
-                    ]
-                      .filter(Boolean)
-                      .join(" ");
-
-                    previousYear = row.year;
-                    previousVariedad = row.variedad;
-
-                    return (
-                      <tr key={buildRowKey(row, rowIndex)} className={rowClassName}>
-                        {columns.map((column) => (
-                          <td key={`${buildRowKey(row, rowIndex)}-${column.field}`}>{renderCellValue(row[column.field])}</td>
-                        ))}
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                <div
+                  className="foliar-analysis-table-card__pill-scrollbar-thumb"
+                  style={thumbStyle}
+                  onPointerDown={handleThumbPointerDown}
+                  onPointerMove={handleThumbPointerMove}
+                  onPointerUp={handleThumbPointerUp}
+                  onPointerCancel={handleThumbPointerUp}
+                />
+              </div>
+            </>
           )}
         </div>
       </div>
