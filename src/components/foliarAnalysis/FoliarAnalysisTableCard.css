@@ -6,7 +6,7 @@
   min-width: 0;
   flex: 0 0 auto;
   width: 100%;
-  border-radius: 0;
+  border-radius: 14px;
   border: 0;
   background: transparent;
   box-shadow: none;
@@ -36,6 +36,7 @@
   overflow-x: auto;
   overflow-y: hidden;
   border-radius: 10px;
+  background: transparent;
   scrollbar-width: none;
   -ms-overflow-style: none;
   z-index: 1;
@@ -52,7 +53,7 @@
   border-spacing: 0;
   font-family: var(--font-brand);
   font-size: var(--font-size-md);
-  color: #ffffff;
+  color: #2e3944;
   border-radius: 10px;
   overflow: hidden;
 }
@@ -61,12 +62,12 @@
   position: sticky;
   top: 0;
   z-index: 1;
-  background: rgba(59, 66, 72, 0.58);
+  background: rgba(146, 156, 166, 0.74);
   text-align: left;
   padding: 0 12px;
   font-weight: var(--font-weight-medium);
   letter-spacing: var(--letter-spacing-tight);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  border-bottom: 1px solid rgba(120, 130, 139, 0.34);
   white-space: nowrap;
   height: var(--data-records-table-header-h);
   vertical-align: middle;
@@ -74,7 +75,7 @@
 
 .foliar-analysis-table-card__table tbody td {
   padding: 0 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(125, 136, 145, 0.24);
   white-space: nowrap;
   height: var(--data-records-table-row-h);
   vertical-align: middle;
@@ -114,19 +115,19 @@
 
 .foliar-analysis-table-card__table thead th:nth-child(1),
 .foliar-analysis-table-card__table thead th:nth-child(2) {
-  background: rgba(100, 106, 112, 1);
+  background: rgba(134, 144, 154, 0.95);
   z-index: 6;
   overflow: visible;
 }
 
 .foliar-analysis-table-card__table tbody td:nth-child(1),
 .foliar-analysis-table-card__table tbody td:nth-child(2) {
-  background: rgba(101, 107, 113, 1);
+  background: rgba(173, 181, 188, 0.92);
 }
 
 .foliar-analysis-table-card__table thead th:nth-child(2),
 .foliar-analysis-table-card__table tbody td:nth-child(2) {
-  box-shadow: inset -1px 0 0 rgba(255, 255, 255, 0.1);
+  box-shadow: inset -1px 0 0 rgba(118, 129, 138, 0.25);
 }
 
 .foliar-analysis-table-card__table thead th:nth-child(2)::after,
@@ -137,47 +138,47 @@
   right: -16px;
   width: 16px;
   height: 100%;
-  background: linear-gradient(to right, rgba(11, 14, 16, 0.22), rgba(11, 14, 16, 0));
+  background: linear-gradient(to right, rgba(126, 136, 145, 0.26), rgba(126, 136, 145, 0));
   pointer-events: none;
 }
 
 .foliar-analysis-table-card__table thead th.foliar-analysis-table-card__col--fertilization {
-  background: rgba(90, 122, 88, 0.5);
-  color: rgba(241, 248, 241, 0.98);
+  background: rgba(172, 188, 172, 0.58);
+  color: #2f3f37;
 }
 
 .foliar-analysis-table-card__table tbody td.foliar-analysis-table-card__col--fertilization {
-  background: rgba(80, 111, 77, 0.2);
+  background: rgba(184, 199, 184, 0.34);
 }
 
 .foliar-analysis-table-card__table thead th.foliar-analysis-table-card__col--bud-analysis {
-  background: rgba(126, 86, 73, 0.5);
-  color: rgba(252, 244, 240, 0.98);
+  background: rgba(182, 163, 151, 0.58);
+  color: #4a3a31;
 }
 
 .foliar-analysis-table-card__table tbody td.foliar-analysis-table-card__col--bud-analysis {
-  background: rgba(121, 84, 71, 0.2);
+  background: rgba(197, 180, 170, 0.34);
 }
 
 .foliar-analysis-table-card__table thead th.foliar-analysis-table-card__col--count {
-  background: rgba(138, 143, 149, 0.5);
-  color: rgba(247, 249, 252, 0.98);
+  background: rgba(177, 185, 196, 0.6);
+  color: #2f3945;
 }
 
 .foliar-analysis-table-card__table tbody td.foliar-analysis-table-card__col--count {
-  background: rgba(133, 139, 146, 0.2);
+  background: rgba(193, 201, 210, 0.34);
 }
 
 .foliar-analysis-table-card__row--year-band-a {
-  background: rgba(62, 69, 75, 0.34);
+  background: rgba(187, 194, 201, 0.42);
 }
 
 .foliar-analysis-table-card__row--year-band-b {
-  background: rgba(77, 84, 90, 0.2);
+  background: rgba(200, 206, 213, 0.36);
 }
 
 .foliar-analysis-table-card__row--year-start td {
-  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  border-top: 1px solid rgba(125, 136, 145, 0.28);
 }
 
 .foliar-analysis-table-card__pill-scrollbar {
@@ -197,6 +198,9 @@
   pointer-events: auto;
   opacity: 1;
   overflow: visible;
+  border-radius: 999px;
+  background: transparent;
+  box-shadow: none;
 }
 
 .foliar-analysis-table-card__pill-scrollbar-thumb {
@@ -206,18 +210,18 @@
   height: 14px;
   min-width: 58px;
   border-radius: 999px;
-  background: rgba(70, 74, 79, 0.9);
+  background: rgba(116, 124, 133, 0.92);
   cursor: grab;
   transition: background-color 120ms ease;
 }
 
 .foliar-analysis-table-card__pill-scrollbar-thumb:hover {
-  background: rgba(82, 87, 92, 0.95);
+  background: rgba(129, 137, 146, 0.95);
 }
 
 .foliar-analysis-table-card__pill-scrollbar-thumb:active {
   cursor: grabbing;
-  background: rgba(58, 63, 68, 0.96);
+  background: rgba(104, 112, 121, 0.96);
 }
 
 .foliar-analysis-table-card__empty-message {
@@ -232,14 +236,14 @@
   font-size: var(--font-size-sm);
   line-height: var(--line-height-normal);
   font-weight: var(--font-weight-regular);
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(52, 63, 74, 0.88);
 }
 
 .foliar-analysis-table-card__empty-cell {
   padding: 24px 12px;
   text-align: center;
-  color: rgba(255, 255, 255, 0.84);
-  background: rgba(90, 96, 102, 0.2);
+  color: rgba(53, 64, 74, 0.86);
+  background: rgba(197, 204, 211, 0.44);
 }
 
 @media (max-width: 900px) {

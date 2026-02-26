@@ -90,7 +90,7 @@
   align-items: center;
   align-content: start;
   overflow: visible;
-  z-index: 2;
+  z-index: auto;
 }
 
 .lower-dots-bridge__lines--low {

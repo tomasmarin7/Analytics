@@ -12,7 +12,7 @@
   background: transparent;
   cursor: pointer;
   pointer-events: auto;
-  z-index: 10;
+  z-index: 2147483002;
   isolation: isolate;
 }
 

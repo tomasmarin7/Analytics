@@ -59,6 +59,18 @@
   outline-offset: 3px;
 }
 
+.lower-dots-bridge__fertilization-button--production-potential:focus-visible {
+  outline: 2px solid rgba(204, 212, 220, 0.95);
+}
+
+.lower-dots-bridge__fertilization-slot--production-potential {
+  --fertilization-slot-height: 425px;
+}
+
+.lower-dots-bridge__fertilization-button--production-potential {
+  --fertilization-height: 425px;
+}
+
 /* Visual surface */
 .lower-dots-bridge__fertilization-visual {
   position: absolute;
@@ -92,6 +104,12 @@
   --fx-green-noise-opacity: 0.12;
 }
 
+.lower-dots-bridge__fertilization-stain--production-potential {
+  border-radius: 6px;
+  box-shadow: none;
+  background: #7f8790;
+}
+
 .lower-dots-bridge__fertilization-blur {
   display: none;
 }
@@ -119,15 +137,39 @@
   overflow: hidden;
   text-overflow: ellipsis;
   transform: translateY(calc(var(--fertilization-height) - 54px));
-  transition: transform 260ms ease, top 260ms ease, left 260ms ease, right 260ms ease;
+  transition: transform 260ms ease, top 260ms ease, left 260ms ease, right 260ms ease, font-size 260ms ease;
   will-change: transform;
 }
 
 .lower-dots-bridge__fertilization-title--docked {
   top: 20px;
-  left: 24px;
+  left: 14px;
   right: 24px;
   transform: translateY(0);
+}
+
+.lower-dots-bridge__fertilization-button--production-potential .lower-dots-bridge__fertilization-title {
+  top: 14px;
+  bottom: auto;
+  left: 14px;
+  right: auto;
+  transform: rotate(-90deg) translateX(-100%);
+  transform-origin: left top;
+  font-size: 24px;
+  line-height: 1;
+  color: rgba(235, 240, 245, 0.95);
+  overflow: visible;
+  text-overflow: clip;
+  white-space: nowrap;
+}
+
+.lower-dots-bridge__fertilization-button--production-potential .lower-dots-bridge__fertilization-title--docked {
+  top: 18px;
+  left: 20px;
+  right: 20px;
+  transform: none;
+  transform-origin: left center;
+  font-size: 34px;
 }
 
 /* Expanded content */
@@ -137,8 +179,13 @@
   right: 24px;
   top: 70px;
   bottom: 16px;
+  display: flex;
   pointer-events: auto;
   z-index: 2;
   contain: layout paint;
   content-visibility: auto;
+}
+
+.lower-dots-bridge__fertilization-panel--production-potential {
+  top: 78px;
 }

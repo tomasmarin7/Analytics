@@ -33,21 +33,48 @@ export const getMonthMarkers = ({ year, startMs, endMs }) => {
   return markers;
 };
 
+const getPeriodGeometry = ({ startMs, endMs, viewStartMs, viewEndMs, viewSpanMs }) => {
+  const clippedStartMs = Math.max(startMs, viewStartMs);
+  const clippedEndMs = Math.min(endMs, viewEndMs);
+
+  if (clippedEndMs < clippedStartMs) return null;
+
+  const left = ((clippedStartMs - viewStartMs) / viewSpanMs) * 100;
+  const right = ((clippedEndMs + DAY_MS - viewStartMs) / viewSpanMs) * 100;
+
+  return {
+    left: clamp(left, 0, 100),
+    width: clamp(right - left, 0.7, 100),
+  };
+};
+
 export const getVisiblePeriods = ({ periods, viewStartMs, viewEndMs, viewSpanMs }) =>
   periods
     .map((period) => {
-      const clippedStartMs = Math.max(period.startMs, viewStartMs);
-      const clippedEndMs = Math.min(period.endMs, viewEndMs);
+      const closedGeometry = getPeriodGeometry({
+        startMs: period.startMs,
+        endMs: period.endMs,
+        viewStartMs,
+        viewEndMs,
+        viewSpanMs,
+      });
 
-      if (clippedEndMs < clippedStartMs) return null;
+      const raisedGeometry = getPeriodGeometry({
+        startMs: period.raisedStartMs ?? period.focusStartMs ?? period.startMs,
+        endMs: period.raisedEndMs ?? period.endMs,
+        viewStartMs,
+        viewEndMs,
+        viewSpanMs,
+      });
 
-      const left = ((clippedStartMs - viewStartMs) / viewSpanMs) * 100;
-      const right = ((clippedEndMs + DAY_MS - viewStartMs) / viewSpanMs) * 100;
+      if (!closedGeometry && !raisedGeometry) return null;
 
       return {
         ...period,
-        left: clamp(left, 0, 100),
-        width: clamp(right - left, 0.7, 100),
+        left: closedGeometry?.left ?? raisedGeometry.left,
+        width: closedGeometry?.width ?? raisedGeometry.width,
+        raisedLeft: raisedGeometry?.left ?? closedGeometry.left,
+        raisedWidth: raisedGeometry?.width ?? closedGeometry.width,
       };
     })
     .filter(Boolean);

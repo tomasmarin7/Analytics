@@ -1,3 +1,5 @@
+import { PERIOD_PANEL_TYPES } from "./panelTypes";
+
 export const createDefaultPeriods = (year) => [
   {
     id: "periodo-fertilizacion",
@@ -6,6 +8,19 @@ export const createDefaultPeriods = (year) => [
     endMs: Date.UTC(year, 3, 0),
     focusStartMs: Date.UTC(year, 0, 1),
     focusEndMs: Date.UTC(year, 3, 1),
+    variant: "fertilization",
+    panelType: PERIOD_PANEL_TYPES.FERTILIZATION,
+  },
+  {
+    id: "periodo-produccion-posible",
+    label: "Producción Posible",
+    startMs: Date.UTC(year, 5, 15),
+    endMs: Date.UTC(year, 6, 1),
+    raisedStartMs: Date.UTC(year, 5, 1),
+    focusStartMs: Date.UTC(year, 4, 15),
+    focusEndMs: Date.UTC(year, 6, 1),
+    variant: "production-potential",
+    panelType: PERIOD_PANEL_TYPES.PRODUCTION_POTENTIAL,
   },
 ];
 

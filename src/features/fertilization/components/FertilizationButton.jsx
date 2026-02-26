@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import fertilizationPlanRows from "../../../data/fertilizationPlanRows.json";
-import FertilizationPlanTable from "./FertilizationPlanTable";
+import { ProductionPotentialPeriodPanel } from "../../productionPotential";
+import { PERIOD_PANEL_TYPES } from "../config/panelTypes";
+import FertilizationPeriodPanel from "./FertilizationPeriodPanel";
 import "../styles/FertilizationButton.css";
 
 const TITLE_DOCK_ANIMATION_MS = 260;
@@ -12,6 +14,11 @@ const TABLE_HEADER_HEIGHT_PX = 42;
 const TABLE_ROW_HEIGHT_PX = 40;
 const ACTIONS_BLOCK_HEIGHT_PX = 66;
 const PANEL_EXTRA_GAP_PX = 12;
+const PRODUCTION_POTENTIAL_BLOCK_HEIGHT_PX = 425;
+const PANEL_BASE_HEIGHT_BY_TYPE = {
+  [PERIOD_PANEL_TYPES.FERTILIZATION]: null,
+  [PERIOD_PANEL_TYPES.PRODUCTION_POTENTIAL]: PRODUCTION_POTENTIAL_BLOCK_HEIGHT_PX,
+};
 
 const FertilizationButton = ({
   period,
@@ -22,6 +29,8 @@ const FertilizationButton = ({
   selectedYears,
   onRequestForeground,
 }) => {
+  const panelType = period?.panelType;
+  const isProductionPotentialPeriod = panelType === PERIOD_PANEL_TYPES.PRODUCTION_POTENTIAL;
   const [isTitleDocked, setIsTitleDocked] = useState(false);
   const [isPanelVisible, setIsPanelVisible] = useState(false);
   const panelTimeoutRef = useRef(null);
@@ -46,12 +55,23 @@ const FertilizationButton = ({
   }, [normalizedSelectedCuartel, selectedYearSet]);
 
   const raisedHeight = useMemo(() => {
+    const fixedHeight = PANEL_BASE_HEIGHT_BY_TYPE[panelType];
+    if (fixedHeight) return fixedHeight;
+
     const visibleRows = Math.max(1, filteredRowsCount + 1);
     const tableHeight = TABLE_HEADER_HEIGHT_PX + visibleRows * TABLE_ROW_HEIGHT_PX;
     const panelContentHeight = tableHeight + ACTIONS_BLOCK_HEIGHT_PX + PANEL_EXTRA_GAP_PX;
     const calculatedHeight = PANEL_TOP_OFFSET_PX + PANEL_BOTTOM_OFFSET_PX + panelContentHeight;
     return Math.max(MIN_RAISED_HEIGHT_PX, calculatedHeight);
-  }, [filteredRowsCount]);
+  }, [filteredRowsCount, panelType]);
+
+  const slotGeometry = useMemo(
+    () => ({
+      left: Number(isRaised ? period?.raisedLeft ?? period?.left ?? 0 : period?.left ?? 0),
+      width: Number(isRaised ? period?.raisedWidth ?? period?.width ?? 0 : period?.width ?? 0),
+    }),
+    [isRaised, period?.left, period?.raisedLeft, period?.raisedWidth, period?.width],
+  );
 
   useEffect(
     () => () => {
@@ -91,14 +111,28 @@ const FertilizationButton = ({
     }, TITLE_DOCK_ANIMATION_MS);
   }, [isRaised]);
 
+  const renderPanelContent = () => {
+    if (panelType === PERIOD_PANEL_TYPES.PRODUCTION_POTENTIAL) {
+      return <ProductionPotentialPeriodPanel selectedCuartel={selectedCuartel} selectedYears={selectedYears} />;
+    }
+
+    return (
+      <FertilizationPeriodPanel
+        selectedHuerto={selectedHuerto}
+        selectedCuartel={selectedCuartel}
+        selectedYears={selectedYears}
+      />
+    );
+  };
+
   return (
     <div
       className={`lower-dots-bridge__fertilization-slot ${
         isRaised ? "lower-dots-bridge__fertilization-slot--raised" : ""
-      }`}
+      } ${isProductionPotentialPeriod ? "lower-dots-bridge__fertilization-slot--production-potential" : ""}`}
       style={{
-        left: `${period.left}%`,
-        width: `${period.width}%`,
+        left: `${slotGeometry.left}%`,
+        width: `${slotGeometry.width}%`,
         "--fertilization-raised-height": `${isRaised ? raisedHeight : CLOSED_HEIGHT_PX}px`,
       }}
       onPointerDown={onRequestForeground}
@@ -107,7 +141,7 @@ const FertilizationButton = ({
         type="button"
         className={`lower-dots-bridge__fertilization-button ${
           isRaised ? "lower-dots-bridge__fertilization-button--raised" : ""
-        }`}
+        } ${isProductionPotentialPeriod ? "lower-dots-bridge__fertilization-button--production-potential" : ""}`}
         title={period.label}
         aria-label={period.label}
         onClick={() => onClick?.(period)}
@@ -121,19 +155,27 @@ const FertilizationButton = ({
           >
             {period.label}
           </span>
-          <span className="lower-dots-bridge__fertilization-stain fx-grainy-green-surface" aria-hidden="true">
+          <span
+            className={`lower-dots-bridge__fertilization-stain ${
+              isProductionPotentialPeriod
+                ? "lower-dots-bridge__fertilization-stain--production-potential"
+                : "fx-grainy-green-surface"
+            }`}
+            aria-hidden="true"
+          >
             <span className="lower-dots-bridge__fertilization-blur" />
           </span>
         </span>
       </button>
 
       {isRaised && isPanelVisible ? (
-        <div className="lower-dots-bridge__fertilization-panel" onPointerDown={onRequestForeground}>
-          <FertilizationPlanTable
-            selectedHuerto={selectedHuerto}
-            selectedCuartel={selectedCuartel}
-            selectedYears={selectedYears}
-          />
+        <div
+          className={`lower-dots-bridge__fertilization-panel ${
+            isProductionPotentialPeriod ? "lower-dots-bridge__fertilization-panel--production-potential" : ""
+          }`}
+          onPointerDown={onRequestForeground}
+        >
+          {renderPanelContent()}
         </div>
       ) : null}
     </div>

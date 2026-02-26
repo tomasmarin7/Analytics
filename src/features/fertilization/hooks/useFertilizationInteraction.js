@@ -1,8 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { DAY_MS } from "../../../components/timeline/constants";
 import { getFallbackFocusRange } from "../config/periods";
-
-const ZOOM_ANIMATION_MS = 380;
 
 export const useFertilizationInteraction = ({
   viewStartMs,
@@ -14,21 +12,8 @@ export const useFertilizationInteraction = ({
   onHandleKeyDown,
 }) => {
   const [raisedPeriodId, setRaisedPeriodId] = useState(null);
-  const animationTimeoutRef = useRef(null);
-
-  useEffect(() => {
-    return () => {
-      if (!animationTimeoutRef.current) return;
-      clearTimeout(animationTimeoutRef.current);
-      animationTimeoutRef.current = null;
-    };
-  }, []);
 
   const clearRaisedPeriod = useCallback(() => {
-    if (animationTimeoutRef.current) {
-      clearTimeout(animationTimeoutRef.current);
-      animationTimeoutRef.current = null;
-    }
     setRaisedPeriodId(null);
   }, []);
 
@@ -44,35 +29,22 @@ export const useFertilizationInteraction = ({
 
       const nextRaisedPeriodId = isFocusedOnPeriod ? null : period?.id ?? null;
 
-      if (animationTimeoutRef.current) {
-        clearTimeout(animationTimeoutRef.current);
-        animationTimeoutRef.current = null;
-      }
-
       if (isFocusedOnPeriod) {
         setRaisedPeriodId(null);
-
-        animationTimeoutRef.current = setTimeout(() => {
-          setVisibleRangeByDates({
-            startMs: yearStartMs,
-            endMs: yearEndMs,
-            animate: true,
-          });
-          animationTimeoutRef.current = null;
-        }, ZOOM_ANIMATION_MS);
+        setVisibleRangeByDates({
+          startMs: yearStartMs,
+          endMs: yearEndMs,
+          animate: true,
+        });
         return;
       }
 
+      setRaisedPeriodId(nextRaisedPeriodId);
       setVisibleRangeByDates({
         startMs: nextStartMs,
         endMs: nextEndMs,
         animate: true,
       });
-
-      animationTimeoutRef.current = setTimeout(() => {
-        setRaisedPeriodId(nextRaisedPeriodId);
-        animationTimeoutRef.current = null;
-      }, ZOOM_ANIMATION_MS);
     },
     [setVisibleRangeByDates, viewEndMs, viewStartMs, yearEndMs, yearStartMs],
   );
