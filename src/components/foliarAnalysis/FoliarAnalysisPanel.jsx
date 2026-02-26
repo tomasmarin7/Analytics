@@ -18,16 +18,22 @@ import {
   sortPrePruningCountRows,
 } from "./prePruningCountConfig";
 
+const FOLIAR_MAPPED_ROWS = foliarAnalysisRows.map(mapFoliarRow);
+const BUD_MAPPED_ROWS = budAnalysisRows.map(mapBudRow);
+const PRE_PRUNING_MAPPED_ROWS = prePruningCountRows.map(mapPrePruningCountRow);
+
 const YEAR_SELECTOR_RAW_ROWS = [
   ...foliarAnalysisRows,
   ...budAnalysisRows,
   ...prePruningCountRows,
 ];
 
-const mapYearSelectorRow = (row) => ({
+const YEAR_SELECTOR_ROWS_MAPPED = YEAR_SELECTOR_RAW_ROWS.map((row) => ({
   year: Number(row["Temp."]),
   cuartel: row.Cuartel,
-});
+}));
+
+const mapYearSelectorRow = (row) => row;
 
 const TONE_BY_DATASET_ID = {
   foliar: "fertilization",
@@ -44,21 +50,23 @@ const countDataPoints = (row, fields) =>
 const buildTableRows = ({
   selectedCuartel,
   selectedYears,
-  rawRows,
-  mapRow,
+  mappedRows,
   scoreFields,
   keepAllRowsPerYear = false,
   sortRows,
 }) => {
   const normalizedSelectedCuartel = String(selectedCuartel ?? "").trim().toUpperCase();
-  if (!normalizedSelectedCuartel) return [];
+  if (!normalizedSelectedCuartel || !selectedYears?.length) return [];
 
-  const mappedRows = rawRows.map(mapRow);
-  const rowsForCuartel = mappedRows.filter(
-    (row) => String(row.cuartel ?? "").trim().toUpperCase() === normalizedSelectedCuartel
-  );
-  const selectedYearsSet = new Set(selectedYears ?? []);
-  const filteredRows = rowsForCuartel.filter((row) => selectedYearsSet.has(row.year));
+  const selectedYearsSet = new Set(selectedYears);
+  const rowsForCuartel = [];
+
+  for (const row of mappedRows) {
+    const rowCuartel = String(row.cuartel ?? "").trim().toUpperCase();
+    if (rowCuartel !== normalizedSelectedCuartel) continue;
+    if (!selectedYearsSet.has(row.year)) continue;
+    rowsForCuartel.push(row);
+  }
 
   const defaultSortRows = (a, b) => {
     if (a.year !== b.year) return a.year - b.year;
@@ -67,9 +75,9 @@ const buildTableRows = ({
     return String(a.cuartel).localeCompare(String(b.cuartel));
   };
 
-  if (keepAllRowsPerYear) return [...filteredRows].sort(sortRows ?? defaultSortRows);
+  if (keepAllRowsPerYear) return [...rowsForCuartel].sort(sortRows ?? defaultSortRows);
 
-  return [...filteredRows
+  return [...rowsForCuartel
     .reduce((rowsByYear, row) => {
       const current = rowsByYear.get(row.year);
       if (!current || countDataPoints(row, scoreFields) > countDataPoints(current, scoreFields)) {
@@ -86,51 +94,58 @@ const FoliarAnalysisPanel = ({
   selectedYears,
   onSelectedYearsChange,
 }) => {
-  const prePruningEvent = activeEvents.find(
-    (event) =>
-      event.id === PRE_PRUNING_COUNT_EVENT_ID ||
-      String(event.label ?? "")
-        .trim()
-        .toLowerCase()
-        .includes("conteo")
+  const activeEventIds = useMemo(() => new Set(activeEvents.map((event) => event.id)), [activeEvents]);
+
+  const prePruningEvent = useMemo(
+    () =>
+      activeEvents.find(
+        (event) =>
+          event.id === PRE_PRUNING_COUNT_EVENT_ID ||
+          String(event.label ?? "")
+            .trim()
+            .toLowerCase()
+            .includes("conteo")
+      ),
+    [activeEvents],
   );
 
-  const activeDatasets = [
-    activeEvents.some((event) => event.id === FOLIAR_ANALYSIS_EVENT_ID)
-      ? {
-          id: "foliar",
-          label: "Foliar",
-          columns: FOLIAR_COLUMNS,
-          rawRows: foliarAnalysisRows,
-          mapRow: mapFoliarRow,
-          scoreFields: FOLIAR_SCORE_FIELDS,
-        }
-      : null,
-    activeEvents.some((event) => event.id === BUD_ANALYSIS_EVENT_ID)
-      ? {
-          id: "bud",
-          label: "Yemas",
-          columns: BUD_COLUMNS,
-          rawRows: budAnalysisRows,
-          mapRow: mapBudRow,
-          scoreFields: BUD_SCORE_FIELDS,
-          keepAllRowsPerYear: true,
-          sortRows: sortBudRows,
-        }
-      : null,
-    prePruningEvent
-      ? {
-          id: "pre-pruning-count",
-          label: "Pre poda",
-          columns: PRE_PRUNING_COUNT_COLUMNS,
-          rawRows: prePruningCountRows,
-          mapRow: mapPrePruningCountRow,
-          scoreFields: PRE_PRUNING_COUNT_SCORE_FIELDS,
-          keepAllRowsPerYear: true,
-          sortRows: sortPrePruningCountRows,
-        }
-      : null,
-  ].filter(Boolean);
+  const activeDatasets = useMemo(
+    () =>
+      [
+        activeEventIds.has(FOLIAR_ANALYSIS_EVENT_ID)
+          ? {
+              id: "foliar",
+              label: "Foliar",
+              columns: FOLIAR_COLUMNS,
+              mappedRows: FOLIAR_MAPPED_ROWS,
+              scoreFields: FOLIAR_SCORE_FIELDS,
+            }
+          : null,
+        activeEventIds.has(BUD_ANALYSIS_EVENT_ID)
+          ? {
+              id: "bud",
+              label: "Yemas",
+              columns: BUD_COLUMNS,
+              mappedRows: BUD_MAPPED_ROWS,
+              scoreFields: BUD_SCORE_FIELDS,
+              keepAllRowsPerYear: true,
+              sortRows: sortBudRows,
+            }
+          : null,
+        prePruningEvent
+          ? {
+              id: "pre-pruning-count",
+              label: "Pre poda",
+              columns: PRE_PRUNING_COUNT_COLUMNS,
+              mappedRows: PRE_PRUNING_MAPPED_ROWS,
+              scoreFields: PRE_PRUNING_COUNT_SCORE_FIELDS,
+              keepAllRowsPerYear: true,
+              sortRows: sortPrePruningCountRows,
+            }
+          : null,
+      ].filter(Boolean),
+    [activeEventIds, prePruningEvent],
+  );
 
   const hasDataTable = activeDatasets.length > 0;
   const unifiedColumns = useMemo(
@@ -158,8 +173,7 @@ const FoliarAnalysisPanel = ({
           buildTableRows({
             selectedCuartel,
             selectedYears,
-            rawRows: dataset.rawRows,
-            mapRow: dataset.mapRow,
+            mappedRows: dataset.mappedRows,
             scoreFields: dataset.scoreFields,
             keepAllRowsPerYear: dataset.keepAllRowsPerYear,
             sortRows: dataset.sortRows,
@@ -199,10 +213,10 @@ const FoliarAnalysisPanel = ({
     });
 
     varietiesByYear.forEach((varieties, year) => {
-        if (varieties.size !== 1) return;
-        const [onlyVariety] = varieties.keys();
-        const current = preferredVarietyByYear.get(year);
-        if (!current) preferredVarietyByYear.set(year, onlyVariety);
+      if (varieties.size !== 1) return;
+      const [onlyVariety] = varieties.keys();
+      const current = preferredVarietyByYear.get(year);
+      if (!current) preferredVarietyByYear.set(year, onlyVariety);
     });
 
     const rowsByKey = new Map();
@@ -260,7 +274,7 @@ const FoliarAnalysisPanel = ({
   return (
     <DataRecordsSection
       selectedCuartel={selectedCuartel}
-      rawRows={YEAR_SELECTOR_RAW_ROWS}
+      rawRows={YEAR_SELECTOR_ROWS_MAPPED}
       mapRow={mapYearSelectorRow}
       scoreFields={[]}
       keepAllRowsPerYear

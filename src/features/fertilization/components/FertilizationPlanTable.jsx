@@ -22,11 +22,14 @@ const FertilizationPlanTable = ({ selectedHuerto, selectedCuartel, selectedYears
 
   const filteredRows = useMemo(() => {
     if (!normalizedSelectedCuartel || selectedYearSet.size === 0) return [];
-
-    return fertilizationPlanRows
-      .filter((row) => String(row.cuartel ?? "").trim().toUpperCase() === normalizedSelectedCuartel)
-      .filter((row) => selectedYearSet.has(Number(row.temp)))
-      .sort((a, b) => Number(a.temp) - Number(b.temp));
+    const rows = [];
+    for (const row of fertilizationPlanRows) {
+      const rowCuartel = String(row.cuartel ?? "").trim().toUpperCase();
+      if (rowCuartel !== normalizedSelectedCuartel) continue;
+      if (!selectedYearSet.has(Number(row.temp))) continue;
+      rows.push(row);
+    }
+    return rows.sort((a, b) => Number(a.temp) - Number(b.temp));
   }, [normalizedSelectedCuartel, selectedYearSet]);
 
   if (!normalizedSelectedCuartel) {

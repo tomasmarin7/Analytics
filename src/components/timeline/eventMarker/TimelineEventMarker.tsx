@@ -20,6 +20,7 @@ type TimelineEventConnector = {
 type TimelineEventMarkerProps = {
   eventId: string;
   label: string;
+  labelLines?: string[];
   leftPx: number;
   isActive: boolean;
   isOutOfView?: boolean;
@@ -30,12 +31,14 @@ type TimelineEventMarkerProps = {
 const TimelineEventMarker = ({
   eventId,
   label,
+  labelLines,
   leftPx,
   isActive,
   isOutOfView = false,
   connector,
   onToggle,
 }: TimelineEventMarkerProps) => {
+  const renderedLabelLines = labelLines?.length ? labelLines : [label];
   const connectorPath =
     connector.fixedLeftPx === undefined
       ? connector.path ?? ""
@@ -69,7 +72,11 @@ const TimelineEventMarker = ({
       <span className="timeline-event-marker__shape" aria-hidden="true" />
       <span className="timeline-event-marker__stem" aria-hidden="true" />
       <span className="timeline-event-marker__label" aria-hidden="true">
-        {label}
+        {renderedLabelLines.map((line) => (
+          <span key={line} className="timeline-event-marker__label-line">
+            {line}
+          </span>
+        ))}
       </span>
 
       {isActive && (

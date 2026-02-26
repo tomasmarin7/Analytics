@@ -126,7 +126,6 @@
   justify-self: center;
   border-radius: 999px;
   transform-origin: center center;
-  transition: transform 160ms ease-out;
 }
 
 .lower-dots-bridge__line--month-start {

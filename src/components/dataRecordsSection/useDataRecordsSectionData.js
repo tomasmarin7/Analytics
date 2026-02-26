@@ -41,19 +41,21 @@ export const useDataRecordsSectionData = ({
       ),
     [cuartelRows]
   );
+  const availableYearsSet = useMemo(() => new Set(availableYears), [availableYears]);
 
   const selectedYearsForCuartel = useMemo(
-    () => selectedYears.filter((year) => availableYears.includes(year)).sort((a, b) => a - b),
-    [selectedYears, availableYears]
+    () => selectedYears.filter((year) => availableYearsSet.has(year)).sort((a, b) => a - b),
+    [selectedYears, availableYearsSet]
   );
+  const selectedYearsSet = useMemo(() => new Set(selectedYearsForCuartel), [selectedYearsForCuartel]);
 
   useEffect(() => {
-    setSelectedYears([]);
+    setSelectedYears((current) => (current.length ? [] : current));
   }, [normalizedSelectedCuartel, setSelectedYears]);
 
   const filteredRows = useMemo(
-    () => cuartelRows.filter((row) => selectedYearsForCuartel.includes(row.year)),
-    [cuartelRows, selectedYearsForCuartel]
+    () => cuartelRows.filter((row) => selectedYearsSet.has(row.year)),
+    [cuartelRows, selectedYearsSet]
   );
 
   const rowData = useMemo(

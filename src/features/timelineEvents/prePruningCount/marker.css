@@ -5,11 +5,3 @@
     radial-gradient(146% 138% at 90% 92%, rgba(196, 201, 207, 0.44) 0%, rgba(196, 201, 207, 0) 68%),
     linear-gradient(135deg, #2a2d31 0%, #4a5057 46%, #a4acb4 100%);
 }
-
-.timeline-event-marker--pre-pruning-count .timeline-event-marker__stem {
-  height: 104px;
-}
-
-.timeline-event-marker--pre-pruning-count .timeline-event-marker__label {
-  top: calc(50% + 160px);
-}

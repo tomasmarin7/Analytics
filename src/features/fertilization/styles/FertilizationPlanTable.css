@@ -1,6 +1,6 @@
 .fertilization-plan-table__content {
   width: 100%;
-  height: 100%;
+  height: auto;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -9,9 +9,9 @@
 
 .fertilization-plan-table__scroll {
   width: 100%;
-  flex: 0 1 auto;
-  max-height: min(360px, calc(100% - 84px));
-  overflow: auto;
+  flex: 0 0 auto;
+  max-height: none;
+  overflow: hidden;
   border-radius: 10px;
   background: rgba(19, 25, 20, 0.28);
 }
@@ -72,7 +72,7 @@
 .fertilization-plan-table__actions {
   display: flex;
   justify-content: flex-end;
-  margin-top: auto;
+  margin-top: 12px;
 }
 
 .fertilization-plan-table__register-button {

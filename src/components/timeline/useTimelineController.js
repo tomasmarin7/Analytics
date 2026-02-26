@@ -16,6 +16,7 @@ export const useTimelineController = ({ periods } = {}) => {
   const dragRef = useRef(null);
   const ratiosRef = useRef(DEFAULT_RATIOS);
   const animationFrameRef = useRef(null);
+  const animationStateRef = useRef({ lastPaintMs: 0 });
 
   const now = new Date();
   const year = now.getFullYear();
@@ -70,6 +71,7 @@ export const useTimelineController = ({ periods } = {}) => {
         return {
           id: eventDef.id,
           label: eventDef.label,
+          labelLines: eventDef.labelLines ?? [eventDef.label],
           connector: eventDef.connector,
           isVisible: eventMs >= viewStartMs && eventMs <= viewEndMs,
           leftPercent: ((eventMs - viewStartMs) / viewSpanMs) * 100,
@@ -98,6 +100,12 @@ export const useTimelineController = ({ periods } = {}) => {
 
     if (clampedRight - clampedLeft < minGap) return;
 
+    const previousLeft = ratiosRef.current.leftRatio;
+    const previousRight = ratiosRef.current.rightRatio;
+    if (Math.abs(clampedLeft - previousLeft) < 0.00001 && Math.abs(clampedRight - previousRight) < 0.00001) {
+      return;
+    }
+
     ratiosRef.current.leftRatio = clampedLeft;
     ratiosRef.current.rightRatio = clampedRight;
 
@@ -109,11 +117,13 @@ export const useTimelineController = ({ periods } = {}) => {
     if (!animationFrameRef.current) return;
     cancelAnimationFrame(animationFrameRef.current);
     animationFrameRef.current = null;
+    animationStateRef.current.lastPaintMs = 0;
   }, []);
 
   const animateToRatios = useCallback(
     (targetLeft, targetRight, { durationMs = 380 } = {}) => {
       cancelRangeAnimation();
+      animationStateRef.current.lastPaintMs = 0;
 
       const startLeft = ratiosRef.current.leftRatio;
       const startRight = ratiosRef.current.rightRatio;
@@ -124,6 +134,15 @@ export const useTimelineController = ({ periods } = {}) => {
       const easeInOutQuad = (t) => (t < 0.5 ? 2 * t * t : 1 - ((-2 * t + 2) ** 2) / 2);
 
       const step = (nowMs) => {
+        if (
+          animationStateRef.current.lastPaintMs &&
+          nowMs - animationStateRef.current.lastPaintMs < 1000 / 30
+        ) {
+          animationFrameRef.current = requestAnimationFrame(step);
+          return;
+        }
+        animationStateRef.current.lastPaintMs = nowMs;
+
         const elapsed = nowMs - startTime;
         const progress = clamp(elapsed / durationMs, 0, 1);
         const eased = easeInOutQuad(progress);

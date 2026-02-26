@@ -1,5 +1,17 @@
+import { useEffect, useMemo, useRef, useState } from "react";
+import fertilizationPlanRows from "../../../data/fertilizationPlanRows.json";
 import FertilizationPlanTable from "./FertilizationPlanTable";
 import "../styles/FertilizationButton.css";
+
+const TITLE_DOCK_ANIMATION_MS = 260;
+const CLOSED_HEIGHT_PX = 64;
+const MIN_RAISED_HEIGHT_PX = 280;
+const PANEL_TOP_OFFSET_PX = 70;
+const PANEL_BOTTOM_OFFSET_PX = 16;
+const TABLE_HEADER_HEIGHT_PX = 42;
+const TABLE_ROW_HEIGHT_PX = 40;
+const ACTIONS_BLOCK_HEIGHT_PX = 66;
+const PANEL_EXTRA_GAP_PX = 12;
 
 const FertilizationButton = ({
   period,
@@ -9,36 +21,123 @@ const FertilizationButton = ({
   selectedCuartel,
   selectedYears,
   onRequestForeground,
-}) => (
-  <div
-    className={`lower-dots-bridge__fertilization-slot ${
-      isRaised ? "lower-dots-bridge__fertilization-slot--raised" : ""
-    }`}
-    style={{ left: `${period.left}%`, width: `${period.width}%` }}
-    onPointerDown={onRequestForeground}
-  >
-    <button
-      type="button"
-      className={`lower-dots-bridge__fertilization-button ${
-        isRaised ? "lower-dots-bridge__fertilization-button--raised" : ""
+}) => {
+  const [isTitleDocked, setIsTitleDocked] = useState(false);
+  const [isPanelVisible, setIsPanelVisible] = useState(false);
+  const panelTimeoutRef = useRef(null);
+  const frameRef = useRef(null);
+
+  const normalizedSelectedCuartel = useMemo(
+    () => String(selectedCuartel ?? "").trim().toUpperCase(),
+    [selectedCuartel],
+  );
+  const selectedYearSet = useMemo(() => new Set(selectedYears), [selectedYears]);
+
+  const filteredRowsCount = useMemo(() => {
+    if (!normalizedSelectedCuartel || selectedYearSet.size === 0) return 0;
+    let count = 0;
+    for (const row of fertilizationPlanRows) {
+      const rowCuartel = String(row.cuartel ?? "").trim().toUpperCase();
+      if (rowCuartel !== normalizedSelectedCuartel) continue;
+      if (!selectedYearSet.has(Number(row.temp))) continue;
+      count += 1;
+    }
+    return count;
+  }, [normalizedSelectedCuartel, selectedYearSet]);
+
+  const raisedHeight = useMemo(() => {
+    const visibleRows = Math.max(1, filteredRowsCount + 1);
+    const tableHeight = TABLE_HEADER_HEIGHT_PX + visibleRows * TABLE_ROW_HEIGHT_PX;
+    const panelContentHeight = tableHeight + ACTIONS_BLOCK_HEIGHT_PX + PANEL_EXTRA_GAP_PX;
+    const calculatedHeight = PANEL_TOP_OFFSET_PX + PANEL_BOTTOM_OFFSET_PX + panelContentHeight;
+    return Math.max(MIN_RAISED_HEIGHT_PX, calculatedHeight);
+  }, [filteredRowsCount]);
+
+  useEffect(
+    () => () => {
+      if (panelTimeoutRef.current) clearTimeout(panelTimeoutRef.current);
+      if (frameRef.current) cancelAnimationFrame(frameRef.current);
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (panelTimeoutRef.current) {
+      clearTimeout(panelTimeoutRef.current);
+      panelTimeoutRef.current = null;
+    }
+    if (frameRef.current) {
+      cancelAnimationFrame(frameRef.current);
+      frameRef.current = null;
+    }
+
+    if (!isRaised) {
+      setIsPanelVisible(false);
+      setIsTitleDocked(false);
+      return;
+    }
+
+    setIsPanelVisible(false);
+    setIsTitleDocked(false);
+
+    frameRef.current = requestAnimationFrame(() => {
+      setIsTitleDocked(true);
+      frameRef.current = null;
+    });
+
+    panelTimeoutRef.current = setTimeout(() => {
+      setIsPanelVisible(true);
+      panelTimeoutRef.current = null;
+    }, TITLE_DOCK_ANIMATION_MS);
+  }, [isRaised]);
+
+  return (
+    <div
+      className={`lower-dots-bridge__fertilization-slot ${
+        isRaised ? "lower-dots-bridge__fertilization-slot--raised" : ""
       }`}
-      title={period.label}
-      onClick={() => onClick?.(period)}
+      style={{
+        left: `${period.left}%`,
+        width: `${period.width}%`,
+        "--fertilization-raised-height": `${isRaised ? raisedHeight : CLOSED_HEIGHT_PX}px`,
+      }}
       onPointerDown={onRequestForeground}
     >
-      <span className="lower-dots-bridge__fertilization-title">{period.label}</span>
-    </button>
+      <button
+        type="button"
+        className={`lower-dots-bridge__fertilization-button ${
+          isRaised ? "lower-dots-bridge__fertilization-button--raised" : ""
+        }`}
+        title={period.label}
+        aria-label={period.label}
+        onClick={() => onClick?.(period)}
+        onPointerDown={onRequestForeground}
+      >
+        <span className="lower-dots-bridge__fertilization-visual">
+          <span
+            className={`lower-dots-bridge__fertilization-title ${
+              isTitleDocked ? "lower-dots-bridge__fertilization-title--docked" : ""
+            }`}
+          >
+            {period.label}
+          </span>
+          <span className="lower-dots-bridge__fertilization-stain fx-grainy-green-surface" aria-hidden="true">
+            <span className="lower-dots-bridge__fertilization-blur" />
+          </span>
+        </span>
+      </button>
 
-    {isRaised ? (
-      <div className="lower-dots-bridge__fertilization-panel" onPointerDown={onRequestForeground}>
-        <FertilizationPlanTable
-          selectedHuerto={selectedHuerto}
-          selectedCuartel={selectedCuartel}
-          selectedYears={selectedYears}
-        />
-      </div>
-    ) : null}
-  </div>
-);
+      {isRaised && isPanelVisible ? (
+        <div className="lower-dots-bridge__fertilization-panel" onPointerDown={onRequestForeground}>
+          <FertilizationPlanTable
+            selectedHuerto={selectedHuerto}
+            selectedCuartel={selectedCuartel}
+            selectedYears={selectedYears}
+          />
+        </div>
+      ) : null}
+    </div>
+  );
+};
 
 export default FertilizationButton;

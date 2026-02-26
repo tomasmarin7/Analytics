@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import TimelineEventMarker from "./eventMarker/TimelineEventMarker";
 import { EventActivationOverlay } from "./eventActivation";
 import { EVENT_ACTIVATION_VERTICAL_TOP_PX } from "./eventActivation/constants";
@@ -41,11 +41,11 @@ const DayLines = ({
     };
   }, []);
 
-  const activeEventSet = new Set(activeEventIds ?? []);
-  const activeEvents = timelineEvents.filter((event) => activeEventSet.has(event.id));
+  const currentActiveEventSet = useMemo(() => new Set(activeEventIds ?? []), [activeEventIds]);
+  const activeEvents = timelineEvents.filter((event) => currentActiveEventSet.has(event.id));
   const hasDataRecordsContent = activeEvents.some((event) => DATA_RECORDS_EVENT_IDS.includes(event.id));
   const renderedMarkerEvents = timelineEvents
-    .filter((event) => event.isVisible || activeEventSet.has(event.id))
+    .filter((event) => event.isVisible || currentActiveEventSet.has(event.id))
     .map((event) => {
       const markerLeftPercent = clamp(event.leftPercent, 0, 100);
       return {
@@ -104,8 +104,9 @@ const DayLines = ({
           key={event.id}
           eventId={event.id}
           label={event.label}
+          labelLines={event.labelLines}
           leftPx={event.markerLeftPx}
-          isActive={activeEventSet.has(event.id)}
+          isActive={currentActiveEventSet.has(event.id)}
           isOutOfView={event.markerOutOfView}
           connector={event.connector}
           onToggle={onTimelineEventToggle}
