@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Mapa from "./Mapa";
 import mapaCompletoHuerto from "../../mapa_completo_huerto.json";
 import flechaSidePopover from "../assets/images/flecha-side-pop-over.png";
@@ -6,6 +6,7 @@ import foliarAnalysisRows from "../data/foliarAnalysisRows.json";
 
 const MAP_COORDINATE = { lat: -35.80658, lng: -71.807608 };
 const MAP_ZOOM = 15;
+const POLYGON_CUARTEL_MAP_STORAGE_KEY = "polygonCuartelMap";
 
 const isLatLngPoint = (value) => {
   const lat = Number(value?.lat);
@@ -38,24 +39,82 @@ const collectPolygonPaths = (value) => {
   return value.flatMap((item) => collectPolygonPaths(item));
 };
 
+const createDeterministicPolygonCuartelMap = ({ availableCuarteles, polygonCount }) => {
+  const nextMap = {};
+  if (!Array.isArray(availableCuarteles) || availableCuarteles.length === 0) {
+    return nextMap;
+  }
+
+  for (let polygonId = 0; polygonId < polygonCount; polygonId += 1) {
+    nextMap[polygonId] = availableCuarteles[polygonId % availableCuarteles.length] ?? null;
+  }
+
+  return nextMap;
+};
+
+const buildPersistentPolygonCuartelMap = ({ rawStoredMap, availableCuarteles, polygonCount }) => {
+  const storedMap = rawStoredMap && typeof rawStoredMap === "object" ? rawStoredMap : {};
+  const fallbackMap = createDeterministicPolygonCuartelMap({ availableCuarteles, polygonCount });
+  const availableCuartelesSet = new Set(availableCuarteles.map((value) => String(value).trim().toUpperCase()));
+  const nextMap = {};
+
+  for (let polygonId = 0; polygonId < polygonCount; polygonId += 1) {
+    const rawCuartel = String(storedMap[polygonId] ?? "").trim();
+    const normalizedCuartel = rawCuartel.toUpperCase();
+    const hasValidStoredCuartel = rawCuartel && availableCuartelesSet.has(normalizedCuartel);
+
+    nextMap[polygonId] = hasValidStoredCuartel ? rawCuartel : fallbackMap[polygonId] ?? null;
+  }
+
+  return nextMap;
+};
+
 const SidePopover = ({ onSelectedCuartelChange }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [polygonCuartelMap, setPolygonCuartelMap] = useState({});
   const availableCuarteles = useMemo(
     () =>
       [...new Set(foliarAnalysisRows.map((row) => String(row.Cuartel ?? "").trim()).filter(Boolean))].sort(),
     []
   );
   const polygonPaths = useMemo(() => collectPolygonPaths(mapaCompletoHuerto), []);
-  const polygonCuartelMap = useMemo(() => {
-    const nextMap = {};
+  useEffect(() => {
+    const polygonCount = polygonPaths.length;
+    if (polygonCount === 0 || availableCuarteles.length === 0) {
+      setPolygonCuartelMap({});
+      return;
+    }
 
-    polygonPaths.forEach((_, polygonId) => {
-      nextMap[polygonId] =
-        availableCuarteles[Math.floor(Math.random() * availableCuarteles.length)] ?? null;
-    });
+    if (typeof window === "undefined") {
+      setPolygonCuartelMap(createDeterministicPolygonCuartelMap({ availableCuarteles, polygonCount }));
+      return;
+    }
 
-    return nextMap;
+    let parsedStoredMap = null;
+    try {
+      const raw = window.localStorage.getItem(POLYGON_CUARTEL_MAP_STORAGE_KEY);
+      parsedStoredMap = raw ? JSON.parse(raw) : null;
+    } catch {
+      parsedStoredMap = null;
+    }
+
+    setPolygonCuartelMap(
+      buildPersistentPolygonCuartelMap({
+        rawStoredMap: parsedStoredMap,
+        availableCuarteles,
+        polygonCount,
+      })
+    );
   }, [availableCuarteles, polygonPaths]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem(POLYGON_CUARTEL_MAP_STORAGE_KEY, JSON.stringify(polygonCuartelMap));
+    } catch {
+      // noop: localStorage can fail in restricted contexts
+    }
+  }, [polygonCuartelMap]);
 
   const handlePolygonSelect = useCallback(
     (polygonId) => {

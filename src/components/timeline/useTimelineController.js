@@ -11,16 +11,17 @@ const DEFAULT_RATIOS = {
   totalDays: 365,
 };
 
-export const useTimelineController = ({ periods } = {}) => {
+export const useTimelineController = ({ periods, currentDate } = {}) => {
   const sliderRef = useRef(null);
   const dragRef = useRef(null);
   const ratiosRef = useRef(DEFAULT_RATIOS);
   const animationFrameRef = useRef(null);
   const animationStateRef = useRef({ lastPaintMs: 0 });
 
-  const now = new Date();
-  const year = now.getFullYear();
-  const todayMs = Date.UTC(year, now.getMonth(), now.getDate());
+  const referenceDate =
+    currentDate instanceof Date && !Number.isNaN(currentDate.getTime()) ? currentDate : new Date();
+  const year = referenceDate.getFullYear();
+  const todayMs = Date.UTC(year, referenceDate.getMonth(), referenceDate.getDate());
 
   const { yearStartMs, yearEndMs, totalDays } = useMemo(() => getYearDomain(year), [year]);
 

@@ -11,6 +11,9 @@ import {
   FOLIAR_ANALYSIS_EVENT_ID,
   PRE_PRUNING_COUNT_EVENT_ID,
 } from "../../features/timelineEvents";
+import { BUD_ANALYSIS_EVENT } from "../../features/timelineEvents/budAnalysis/event";
+import { FOLIAR_ANALYSIS_EVENT } from "../../features/timelineEvents/foliarAnalysis/event";
+import { PRE_PRUNING_COUNT_EVENT } from "../../features/timelineEvents/prePruningCount/event";
 import {
   PRE_PRUNING_COUNT_COLUMNS,
   PRE_PRUNING_COUNT_SCORE_FIELDS,
@@ -22,17 +25,11 @@ const FOLIAR_MAPPED_ROWS = foliarAnalysisRows.map(mapFoliarRow);
 const BUD_MAPPED_ROWS = budAnalysisRows.map(mapBudRow);
 const PRE_PRUNING_MAPPED_ROWS = prePruningCountRows.map(mapPrePruningCountRow);
 
-const YEAR_SELECTOR_RAW_ROWS = [
-  ...foliarAnalysisRows,
-  ...budAnalysisRows,
-  ...prePruningCountRows,
-];
-
-const YEAR_SELECTOR_ROWS_MAPPED = YEAR_SELECTOR_RAW_ROWS.map((row) => ({
-  year: Number(row["Temp."]),
-  cuartel: row.Cuartel,
-}));
-
+const EVENT_DEFINITION_BY_ID = {
+  [FOLIAR_ANALYSIS_EVENT_ID]: FOLIAR_ANALYSIS_EVENT,
+  [BUD_ANALYSIS_EVENT_ID]: BUD_ANALYSIS_EVENT,
+  [PRE_PRUNING_COUNT_EVENT_ID]: PRE_PRUNING_COUNT_EVENT,
+};
 const mapYearSelectorRow = (row) => row;
 
 const TONE_BY_DATASET_ID = {
@@ -88,11 +85,39 @@ const buildTableRows = ({
     .values()].sort(sortRows ?? defaultSortRows);
 };
 
+const filterRowsByTimelineMoment = ({ rows, eventId, currentDate }) => {
+  if (!Array.isArray(rows) || rows.length === 0) return [];
+
+  const safeCurrentDate =
+    currentDate instanceof Date && !Number.isNaN(currentDate.getTime()) ? currentDate : new Date();
+  const currentYear = safeCurrentDate.getFullYear();
+  const eventDefinition = EVENT_DEFINITION_BY_ID[eventId];
+  if (!eventDefinition) {
+    return rows.filter((row) => Number.isFinite(row.year) && row.year <= currentYear);
+  }
+
+  const eventDateMs = Date.UTC(currentYear, eventDefinition.month, eventDefinition.day);
+  const currentDateMs = Date.UTC(
+    currentYear,
+    safeCurrentDate.getMonth(),
+    safeCurrentDate.getDate(),
+  );
+  const hasCurrentYearDataEnabled = currentDateMs >= eventDateMs;
+
+  return rows.filter((row) => {
+    if (!Number.isFinite(row.year)) return false;
+    if (row.year < currentYear) return true;
+    if (row.year > currentYear) return false;
+    return hasCurrentYearDataEnabled;
+  });
+};
+
 const FoliarAnalysisPanel = ({
   activeEvents = [],
   selectedCuartel,
   selectedYears,
   onSelectedYearsChange,
+  currentDate,
 }) => {
   const activeEventIds = useMemo(() => new Set(activeEvents.map((event) => event.id)), [activeEvents]);
 
@@ -115,6 +140,7 @@ const FoliarAnalysisPanel = ({
         activeEventIds.has(FOLIAR_ANALYSIS_EVENT_ID)
           ? {
               id: "foliar",
+              eventId: FOLIAR_ANALYSIS_EVENT_ID,
               label: "Foliar",
               columns: FOLIAR_COLUMNS,
               mappedRows: FOLIAR_MAPPED_ROWS,
@@ -124,6 +150,7 @@ const FoliarAnalysisPanel = ({
         activeEventIds.has(BUD_ANALYSIS_EVENT_ID)
           ? {
               id: "bud",
+              eventId: BUD_ANALYSIS_EVENT_ID,
               label: "Yemas",
               columns: BUD_COLUMNS,
               mappedRows: BUD_MAPPED_ROWS,
@@ -135,6 +162,7 @@ const FoliarAnalysisPanel = ({
         prePruningEvent
           ? {
               id: "pre-pruning-count",
+              eventId: PRE_PRUNING_COUNT_EVENT_ID,
               label: "Pre poda",
               columns: PRE_PRUNING_COUNT_COLUMNS,
               mappedRows: PRE_PRUNING_MAPPED_ROWS,
@@ -148,6 +176,21 @@ const FoliarAnalysisPanel = ({
   );
 
   const hasDataTable = activeDatasets.length > 0;
+  const yearSelectorRowsMapped = useMemo(
+    () =>
+      activeDatasets.flatMap((dataset) =>
+        filterRowsByTimelineMoment({
+          rows: dataset.mappedRows,
+          eventId: dataset.eventId,
+          currentDate,
+        }).map((row) => ({
+          year: row.year,
+          cuartel: row.cuartel,
+        })),
+      ),
+    [activeDatasets, currentDate],
+  );
+
   const unifiedColumns = useMemo(
     () => [
       { field: "year", header: "Temp." },
@@ -173,14 +216,18 @@ const FoliarAnalysisPanel = ({
           buildTableRows({
             selectedCuartel,
             selectedYears,
-            mappedRows: dataset.mappedRows,
+            mappedRows: filterRowsByTimelineMoment({
+              rows: dataset.mappedRows,
+              eventId: dataset.eventId,
+              currentDate,
+            }),
             scoreFields: dataset.scoreFields,
             keepAllRowsPerYear: dataset.keepAllRowsPerYear,
             sortRows: dataset.sortRows,
           }),
         ])
       ),
-    [activeDatasets, selectedCuartel, selectedYears]
+    [activeDatasets, currentDate, selectedCuartel, selectedYears]
   );
 
   const unifiedRowData = useMemo(() => {
@@ -274,7 +321,7 @@ const FoliarAnalysisPanel = ({
   return (
     <DataRecordsSection
       selectedCuartel={selectedCuartel}
-      rawRows={YEAR_SELECTOR_ROWS_MAPPED}
+      rawRows={yearSelectorRowsMapped}
       mapRow={mapYearSelectorRow}
       scoreFields={[]}
       keepAllRowsPerYear

@@ -328,8 +328,11 @@ const Mapa = ({
 
       polygon.setMap(mapRef.current);
       polygon.addListener("click", () => {
-        setSelectedPolygonId(polygonId);
-        onPolygonSelect?.(polygonId);
+        setSelectedPolygonId((currentPolygonId) => {
+          const nextPolygonId = currentPolygonId === polygonId ? null : polygonId;
+          onPolygonSelect?.(nextPolygonId);
+          return nextPolygonId;
+        });
       });
 
       polygonRefs.current.push({ polygonId, polygon });

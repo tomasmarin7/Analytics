@@ -22,6 +22,7 @@ const DayLines = ({
   onSelectedYearsChange,
   dataRecordsZIndex = 2,
   onRequestDataRecordsForeground,
+  currentDate,
 }) => {
   const linesRef = useRef(null);
   const [containerWidth, setContainerWidth] = useState(0);
@@ -95,6 +96,7 @@ const DayLines = ({
             selectedCuartel={selectedCuartel}
             selectedYears={selectedYears}
             onSelectedYearsChange={onSelectedYearsChange}
+            currentDate={currentDate}
           />
         ) : null}
       </EventActivationOverlay>

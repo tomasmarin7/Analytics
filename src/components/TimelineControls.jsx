@@ -15,6 +15,7 @@ const TimelineControls = ({
   selectedCuartel,
   selectedYears,
   onSelectedYearsChange,
+  currentDate,
 }) => {
   const {
     sliderRef,
@@ -35,7 +36,7 @@ const TimelineControls = ({
     startDrag,
     onHandleKeyDown,
     setVisibleRangeByDates,
-  } = useTimelineController();
+  } = useTimelineController({ currentDate });
 
   const {
     raisedPeriodId,
@@ -78,6 +79,7 @@ const TimelineControls = ({
         showFertilizationTitle={showFertilizationTitle}
         showProductionPotentialTitle={showProductionPotentialTitle}
         showProductionPotentialValue={showProductionPotentialValue}
+        currentDate={currentDate}
       />
 
       <RangeSlider

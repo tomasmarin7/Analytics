@@ -25,6 +25,7 @@ const TimelineTrack = ({
   showFertilizationTitle,
   showProductionPotentialTitle,
   showProductionPotentialValue,
+  currentDate,
 }) => {
   const [foregroundLayer, setForegroundLayer] = useState("data-records");
   const periodsZIndex = foregroundLayer === "fertilization" ? 4 : 1;
@@ -63,6 +64,7 @@ const TimelineTrack = ({
           onSelectedYearsChange={onSelectedYearsChange}
           dataRecordsZIndex={dataRecordsZIndex}
           onRequestDataRecordsForeground={() => setForegroundLayer("data-records")}
+          currentDate={currentDate}
         />
         <MonthLabels markers={monthMarkers} />
         {isTodayVisible ? (
