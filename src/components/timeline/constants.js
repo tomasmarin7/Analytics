@@ -1,6 +1,6 @@
 export const DAY_MS = 86400000;
 export const HANDLE_EDGE_OFFSET_PX = 5;
-export const MIN_VISIBLE_DAYS = 30;
+export const MIN_VISIBLE_DAYS = 15;
 
 export const MONTH_NAMES = [
   "Enero",

@@ -25,6 +25,7 @@ const TimelineTrack = ({
   showFertilizationTitle,
   showProductionPotentialTitle,
   showProductionPotentialValue,
+  showPruningTitle,
   currentDate,
 }) => {
   const [foregroundLayer, setForegroundLayer] = useState("data-records");
@@ -50,6 +51,7 @@ const TimelineTrack = ({
           showFertilizationTitle={showFertilizationTitle}
           showProductionPotentialTitle={showProductionPotentialTitle}
           showProductionPotentialValue={showProductionPotentialValue}
+          showPruningTitle={showPruningTitle}
         />
         <DayLines
           dayLines={dayLines}

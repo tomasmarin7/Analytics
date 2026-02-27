@@ -241,7 +241,7 @@ const ProductionPotentialTable = ({ selectedCuartel, selectedYears = [], current
                     inputMode="decimal"
                     value={row.cuajaEsperadaInput}
                     onChange={(event) => updateDraftField(row.variedad, "cuajaEsperada", event.target.value)}
-                    aria-label={`% cuaja esperada ${row.variedad} ${DRAFT_YEAR}`}
+                    aria-label={`% cuaja estimada ${row.variedad} ${DRAFT_YEAR}`}
                   />
                 </td>
                 <td />

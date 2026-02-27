@@ -1,8 +1,9 @@
 import { TIMELINE_ARIA_LABEL } from "./timeline/constants";
+import { DAY_MS } from "./timeline/constants";
 import RangeSlider from "./rangeSlider/RangeSlider";
 import TimelineTrack from "./timeline/TimelineTrack";
 import { useTimelineController } from "./timeline/useTimelineController";
-import { useFertilizationInteraction } from "../features/fertilization";
+import { createDefaultPeriods, PERIOD_PANEL_TYPES, useFertilizationInteraction } from "../features/fertilization";
 
 const MAX_VISIBLE_DAYS_FOR_FERTILIZATION_TITLE = 183;
 const MAX_VISIBLE_DAYS_FOR_PRODUCTION_POTENTIAL_TITLE = 92;
@@ -57,6 +58,19 @@ const TimelineControls = ({
   const showFertilizationTitle = visibleDays <= MAX_VISIBLE_DAYS_FOR_FERTILIZATION_TITLE;
   const showProductionPotentialTitle = visibleDays <= MAX_VISIBLE_DAYS_FOR_PRODUCTION_POTENTIAL_TITLE;
   const showProductionPotentialValue = visibleDays <= MAX_VISIBLE_DAYS_FOR_PRODUCTION_POTENTIAL_VALUE;
+  const zoomReferenceYear = new Date(yearStartMs).getUTCFullYear();
+  const productionPotentialDardoPeriod = createDefaultPeriods(zoomReferenceYear).find(
+    (period) => period.panelType === PERIOD_PANEL_TYPES.PRODUCTION_POTENTIAL_VARIETY_DARDO,
+  );
+  const pruningTitleMaxVisibleDays = Math.max(
+    1,
+    Math.round(
+      ((productionPotentialDardoPeriod?.focusEndMs ?? yearEndMs) -
+        (productionPotentialDardoPeriod?.focusStartMs ?? yearStartMs)) /
+        DAY_MS,
+    ) + 1,
+  );
+  const showPruningTitle = visibleDays <= pruningTitleMaxVisibleDays;
 
   return (
     <section className="lower-dots-bridge" aria-label={TIMELINE_ARIA_LABEL}>
@@ -80,6 +94,7 @@ const TimelineControls = ({
         showFertilizationTitle={showFertilizationTitle}
         showProductionPotentialTitle={showProductionPotentialTitle}
         showProductionPotentialValue={showProductionPotentialValue}
+        showPruningTitle={showPruningTitle}
         currentDate={currentDate}
       />
 

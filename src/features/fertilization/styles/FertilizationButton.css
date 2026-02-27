@@ -270,27 +270,40 @@
   bottom: 0;
   height: 425px;
   pointer-events: none;
+  z-index: 4;
+}
+
+.lower-dots-bridge__pruning-line-slot--raised {
+  z-index: 3;
 }
 
 .lower-dots-bridge__pruning-line-button {
   position: absolute;
-  inset: 0;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--pruning-line-height, 340px) - 13px);
+  height: 26px;
   border: 0;
   margin: 0;
   padding: 0;
   background: transparent;
   pointer-events: auto;
   cursor: pointer;
+  z-index: 3;
 }
 
 .lower-dots-bridge__pruning-line-track {
   position: absolute;
   left: 0;
   right: 24px;
-  bottom: calc(var(--pruning-line-height, 340px) - 13px);
+  bottom: 0;
   height: 26px;
   background: #b30000;
   border-radius: 2px 0 0 2px;
+}
+
+.lower-dots-bridge__pruning-line-track--hidden {
+  opacity: 0;
 }
 
 .lower-dots-bridge__pruning-line-track::after {
@@ -310,7 +323,7 @@
   position: absolute;
   left: 0;
   right: 24px;
-  bottom: calc(var(--pruning-line-height, 340px) - 13px);
+  bottom: 0;
   height: 26px;
   display: flex;
   align-items: center;
@@ -321,4 +334,49 @@
   font-weight: 500;
   color: #e5e5e5;
   white-space: nowrap;
+}
+
+.lower-dots-bridge__pruning-line-title--hidden {
+  opacity: 0;
+}
+
+.lower-dots-bridge__pruning-expanded {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% - var(--pruning-line-height, 340px) - 13px);
+  bottom: 0;
+  background: rgba(168, 21, 13, 0.9);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.lower-dots-bridge__pruning-expanded-title {
+  position: absolute;
+  top: 8px;
+  left: 16px;
+  right: 18px;
+  margin: 0;
+  z-index: 3;
+  font-family: "Lufga", var(--font-brand);
+  font-size: 26px;
+  line-height: 1.1;
+  font-weight: 450;
+  color: #f1f4f2;
+  letter-spacing: 0.004em;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lower-dots-bridge__pruning-panel {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  top: 46px;
+  bottom: 8px;
+  pointer-events: auto;
+  z-index: 2;
+  overflow: auto;
 }

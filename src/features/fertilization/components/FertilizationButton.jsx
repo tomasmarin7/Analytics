@@ -3,6 +3,7 @@ import fertilizationPlanRows from "../../../data/fertilizationPlanRows.json";
 import { ProductionPotentialPeriodPanel, ProductionPotentialShapePreview } from "../../productionPotential";
 import { PERIOD_PANEL_TYPES } from "../config/panelTypes";
 import FertilizationPeriodPanel from "./FertilizationPeriodPanel";
+import PruningDecisionTable from "./pruningDecision";
 import "../styles/FertilizationButton.css";
 
 const TITLE_DOCK_ANIMATION_MS = 260;
@@ -16,12 +17,14 @@ const ACTIONS_BLOCK_HEIGHT_PX = 56;
 const PANEL_EXTRA_GAP_PX = 8;
 const PRODUCTION_POTENTIAL_BLOCK_HEIGHT_PX = 425;
 const PRODUCTION_POTENTIAL_DARDO_BLOCK_HEIGHT_PX = PRODUCTION_POTENTIAL_BLOCK_HEIGHT_PX;
+const PRUNING_DECISION_BLOCK_HEIGHT_PX = PRODUCTION_POTENTIAL_BLOCK_HEIGHT_PX;
 const PRUNING_LINE_MIN_HEIGHT_PX = 20;
 const PRUNING_LINE_TOP_PADDING_PX = 8;
 const PANEL_BASE_HEIGHT_BY_TYPE = {
   [PERIOD_PANEL_TYPES.FERTILIZATION]: null,
   [PERIOD_PANEL_TYPES.PRODUCTION_POTENTIAL]: PRODUCTION_POTENTIAL_BLOCK_HEIGHT_PX,
   [PERIOD_PANEL_TYPES.PRODUCTION_POTENTIAL_VARIETY_DARDO]: PRODUCTION_POTENTIAL_DARDO_BLOCK_HEIGHT_PX,
+  [PERIOD_PANEL_TYPES.PRUNING_DECISION]: PRUNING_DECISION_BLOCK_HEIGHT_PX,
 };
 const normalizeText = (value) => String(value ?? "").trim().toUpperCase();
 const formatKgHa = (value) =>
@@ -40,10 +43,13 @@ const FertilizationButton = ({
   currentDate,
   onRequestForeground,
   onRegisterProduction,
+  onRegisterPruning,
   registeredProductionByCuartel = {},
+  registeredPruningByCuartel = {},
   showFertilizationTitle = true,
   showProductionPotentialTitle = true,
   showProductionPotentialValue = true,
+  showPruningTitle = true,
 }) => {
   const panelType = period?.panelType;
   const isFertilizationPeriod = panelType === PERIOD_PANEL_TYPES.FERTILIZATION;
@@ -155,6 +161,18 @@ const FertilizationButton = ({
       );
     }
 
+    if (panelType === PERIOD_PANEL_TYPES.PRUNING_DECISION) {
+      return (
+        <PruningDecisionTable
+          selectedCuartel={selectedCuartel}
+          selectedYears={selectedYears}
+          registeredProductionByCuartel={registeredProductionByCuartel}
+          registeredPruningByCuartel={registeredPruningByCuartel}
+          onRegisterPruning={onRegisterPruning}
+        />
+      );
+    }
+
     return (
       <FertilizationPeriodPanel
         selectedHuerto={selectedHuerto}
@@ -209,11 +227,14 @@ const FertilizationButton = ({
 
     return (
       <div
-        className="lower-dots-bridge__pruning-line-slot"
+        className={`lower-dots-bridge__pruning-line-slot ${
+          isRaised ? "lower-dots-bridge__pruning-line-slot--raised" : ""
+        }`}
         style={{
           left: `${slotGeometry.left}%`,
           width: `${slotGeometry.width}%`,
           "--pruning-line-height": `${pruningLineHeightClamped}px`,
+          "--fertilization-raised-height": `${PRUNING_DECISION_BLOCK_HEIGHT_PX}px`,
         }}
         onPointerDown={onRequestForeground}
       >
@@ -225,9 +246,33 @@ const FertilizationButton = ({
           onClick={() => onClick?.(period)}
           onPointerDown={onRequestForeground}
         >
-          <span className="lower-dots-bridge__pruning-line-track" aria-hidden="true" />
-          <span className="lower-dots-bridge__pruning-line-title">{period.label}</span>
+          <span
+            className={`lower-dots-bridge__pruning-line-track ${
+              isRaised ? "lower-dots-bridge__pruning-line-track--hidden" : ""
+            }`}
+            aria-hidden="true"
+          />
+          <span
+            className={`lower-dots-bridge__pruning-line-title ${
+              isRaised || !showPruningTitle ? "lower-dots-bridge__pruning-line-title--hidden" : ""
+            }`}
+          >
+            {period.label}
+          </span>
         </button>
+
+        {isRaised ? (
+          <div className="lower-dots-bridge__pruning-expanded" onPointerDown={onRequestForeground}>
+            {showPruningTitle ? (
+              <span className="lower-dots-bridge__pruning-expanded-title">{period.label}</span>
+            ) : null}
+            {isPanelVisible ? (
+              <div className="lower-dots-bridge__pruning-panel" onPointerDown={onRequestForeground}>
+                {renderPanelContent()}
+              </div>
+            ) : null}
+          </div>
+        ) : null}
       </div>
     );
   }

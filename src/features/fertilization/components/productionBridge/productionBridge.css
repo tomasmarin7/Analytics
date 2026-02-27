@@ -1,7 +1,8 @@
 .lower-dots-bridge__production-bridge {
   position: absolute;
   bottom: 0;
-  pointer-events: none;
+  pointer-events: auto;
+  cursor: default;
   z-index: 2;
   border-radius: 0;
   background: linear-gradient(

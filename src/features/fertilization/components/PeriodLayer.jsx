@@ -6,6 +6,7 @@ import FertilizationButton from "./FertilizationButton";
 import ProductionHistoricalBridge from "./productionBridge/ProductionHistoricalBridge";
 
 const PRODUCTION_POTENTIAL_REGISTER_STORAGE_KEY = "productionPotentialRegisterByCuartel";
+const PRUNING_REGISTER_STORAGE_KEY = "pruningRegisterByCuartel";
 const PRODUCTION_POTENTIAL_DARDO_PERIOD_ID = "periodo-produccion-posible-variedad-dardo";
 const PRODUCTION_POTENTIAL_CURRENT_HEIGHT_PX = 425;
 const PRUNING_LINE_FALLBACK_RATIO = 0.8;
@@ -25,8 +26,10 @@ const PeriodLayer = ({
   showFertilizationTitle = true,
   showProductionPotentialTitle = true,
   showProductionPotentialValue = true,
+  showPruningTitle = true,
 }) => {
   const [productionRegisterByCuartel, setProductionRegisterByCuartel] = useState({});
+  const [pruningRegisterByCuartel, setPruningRegisterByCuartel] = useState({});
   const [historicalBridgeMetrics, setHistoricalBridgeMetrics] = useState(null);
 
   useEffect(() => {
@@ -47,6 +50,21 @@ const PeriodLayer = ({
   useEffect(() => {
     if (typeof window === "undefined") return;
     try {
+      const raw = window.localStorage.getItem(PRUNING_REGISTER_STORAGE_KEY);
+      if (!raw) return;
+
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === "object") {
+        setPruningRegisterByCuartel(parsed);
+      }
+    } catch {
+      setPruningRegisterByCuartel({});
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
       window.localStorage.setItem(
         PRODUCTION_POTENTIAL_REGISTER_STORAGE_KEY,
         JSON.stringify(productionRegisterByCuartel),
@@ -55,6 +73,15 @@ const PeriodLayer = ({
       // noop: localStorage can fail in restricted contexts
     }
   }, [productionRegisterByCuartel]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem(PRUNING_REGISTER_STORAGE_KEY, JSON.stringify(pruningRegisterByCuartel));
+    } catch {
+      // noop
+    }
+  }, [pruningRegisterByCuartel]);
 
   const handleProductionRegister = useCallback((payload) => {
     const normalizedCuartel = normalizeText(payload?.cuartel);
@@ -69,6 +96,27 @@ const PeriodLayer = ({
   const handleBridgeMetricsChange = useCallback((metrics) => {
     setHistoricalBridgeMetrics(metrics);
   }, []);
+
+  const handlePruningRegister = useCallback((payload) => {
+    const normalizedCuartel = normalizeText(payload?.cuartel);
+    if (!normalizedCuartel) return;
+
+    setPruningRegisterByCuartel((current) => ({
+      ...current,
+      [normalizedCuartel]: payload,
+    }));
+  }, []);
+
+  const normalizedSelectedCuartel = normalizeText(selectedCuartel);
+  const registeredProductionForSelectedCuartel = normalizedSelectedCuartel
+    ? productionRegisterByCuartel[normalizedSelectedCuartel]
+    : null;
+  const hasDefinedProductionPotentialForSelectedCuartel =
+    Number.isFinite(Number(registeredProductionForSelectedCuartel?.visual?.totalKgHa)) ||
+    (Array.isArray(registeredProductionForSelectedCuartel?.visual?.segments) &&
+      registeredProductionForSelectedCuartel.visual.segments.length > 0) ||
+    (Array.isArray(registeredProductionForSelectedCuartel?.rows) &&
+      registeredProductionForSelectedCuartel.rows.length > 0);
 
   const periodsWithPruningGeometry = useMemo(() => {
     if (!Array.isArray(periods)) return [];
@@ -109,6 +157,16 @@ const PeriodLayer = ({
     });
   }, [historicalBridgeMetrics, periods, timelineEvents]);
 
+  const visiblePeriods = useMemo(
+    () =>
+      periodsWithPruningGeometry.filter(
+        (period) =>
+          period?.panelType !== PERIOD_PANEL_TYPES.PRUNING_DECISION ||
+          hasDefinedProductionPotentialForSelectedCuartel,
+      ),
+    [hasDefinedProductionPotentialForSelectedCuartel, periodsWithPruningGeometry],
+  );
+
   return (
     <div className="lower-dots-bridge__periods" style={{ zIndex }} aria-label={PERIODS_ARIA_LABEL}>
       <ProductionHistoricalBridge
@@ -123,7 +181,7 @@ const PeriodLayer = ({
         onMetricsChange={handleBridgeMetricsChange}
       />
 
-      {periodsWithPruningGeometry.map((period) => (
+      {visiblePeriods.map((period) => (
         <FertilizationButton
           key={period.id}
           period={period}
@@ -135,10 +193,13 @@ const PeriodLayer = ({
           currentDate={currentDate}
           onRequestForeground={onRequestForeground}
           onRegisterProduction={handleProductionRegister}
+          onRegisterPruning={handlePruningRegister}
           registeredProductionByCuartel={productionRegisterByCuartel}
+          registeredPruningByCuartel={pruningRegisterByCuartel}
           showFertilizationTitle={showFertilizationTitle}
           showProductionPotentialTitle={showProductionPotentialTitle}
           showProductionPotentialValue={showProductionPotentialValue}
+          showPruningTitle={showPruningTitle}
         />
       ))}
     </div>
