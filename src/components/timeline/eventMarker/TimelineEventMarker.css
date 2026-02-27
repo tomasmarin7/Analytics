@@ -1,4 +1,7 @@
 .timeline-event-marker {
+  --timeline-event-marker-stem-top: calc(50% + 40px);
+  --timeline-event-marker-stem-height: 48px;
+  --timeline-event-marker-label-gap: 12px;
   position: absolute;
   top: 50%;
   width: 56px;
@@ -46,9 +49,9 @@
   position: absolute;
   z-index: 2;
   left: 50%;
-  top: calc(50% + 40px);
+  top: var(--timeline-event-marker-stem-top);
   width: var(--month-line-width, 2px);
-  height: 70px;
+  height: var(--timeline-event-marker-stem-height);
   transform: translateX(-50%);
   background: rgba(34, 37, 39, 0.82);
   border-radius: 999px;
@@ -58,7 +61,10 @@
   position: absolute;
   z-index: 2;
   left: 50%;
-  top: calc(50% + 126px);
+  top: calc(
+    var(--timeline-event-marker-stem-top) + var(--timeline-event-marker-stem-height) +
+      var(--timeline-event-marker-label-gap)
+  );
   transform: translateX(-50%);
   display: inline-flex;
   flex-direction: column;

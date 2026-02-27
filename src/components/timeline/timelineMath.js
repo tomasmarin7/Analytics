@@ -60,7 +60,7 @@ export const getVisiblePeriods = ({ periods, viewStartMs, viewEndMs, viewSpanMs 
       });
 
       const raisedGeometry = getPeriodGeometry({
-        startMs: period.raisedStartMs ?? period.focusStartMs ?? period.startMs,
+        startMs: period.raisedStartMs ?? period.startMs,
         endMs: period.raisedEndMs ?? period.endMs,
         viewStartMs,
         viewEndMs,

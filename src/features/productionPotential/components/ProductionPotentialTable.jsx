@@ -9,11 +9,14 @@ import {
   buildHistoricalProductionRows,
   getAvailableVarietiesForCuartel,
 } from "../productionPotentialService";
+import { PRODUCTION_POTENTIAL_TABLE_COLUMNS } from "../config/tableColumns";
+import { buildYearBandByYear, getYearBandClass } from "../utils/yearBanding";
 import "../styles/ProductionPotentialTable.css";
 
 const BUD_MAPPED_ROWS = budAnalysisRows.map(mapBudRow);
 const PRE_PRUNING_MAPPED_ROWS = prePruningCountRows.map(mapPrePruningCountRow);
 const DRAFT_YEAR = 2026;
+const EMPTY_DRAFT_VALUES = { cuajaEsperada: "", calibreEsperado: "" };
 
 const formatCellValue = (value) => (value === null || value === undefined || value === "" ? "" : value);
 
@@ -49,7 +52,7 @@ const ProductionPotentialTable = ({ selectedCuartel, selectedYears = [] }) => {
     setDraftByVariety((current) => {
       const next = {};
       for (const variedad of varieties) {
-        next[variedad] = current[variedad] ?? { cuajaEsperada: "", calibreEsperado: "" };
+        next[variedad] = current[variedad] ?? EMPTY_DRAFT_VALUES;
       }
       return next;
     });
@@ -58,7 +61,7 @@ const ProductionPotentialTable = ({ selectedCuartel, selectedYears = [] }) => {
   const draftRows = useMemo(
     () =>
       varieties.map((variedad) => {
-        const draft = draftByVariety[variedad] ?? { cuajaEsperada: "", calibreEsperado: "" };
+        const draft = draftByVariety[variedad] ?? EMPTY_DRAFT_VALUES;
 
         const baseRow = buildDraftProductionRow({
           selectedCuartel,
@@ -90,6 +93,21 @@ const ProductionPotentialTable = ({ selectedCuartel, selectedYears = [] }) => {
     [draftByVariety, selectedCuartel, varieties],
   );
 
+  const yearBandByYear = useMemo(
+    () => buildYearBandByYear({ historicalRows, draftRows }),
+    [draftRows, historicalRows],
+  );
+
+  const updateDraftField = (variedad, field, value) => {
+    setDraftByVariety((current) => ({
+      ...current,
+      [variedad]: {
+        ...(current[variedad] ?? EMPTY_DRAFT_VALUES),
+        [field]: value,
+      },
+    }));
+  };
+
   if (!normalizedSelectedCuartel) {
     return (
       <div className="production-potential-table__empty">
@@ -104,20 +122,20 @@ const ProductionPotentialTable = ({ selectedCuartel, selectedYears = [] }) => {
         <table className="production-potential-table" role="table" aria-label="Tabla de producción posible">
           <thead>
             <tr>
-              <th scope="col">Temp.</th>
-              <th scope="col">Variedad</th>
-              <th scope="col">% Cuaja Esperada</th>
-              <th scope="col">% Cuaja Real</th>
-              <th scope="col">Calibre Esperado (g)</th>
-              <th scope="col">Calibre Real (g)</th>
-              <th scope="col">Prod. Esperada (kg/ha)</th>
-              <th scope="col">Prod. Real (kg/ha)</th>
+              {PRODUCTION_POTENTIAL_TABLE_COLUMNS.map((column) => (
+                <th key={column.key} scope="col">
+                  {column.label}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
             {hasSelectedYears
               ? historicalRows.map((row) => (
-                  <tr key={`hist-${row.year}-${row.variedad}`}>
+                  <tr
+                    key={`hist-${row.year}-${row.variedad}`}
+                    className={getYearBandClass(yearBandByYear, row.year)}
+                  >
                     <td>{row.year}</td>
                     <td>{row.variedad}</td>
                     <td>{formatCellValue(row.cuajaEsperada)}</td>
@@ -131,7 +149,10 @@ const ProductionPotentialTable = ({ selectedCuartel, selectedYears = [] }) => {
               : null}
 
             {draftRows.map((row) => (
-              <tr key={`draft-${row.variedad}`} className="production-potential-table__draft-row">
+              <tr
+                key={`draft-${row.variedad}`}
+                className={`production-potential-table__draft-row ${getYearBandClass(yearBandByYear, row.year)}`}
+              >
                 <td>{row.year}</td>
                 <td>{row.variedad}</td>
                 <td>
@@ -140,15 +161,7 @@ const ProductionPotentialTable = ({ selectedCuartel, selectedYears = [] }) => {
                     type="text"
                     inputMode="decimal"
                     value={row.cuajaEsperadaInput}
-                    onChange={(event) =>
-                      setDraftByVariety((current) => ({
-                        ...current,
-                        [row.variedad]: {
-                          ...(current[row.variedad] ?? {}),
-                          cuajaEsperada: event.target.value,
-                        },
-                      }))
-                    }
+                    onChange={(event) => updateDraftField(row.variedad, "cuajaEsperada", event.target.value)}
                     aria-label={`% cuaja esperada ${row.variedad} ${DRAFT_YEAR}`}
                   />
                 </td>
@@ -159,15 +172,7 @@ const ProductionPotentialTable = ({ selectedCuartel, selectedYears = [] }) => {
                     type="text"
                     inputMode="decimal"
                     value={row.calibreEsperadoInput}
-                    onChange={(event) =>
-                      setDraftByVariety((current) => ({
-                        ...current,
-                        [row.variedad]: {
-                          ...(current[row.variedad] ?? {}),
-                          calibreEsperado: event.target.value,
-                        },
-                      }))
-                    }
+                    onChange={(event) => updateDraftField(row.variedad, "calibreEsperado", event.target.value)}
                     aria-label={`calibre esperado ${row.variedad} ${DRAFT_YEAR}`}
                   />
                 </td>

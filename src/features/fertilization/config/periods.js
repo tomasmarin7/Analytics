@@ -7,7 +7,7 @@ export const createDefaultPeriods = (year) => [
     startMs: Date.UTC(year, 1, 1),
     endMs: Date.UTC(year, 3, 0),
     focusStartMs: Date.UTC(year, 0, 1),
-    focusEndMs: Date.UTC(year, 3, 1),
+    focusEndMs: Date.UTC(year, 3, 0),
     variant: "fertilization",
     panelType: PERIOD_PANEL_TYPES.FERTILIZATION,
   },
@@ -26,5 +26,5 @@ export const createDefaultPeriods = (year) => [
 
 export const getFallbackFocusRange = (year) => ({
   startMs: Date.UTC(year, 0, 1),
-  endMs: Date.UTC(year, 3, 1),
+  endMs: Date.UTC(year, 3, 0),
 });
