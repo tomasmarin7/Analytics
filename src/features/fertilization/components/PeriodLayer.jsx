@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
 import { PERIODS_ARIA_LABEL } from "../../../components/timeline/constants";
 import FertilizationButton from "./FertilizationButton";
+import ProductionHistoricalBridge from "./productionBridge/ProductionHistoricalBridge";
 
 const PRODUCTION_POTENTIAL_REGISTER_STORAGE_KEY = "productionPotentialRegisterByCuartel";
 const normalizeText = (value) => String(value ?? "").trim().toUpperCase();
 
 const PeriodLayer = ({
   periods,
+  timelineEvents = [],
   onFertilizationClick,
   raisedPeriodId,
   selectedHuerto,
@@ -60,6 +62,17 @@ const PeriodLayer = ({
 
   return (
     <div className="lower-dots-bridge__periods" style={{ zIndex }} aria-label={PERIODS_ARIA_LABEL}>
+      <ProductionHistoricalBridge
+        periods={periods}
+        timelineEvents={timelineEvents}
+        selectedCuartel={selectedCuartel}
+        selectedYears={selectedYears}
+        currentDate={currentDate}
+        registeredProductionByCuartel={productionRegisterByCuartel}
+        showProductionPotentialTitle={showProductionPotentialTitle}
+        showProductionPotentialValue={showProductionPotentialValue}
+      />
+
       {periods.map((period) => (
         <FertilizationButton
           key={period.id}

@@ -38,6 +38,7 @@ const TimelineTrack = ({
       <div className="lower-dots-bridge__track" aria-hidden="true">
         <PeriodLayer
           periods={visiblePeriods}
+          timelineEvents={timelineEvents}
           onFertilizationClick={onFertilizationClick}
           raisedPeriodId={raisedPeriodId}
           selectedHuerto={selectedHuerto}

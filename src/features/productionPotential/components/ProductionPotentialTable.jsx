@@ -50,6 +50,22 @@ const ProductionPotentialTable = ({ selectedCuartel, selectedYears = [], current
     [selectedCuartel, selectedYears],
   );
 
+  const historicalDraftDefaultsByVariety = useMemo(
+    () =>
+      Object.fromEntries(
+        historicalRows
+          .filter((row) => row.year === DRAFT_YEAR)
+          .map((row) => [
+            String(row.variedad ?? "").trim(),
+            {
+              cuajaEsperada: row.cuajaEsperada ?? "",
+              calibreEsperado: row.calibreEsperado ?? "",
+            },
+          ]),
+      ),
+    [historicalRows],
+  );
+
   const varieties = useMemo(
     () =>
       getAvailableVarietiesForCuartel({
@@ -66,11 +82,23 @@ const ProductionPotentialTable = ({ selectedCuartel, selectedYears = [], current
     setDraftByVariety((current) => {
       const next = {};
       for (const variedad of varieties) {
-        next[variedad] = current[variedad] ?? EMPTY_DRAFT_VALUES;
+        const currentDraft = current[variedad];
+        if (currentDraft) {
+          next[variedad] = currentDraft;
+          continue;
+        }
+
+        const defaults = historicalDraftDefaultsByVariety[variedad];
+        next[variedad] = defaults
+          ? {
+              cuajaEsperada: String(defaults.cuajaEsperada ?? ""),
+              calibreEsperado: String(defaults.calibreEsperado ?? ""),
+            }
+          : EMPTY_DRAFT_VALUES;
       }
       return next;
     });
-  }, [varieties]);
+  }, [historicalDraftDefaultsByVariety, varieties]);
 
   const draftRows = useMemo(
     () =>
@@ -108,8 +136,8 @@ const ProductionPotentialTable = ({ selectedCuartel, selectedYears = [], current
   );
 
   const visibleHistoricalRows = useMemo(
-    () => (isDraftYearEnabled ? historicalRows : historicalRows.filter((row) => row.year !== DRAFT_YEAR)),
-    [historicalRows, isDraftYearEnabled],
+    () => historicalRows.filter((row) => row.year !== DRAFT_YEAR),
+    [historicalRows],
   );
 
   const visibleDraftRows = useMemo(
