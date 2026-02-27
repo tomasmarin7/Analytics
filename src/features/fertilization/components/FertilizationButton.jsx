@@ -16,6 +16,8 @@ const ACTIONS_BLOCK_HEIGHT_PX = 56;
 const PANEL_EXTRA_GAP_PX = 8;
 const PRODUCTION_POTENTIAL_BLOCK_HEIGHT_PX = 425;
 const PRODUCTION_POTENTIAL_DARDO_BLOCK_HEIGHT_PX = PRODUCTION_POTENTIAL_BLOCK_HEIGHT_PX;
+const PRUNING_LINE_MIN_HEIGHT_PX = 20;
+const PRUNING_LINE_TOP_PADDING_PX = 8;
 const PANEL_BASE_HEIGHT_BY_TYPE = {
   [PERIOD_PANEL_TYPES.FERTILIZATION]: null,
   [PERIOD_PANEL_TYPES.PRODUCTION_POTENTIAL]: PRODUCTION_POTENTIAL_BLOCK_HEIGHT_PX,
@@ -47,6 +49,7 @@ const FertilizationButton = ({
   const isFertilizationPeriod = panelType === PERIOD_PANEL_TYPES.FERTILIZATION;
   const isProductionPotentialPeriod = panelType === PERIOD_PANEL_TYPES.PRODUCTION_POTENTIAL;
   const isProductionPotentialDardoPeriod = panelType === PERIOD_PANEL_TYPES.PRODUCTION_POTENTIAL_VARIETY_DARDO;
+  const isPruningDecisionPeriod = panelType === PERIOD_PANEL_TYPES.PRUNING_DECISION;
   const [isTitleDocked, setIsTitleDocked] = useState(false);
   const [isPanelVisible, setIsPanelVisible] = useState(false);
   const panelTimeoutRef = useRef(null);
@@ -190,6 +193,41 @@ const FertilizationButton = ({
           visual={registeredProductionForSelectedCuartel?.visual}
           showLabels={showProductionPotentialTitle}
         />
+      </div>
+    );
+  }
+
+  if (isPruningDecisionPeriod) {
+    const pruningLineHeightRaw = Number(period?.pruningLineHeightPx);
+    const pruningLineHeight = Number.isFinite(pruningLineHeightRaw)
+      ? pruningLineHeightRaw
+      : PRODUCTION_POTENTIAL_BLOCK_HEIGHT_PX * 0.8;
+    const pruningLineHeightClamped = Math.max(
+      PRUNING_LINE_MIN_HEIGHT_PX,
+      Math.min(PRODUCTION_POTENTIAL_BLOCK_HEIGHT_PX - PRUNING_LINE_TOP_PADDING_PX, pruningLineHeight),
+    );
+
+    return (
+      <div
+        className="lower-dots-bridge__pruning-line-slot"
+        style={{
+          left: `${slotGeometry.left}%`,
+          width: `${slotGeometry.width}%`,
+          "--pruning-line-height": `${pruningLineHeightClamped}px`,
+        }}
+        onPointerDown={onRequestForeground}
+      >
+        <button
+          type="button"
+          className="lower-dots-bridge__pruning-line-button"
+          title={period.label}
+          aria-label={period.label}
+          onClick={() => onClick?.(period)}
+          onPointerDown={onRequestForeground}
+        >
+          <span className="lower-dots-bridge__pruning-line-track" aria-hidden="true" />
+          <span className="lower-dots-bridge__pruning-line-title">{period.label}</span>
+        </button>
       </div>
     );
   }

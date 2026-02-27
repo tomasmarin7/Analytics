@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import budAnalysisRows from "../../../../data/budAnalysisRows.json";
 import prePruningCountRows from "../../../../data/prePruningCountRows.json";
 import postPruningCountRows from "../../../../data/postPruningCountRows.json";
@@ -106,6 +106,7 @@ const ProductionHistoricalBridge = ({
   registeredProductionByCuartel,
   showProductionPotentialTitle = true,
   showProductionPotentialValue = true,
+  onMetricsChange,
 }) => {
   const safeCurrentDate =
     currentDate instanceof Date && !Number.isNaN(currentDate.getTime()) ? currentDate : new Date();
@@ -243,12 +244,27 @@ const ProductionHistoricalBridge = ({
     };
   }, [referenceYear, registeredProductionByCuartel, safeCurrentDate, selectedCuartel]);
 
+  const pruningMetrics = useMemo(() => {
+    if (!bridgeGeometry || bridgeData.pre.year === null) return null;
+    return {
+      preGeometry: bridgeGeometry,
+      preHeightPx: Number(bridgeData.pre.heightPx) || 0,
+      postHeightPx: Number(bridgeData.post.heightPx) || 0,
+    };
+  }, [bridgeData.post.heightPx, bridgeData.pre.heightPx, bridgeData.pre.year, bridgeGeometry]);
+
+  useEffect(() => {
+    onMetricsChange?.(pruningMetrics);
+  }, [onMetricsChange, pruningMetrics]);
+
   if (!bridgeGeometry || bridgeData.pre.year === null) return null;
 
   return (
     <>
       <span
-        className="lower-dots-bridge__production-bridge"
+        className={`lower-dots-bridge__production-bridge${
+          showProductionPotentialValue ? " lower-dots-bridge__production-bridge--value-hoverable" : ""
+        }`}
         style={{
           left: `${bridgeGeometry.left}%`,
           width: `${bridgeGeometry.width}%`,
@@ -257,7 +273,11 @@ const ProductionHistoricalBridge = ({
         aria-hidden="true"
       >
         {bridgeData.pre.kgHa > 0 ? (
-          <span className="lower-dots-bridge__production-bridge-content">
+          <span
+            className={`lower-dots-bridge__production-bridge-content${
+              showProductionPotentialValue ? " lower-dots-bridge__production-bridge-content--hover-reveal" : ""
+            }`}
+          >
             <span
               className={`lower-dots-bridge__production-bridge-title${
                 showProductionPotentialTitle ? "" : " lower-dots-bridge__production-bridge-title--hidden"
@@ -267,7 +287,9 @@ const ProductionHistoricalBridge = ({
             </span>
             <span
               className={`lower-dots-bridge__production-bridge-value${
-                showProductionPotentialValue ? "" : " lower-dots-bridge__production-bridge-value--hidden"
+                showProductionPotentialValue
+                  ? ""
+                  : " lower-dots-bridge__production-bridge-value--hidden"
               }`}
             >
               {formatKgHa(bridgeData.pre.kgHa)} kg/ha
@@ -278,7 +300,9 @@ const ProductionHistoricalBridge = ({
 
       {postBridgeGeometry ? (
         <span
-          className="lower-dots-bridge__production-bridge lower-dots-bridge__production-bridge--post-pruning"
+          className={`lower-dots-bridge__production-bridge lower-dots-bridge__production-bridge--post-pruning${
+            showProductionPotentialValue ? " lower-dots-bridge__production-bridge--value-hoverable" : ""
+          }`}
           style={{
             left: `${postBridgeGeometry.left}%`,
             width: `${postBridgeGeometry.width}%`,
@@ -287,7 +311,11 @@ const ProductionHistoricalBridge = ({
           aria-hidden="true"
         >
           {bridgeData.post.kgHa > 0 ? (
-            <span className="lower-dots-bridge__production-bridge-content">
+            <span
+              className={`lower-dots-bridge__production-bridge-content${
+                showProductionPotentialValue ? " lower-dots-bridge__production-bridge-content--hover-reveal" : ""
+              }`}
+            >
               <span
                 className={`lower-dots-bridge__production-bridge-title${
                   showProductionPotentialTitle ? "" : " lower-dots-bridge__production-bridge-title--hidden"
@@ -297,7 +325,9 @@ const ProductionHistoricalBridge = ({
               </span>
               <span
                 className={`lower-dots-bridge__production-bridge-value${
-                  showProductionPotentialValue ? "" : " lower-dots-bridge__production-bridge-value--hidden"
+                  showProductionPotentialValue
+                    ? ""
+                    : " lower-dots-bridge__production-bridge-value--hidden"
                 }`}
               >
                 {formatKgHa(bridgeData.post.kgHa)} kg/ha

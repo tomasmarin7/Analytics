@@ -34,6 +34,18 @@ export const createDefaultPeriods = (year) => [
     variant: "production-potential-variedad-dardo",
     panelType: PERIOD_PANEL_TYPES.PRODUCTION_POTENTIAL_VARIETY_DARDO,
   },
+  {
+    id: "periodo-poda",
+    label: "Poda",
+    startMs: Date.UTC(year, 6, 1),
+    endMs: Date.UTC(year, 6, 15),
+    raisedStartMs: Date.UTC(year, 6, 1),
+    raisedEndMs: Date.UTC(year, 6, 15),
+    focusStartMs: Date.UTC(year, 5, 24),
+    focusEndMs: Date.UTC(year, 6, 20),
+    variant: "pruning-decision",
+    panelType: PERIOD_PANEL_TYPES.PRUNING_DECISION,
+  },
 ];
 
 export const getFallbackFocusRange = (year) => ({

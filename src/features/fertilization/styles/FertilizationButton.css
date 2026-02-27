@@ -264,3 +264,61 @@
   border-radius: 0;
   backdrop-filter: none;
 }
+
+.lower-dots-bridge__pruning-line-slot {
+  position: absolute;
+  bottom: 0;
+  height: 425px;
+  pointer-events: none;
+}
+
+.lower-dots-bridge__pruning-line-button {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.lower-dots-bridge__pruning-line-track {
+  position: absolute;
+  left: 0;
+  right: 24px;
+  bottom: calc(var(--pruning-line-height, 340px) - 13px);
+  height: 26px;
+  background: #b30000;
+  border-radius: 2px 0 0 2px;
+}
+
+.lower-dots-bridge__pruning-line-track::after {
+  content: "";
+  position: absolute;
+  right: -24px;
+  top: 50%;
+  width: 0;
+  height: 0;
+  border-top: 13px solid transparent;
+  border-bottom: 13px solid transparent;
+  border-left: 24px solid #b30000;
+  transform: translateY(-50%);
+}
+
+.lower-dots-bridge__pruning-line-title {
+  position: absolute;
+  left: 0;
+  right: 24px;
+  bottom: calc(var(--pruning-line-height, 340px) - 13px);
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Lufga", var(--font-brand);
+  font-size: 18px;
+  line-height: 1;
+  font-weight: 500;
+  color: #e5e5e5;
+  white-space: nowrap;
+}
