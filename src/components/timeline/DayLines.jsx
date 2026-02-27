@@ -9,6 +9,7 @@ const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
 const DayLines = ({
   dayLines,
+  monthMarkers = [],
   lineVisualLevel,
   visibleDays,
   isTodayVisible,
@@ -66,9 +67,9 @@ const DayLines = ({
       }}
     >
       {dayLines.map((line, index) => {
-        const baseClass = `lower-dots-bridge__line${line.isMonthStart ? " lower-dots-bridge__line--month-start" : ""}`;
+        const baseClass = "lower-dots-bridge__line";
 
-        if (!isTodayVisible || line.isMonthStart || visibleDays <= 1) {
+        if (!isTodayVisible || visibleDays <= 1) {
           return <span key={line.id} className={baseClass} />;
         }
 
@@ -81,6 +82,15 @@ const DayLines = ({
 
         return <span key={line.id} className={baseClass} style={{ transform: `scaleY(${scaleY})` }} />;
       })}
+
+      {monthMarkers.map((marker) => (
+        <span
+          key={`month-line-${marker.id}`}
+          className="lower-dots-bridge__month-start-line"
+          style={{ left: `${marker.ratio * 100}%` }}
+          aria-hidden="true"
+        />
+      ))}
 
       <EventActivationOverlay
         activeEvents={activeEvents}

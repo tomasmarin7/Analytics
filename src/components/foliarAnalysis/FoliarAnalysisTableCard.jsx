@@ -12,6 +12,7 @@ const FoliarAnalysisTableCard = ({
   rowData,
   selectedYearsCount,
   columns = [],
+  tableTone = null,
   tableAriaLabel = "Tabla de análisis",
 }) => {
   const tableScrollRef = useRef(null);
@@ -138,7 +139,7 @@ const FoliarAnalysisTableCard = ({
   );
 
   return (
-    <div className="foliar-analysis-table-card">
+    <div className={`foliar-analysis-table-card${tableTone ? ` foliar-analysis-table-card--${tableTone}` : ""}`}>
       <div className="foliar-analysis-table-card__inner">
         <div className="foliar-analysis-table-card__grid">
           {!hasDataTable ? (

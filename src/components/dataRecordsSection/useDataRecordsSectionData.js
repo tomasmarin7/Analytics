@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const countDataPoints = (row, fields) =>
   fields.reduce((total, field) => {
@@ -21,6 +21,7 @@ export const useDataRecordsSectionData = ({
   const selectedYears = controlledSelectedYears ?? internalSelectedYears;
   const setSelectedYears = onSelectedYearsChange ?? setInternalSelectedYears;
   const normalizedSelectedCuartel = String(selectedCuartel ?? "").trim().toUpperCase();
+  const previousCuartelRef = useRef(normalizedSelectedCuartel);
 
   const mappedRows = useMemo(() => rawRows.map(mapRow), [rawRows, mapRow]);
 
@@ -50,6 +51,8 @@ export const useDataRecordsSectionData = ({
   const selectedYearsSet = useMemo(() => new Set(selectedYearsForCuartel), [selectedYearsForCuartel]);
 
   useEffect(() => {
+    if (previousCuartelRef.current === normalizedSelectedCuartel) return;
+    previousCuartelRef.current = normalizedSelectedCuartel;
     setSelectedYears((current) => (current.length ? [] : current));
   }, [normalizedSelectedCuartel, setSelectedYears]);
 

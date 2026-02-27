@@ -128,12 +128,14 @@
   transform-origin: center center;
 }
 
-.lower-dots-bridge__line--month-start {
+.lower-dots-bridge__month-start-line {
+  position: absolute;
+  top: 8px;
   width: var(--month-line-width, 2px);
   height: var(--month-line-height, 100px);
   background: var(--bridge-month-line-color);
-  align-self: start;
-  transform: translateY(8px);
+  border-radius: 999px;
+  transform: translateX(-50%);
   transform-origin: center top;
 }
 

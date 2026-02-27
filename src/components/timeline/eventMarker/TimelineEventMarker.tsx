@@ -1,5 +1,6 @@
 import "./TimelineEventMarker.css";
 import "../../../features/timelineEvents/budAnalysis/marker.css";
+import "../../../features/timelineEvents/postPruningCount/marker.css";
 import "../../../features/timelineEvents/prePruningCount/marker.css";
 import {
   buildDynamicConnectorPath,

@@ -79,14 +79,10 @@ export const getVisiblePeriods = ({ periods, viewStartMs, viewEndMs, viewSpanMs 
     })
     .filter(Boolean);
 
-export const getDayLines = ({ visibleDays, viewStartMs }) =>
-  Array.from({ length: visibleDays }, (_, index) => {
-    const dayMs = viewStartMs + DAY_MS * index;
-    return {
-      id: `line-${index}`,
-      isMonthStart: new Date(dayMs).getUTCDate() === 1,
-    };
-  });
+export const getDayLines = ({ visibleDays }) =>
+  Array.from({ length: visibleDays }, (_, index) => ({
+    id: `line-${index}`,
+  }));
 
 export const getLineVisualLevel = ({ leftRatio, rightRatio, minRangeRatio }) => {
   const rangeRatio = rightRatio - leftRatio;

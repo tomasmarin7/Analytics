@@ -52,6 +52,7 @@ const TimelineTrack = ({
         />
         <DayLines
           dayLines={dayLines}
+          monthMarkers={monthMarkers}
           lineVisualLevel={lineVisualLevel}
           visibleDays={visibleDays}
           isTodayVisible={isTodayVisible}

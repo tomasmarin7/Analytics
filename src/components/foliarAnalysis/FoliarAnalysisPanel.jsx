@@ -1,5 +1,6 @@
 import foliarAnalysisRows from "../../data/foliarAnalysisRows.json";
 import budAnalysisRows from "../../data/budAnalysisRows.json";
+import postPruningCountRows from "../../data/postPruningCountRows.json";
 import prePruningCountRows from "../../data/prePruningCountRows.json";
 import { useMemo } from "react";
 import DataRecordsSection from "../dataRecordsSection/DataRecordsSection";
@@ -9,10 +10,12 @@ import { BUD_COLUMNS, BUD_SCORE_FIELDS, mapBudRow, sortBudRows } from "./budAnal
 import {
   BUD_ANALYSIS_EVENT_ID,
   FOLIAR_ANALYSIS_EVENT_ID,
+  POST_PRUNING_COUNT_EVENT_ID,
   PRE_PRUNING_COUNT_EVENT_ID,
 } from "../../features/timelineEvents";
 import { BUD_ANALYSIS_EVENT } from "../../features/timelineEvents/budAnalysis/event";
 import { FOLIAR_ANALYSIS_EVENT } from "../../features/timelineEvents/foliarAnalysis/event";
+import { POST_PRUNING_COUNT_EVENT } from "../../features/timelineEvents/postPruningCount/event";
 import { PRE_PRUNING_COUNT_EVENT } from "../../features/timelineEvents/prePruningCount/event";
 import {
   PRE_PRUNING_COUNT_COLUMNS,
@@ -23,19 +26,23 @@ import {
 
 const FOLIAR_MAPPED_ROWS = foliarAnalysisRows.map(mapFoliarRow);
 const BUD_MAPPED_ROWS = budAnalysisRows.map(mapBudRow);
+const POST_PRUNING_MAPPED_ROWS = postPruningCountRows.map(mapPrePruningCountRow);
 const PRE_PRUNING_MAPPED_ROWS = prePruningCountRows.map(mapPrePruningCountRow);
 
 const EVENT_DEFINITION_BY_ID = {
   [FOLIAR_ANALYSIS_EVENT_ID]: FOLIAR_ANALYSIS_EVENT,
   [BUD_ANALYSIS_EVENT_ID]: BUD_ANALYSIS_EVENT,
   [PRE_PRUNING_COUNT_EVENT_ID]: PRE_PRUNING_COUNT_EVENT,
+  [POST_PRUNING_COUNT_EVENT_ID]: POST_PRUNING_COUNT_EVENT,
 };
+
 const mapYearSelectorRow = (row) => row;
 
 const TONE_BY_DATASET_ID = {
   foliar: "fertilization",
   bud: "bud-analysis",
   "pre-pruning-count": "count",
+  "post-pruning-count": "count-post",
 };
 
 const countDataPoints = (row, fields) =>
@@ -121,19 +128,6 @@ const FoliarAnalysisPanel = ({
 }) => {
   const activeEventIds = useMemo(() => new Set(activeEvents.map((event) => event.id)), [activeEvents]);
 
-  const prePruningEvent = useMemo(
-    () =>
-      activeEvents.find(
-        (event) =>
-          event.id === PRE_PRUNING_COUNT_EVENT_ID ||
-          String(event.label ?? "")
-            .trim()
-            .toLowerCase()
-            .includes("conteo")
-      ),
-    [activeEvents],
-  );
-
   const activeDatasets = useMemo(
     () =>
       [
@@ -145,6 +139,7 @@ const FoliarAnalysisPanel = ({
               columns: FOLIAR_COLUMNS,
               mappedRows: FOLIAR_MAPPED_ROWS,
               scoreFields: FOLIAR_SCORE_FIELDS,
+              tone: "fertilization",
             }
           : null,
         activeEventIds.has(BUD_ANALYSIS_EVENT_ID)
@@ -157,9 +152,10 @@ const FoliarAnalysisPanel = ({
               scoreFields: BUD_SCORE_FIELDS,
               keepAllRowsPerYear: true,
               sortRows: sortBudRows,
+              tone: "bud-analysis",
             }
           : null,
-        prePruningEvent
+        activeEventIds.has(PRE_PRUNING_COUNT_EVENT_ID)
           ? {
               id: "pre-pruning-count",
               eventId: PRE_PRUNING_COUNT_EVENT_ID,
@@ -169,13 +165,33 @@ const FoliarAnalysisPanel = ({
               scoreFields: PRE_PRUNING_COUNT_SCORE_FIELDS,
               keepAllRowsPerYear: true,
               sortRows: sortPrePruningCountRows,
+              tone: "count",
+            }
+          : null,
+        activeEventIds.has(POST_PRUNING_COUNT_EVENT_ID)
+          ? {
+              id: "post-pruning-count",
+              eventId: POST_PRUNING_COUNT_EVENT_ID,
+              label: "Post poda",
+              columns: PRE_PRUNING_COUNT_COLUMNS,
+              mappedRows: POST_PRUNING_MAPPED_ROWS,
+              scoreFields: PRE_PRUNING_COUNT_SCORE_FIELDS,
+              keepAllRowsPerYear: true,
+              sortRows: sortPrePruningCountRows,
+              tone: "count-post",
             }
           : null,
       ].filter(Boolean),
-    [activeEventIds, prePruningEvent],
+    [activeEventIds],
   );
 
   const hasDataTable = activeDatasets.length > 0;
+  const isCountPairOnly = useMemo(() => {
+    if (activeDatasets.length !== 2) return false;
+    const ids = new Set(activeDatasets.map((dataset) => dataset.id));
+    return ids.has("pre-pruning-count") && ids.has("post-pruning-count");
+  }, [activeDatasets]);
+
   const yearSelectorRowsMapped = useMemo(
     () =>
       activeDatasets.flatMap((dataset) =>
@@ -189,23 +205,6 @@ const FoliarAnalysisPanel = ({
         })),
       ),
     [activeDatasets, currentDate],
-  );
-
-  const unifiedColumns = useMemo(
-    () => [
-      { field: "year", header: "Temp." },
-      { field: "variedad", header: "Variedad" },
-      ...activeDatasets.flatMap((dataset) =>
-        dataset.columns
-          .filter((column) => column.field !== "variedad")
-          .map((column) => ({
-            field: `${dataset.id}::${column.field}`,
-            header: column.header,
-            tone: TONE_BY_DATASET_ID[dataset.id] ?? null,
-          }))
-      ),
-    ],
-    [activeDatasets]
   );
 
   const rowsByDataset = useMemo(
@@ -225,9 +224,26 @@ const FoliarAnalysisPanel = ({
             keepAllRowsPerYear: dataset.keepAllRowsPerYear,
             sortRows: dataset.sortRows,
           }),
-        ])
+        ]),
       ),
-    [activeDatasets, currentDate, selectedCuartel, selectedYears]
+    [activeDatasets, currentDate, selectedCuartel, selectedYears],
+  );
+
+  const unifiedColumns = useMemo(
+    () => [
+      { field: "year", header: "Temp." },
+      { field: "variedad", header: "Variedad" },
+      ...activeDatasets.flatMap((dataset) =>
+        dataset.columns
+          .filter((column) => column.field !== "variedad")
+          .map((column) => ({
+            field: `${dataset.id}::${column.field}`,
+            header: column.header,
+            tone: TONE_BY_DATASET_ID[dataset.id] ?? null,
+          }))
+      ),
+    ],
+    [activeDatasets],
   );
 
   const unifiedRowData = useMemo(() => {
@@ -328,15 +344,51 @@ const FoliarAnalysisPanel = ({
       selectedYears={selectedYears}
       onSelectedYearsChange={onSelectedYearsChange}
     >
-      {({ selectedYearsCount }) => (
-        <FoliarAnalysisTableCard
-          hasDataTable={hasDataTable}
-          rowData={unifiedRowData}
-          selectedYearsCount={selectedYearsCount}
-          columns={unifiedColumns}
-          tableAriaLabel="Tabla unificada de análisis"
-        />
-      )}
+      {({ selectedYearsCount }) =>
+        hasDataTable ? (
+          isCountPairOnly ? (
+            <div className="foliar-analysis-table-card-stack foliar-analysis-table-card-stack--count-only">
+              {activeDatasets.map((dataset) => {
+                const columns = [
+                  { field: "year", header: "Temp." },
+                  ...dataset.columns.map((column) => ({
+                    ...column,
+                    tone: dataset.tone,
+                  })),
+                ];
+
+                return (
+                  <FoliarAnalysisTableCard
+                    key={dataset.id}
+                    hasDataTable
+                    rowData={rowsByDataset[dataset.id] ?? []}
+                    selectedYearsCount={selectedYearsCount}
+                    columns={columns}
+                    tableTone={dataset.tone}
+                    tableAriaLabel={`Tabla ${dataset.label}`}
+                  />
+                );
+              })}
+            </div>
+          ) : (
+            <FoliarAnalysisTableCard
+              hasDataTable
+              rowData={unifiedRowData}
+              selectedYearsCount={selectedYearsCount}
+              columns={unifiedColumns}
+              tableAriaLabel="Tabla unificada de análisis"
+            />
+          )
+        ) : (
+          <FoliarAnalysisTableCard
+            hasDataTable={false}
+            rowData={[]}
+            selectedYearsCount={selectedYearsCount}
+            columns={[]}
+            tableAriaLabel="Tabla de análisis"
+          />
+        )
+      }
     </DataRecordsSection>
   );
 };

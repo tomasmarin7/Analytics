@@ -1,3 +1,21 @@
+.foliar-analysis-table-card-stack {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.foliar-analysis-table-card-stack--count-only .foliar-analysis-table-card {
+  background: #e5e8ec;
+  border-radius: 12px;
+  padding: 6px;
+}
+
+.foliar-analysis-table-card-stack--count-only .foliar-analysis-table-card__table-scroll {
+  background: #d7dde4;
+  border-radius: 8px;
+}
+
 .foliar-analysis-table-card {
   --table-col-year-w: 126px;
   --table-col-variedad-w: 180px;
@@ -167,6 +185,97 @@
 
 .foliar-analysis-table-card__table tbody td.foliar-analysis-table-card__col--count {
   background: rgba(193, 201, 210, 0.34);
+}
+
+.foliar-analysis-table-card__table thead th.foliar-analysis-table-card__col--count-post {
+  background: rgba(171, 143, 149, 0.6);
+  color: #402c30;
+}
+
+.foliar-analysis-table-card__table tbody td.foliar-analysis-table-card__col--count-post {
+  background: rgba(192, 167, 173, 0.34);
+}
+
+.foliar-analysis-table-card--count-post .foliar-analysis-table-card__table thead th:nth-child(1),
+.foliar-analysis-table-card--count-post .foliar-analysis-table-card__table thead th:nth-child(2) {
+  background: rgba(141, 124, 128, 0.95);
+}
+
+.foliar-analysis-table-card--count-post .foliar-analysis-table-card__table tbody td:nth-child(1),
+.foliar-analysis-table-card--count-post .foliar-analysis-table-card__table tbody td:nth-child(2) {
+  background: rgba(184, 167, 171, 0.92);
+}
+
+.foliar-analysis-table-card--count-post .foliar-analysis-table-card__row--year-band-a {
+  background: rgba(199, 179, 184, 0.42);
+}
+
+.foliar-analysis-table-card--count-post .foliar-analysis-table-card__row--year-band-b {
+  background: rgba(211, 192, 196, 0.36);
+}
+
+.foliar-analysis-table-card-stack--count-only .foliar-analysis-table-card__table {
+  background: #d7dde4;
+}
+
+.foliar-analysis-table-card-stack--count-only .foliar-analysis-table-card__table thead th {
+  background: #aeb7c2;
+}
+
+.foliar-analysis-table-card-stack--count-only .foliar-analysis-table-card__table tbody td {
+  background: #c5ccd5;
+}
+
+.foliar-analysis-table-card-stack--count-only .foliar-analysis-table-card__table thead th:nth-child(1),
+.foliar-analysis-table-card-stack--count-only .foliar-analysis-table-card__table thead th:nth-child(2) {
+  background: #86909a;
+}
+
+.foliar-analysis-table-card-stack--count-only .foliar-analysis-table-card__table tbody td:nth-child(1),
+.foliar-analysis-table-card-stack--count-only .foliar-analysis-table-card__table tbody td:nth-child(2) {
+  background: #adb5bc;
+}
+
+.foliar-analysis-table-card-stack--count-only .foliar-analysis-table-card__table thead th.foliar-analysis-table-card__col--count {
+  background: #b1b9c4;
+}
+
+.foliar-analysis-table-card-stack--count-only .foliar-analysis-table-card__table tbody td.foliar-analysis-table-card__col--count {
+  background: #c1c9d2;
+}
+
+.foliar-analysis-table-card-stack--count-only .foliar-analysis-table-card__table thead th.foliar-analysis-table-card__col--count-post {
+  background: #ab8f95;
+}
+
+.foliar-analysis-table-card-stack--count-only .foliar-analysis-table-card__table tbody td.foliar-analysis-table-card__col--count-post {
+  background: #c0a7ad;
+}
+
+.foliar-analysis-table-card-stack--count-only .foliar-analysis-table-card--count-post .foliar-analysis-table-card__table thead th:nth-child(1),
+.foliar-analysis-table-card-stack--count-only .foliar-analysis-table-card--count-post .foliar-analysis-table-card__table thead th:nth-child(2) {
+  background: #8d7c80;
+}
+
+.foliar-analysis-table-card-stack--count-only .foliar-analysis-table-card--count-post .foliar-analysis-table-card__table tbody td:nth-child(1),
+.foliar-analysis-table-card-stack--count-only .foliar-analysis-table-card--count-post .foliar-analysis-table-card__table tbody td:nth-child(2) {
+  background: #b8a7ab;
+}
+
+.foliar-analysis-table-card-stack--count-only .foliar-analysis-table-card__row--year-band-a {
+  background: #bbc2c9;
+}
+
+.foliar-analysis-table-card-stack--count-only .foliar-analysis-table-card__row--year-band-b {
+  background: #c8ced5;
+}
+
+.foliar-analysis-table-card-stack--count-only .foliar-analysis-table-card--count-post .foliar-analysis-table-card__row--year-band-a {
+  background: #c7b3b8;
+}
+
+.foliar-analysis-table-card-stack--count-only .foliar-analysis-table-card--count-post .foliar-analysis-table-card__row--year-band-b {
+  background: #d3c0c4;
 }
 
 .foliar-analysis-table-card__row--year-band-a {

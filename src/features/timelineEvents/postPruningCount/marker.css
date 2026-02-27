@@ -1,0 +1,7 @@
+.timeline-event-marker--post-pruning-count .timeline-event-marker__shape {
+  border: 0;
+  background:
+    radial-gradient(124% 132% at 10% 8%, rgba(100, 95, 97, 0.62) 0%, rgba(100, 95, 97, 0) 46%),
+    radial-gradient(146% 138% at 90% 92%, rgba(220, 186, 187, 0.44) 0%, rgba(220, 186, 187, 0) 68%),
+    linear-gradient(135deg, #3c3537 0%, #6d5559 46%, #ba9ea1 100%);
+}

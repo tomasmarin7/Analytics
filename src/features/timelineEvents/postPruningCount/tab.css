@@ -1,0 +1,7 @@
+.foliar-analysis-table-card__tab--post-pruning-count {
+  color: #1d1718;
+  background: rgba(194, 166, 168, 0.24);
+  box-shadow: 0 1px 0 rgba(194, 166, 168, 0.24);
+  border: 1px solid rgba(36, 25, 27, 0.58);
+  border-bottom: none;
+}

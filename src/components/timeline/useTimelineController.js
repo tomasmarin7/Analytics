@@ -68,6 +68,7 @@ export const useTimelineController = ({ periods, currentDate } = {}) => {
     () =>
       TIMELINE_EVENT_DEFINITIONS.map((eventDef) => {
         const eventMs = Date.UTC(year, eventDef.month, eventDef.day);
+        const centeredEventMs = eventMs + DAY_MS / 2;
 
         return {
           id: eventDef.id,
@@ -75,20 +76,20 @@ export const useTimelineController = ({ periods, currentDate } = {}) => {
           labelLines: eventDef.labelLines ?? [eventDef.label],
           connector: eventDef.connector,
           isVisible: eventMs >= viewStartMs && eventMs <= viewEndMs,
-          leftPercent: ((eventMs - viewStartMs) / viewSpanMs) * 100,
+          leftPercent: ((centeredEventMs - viewStartMs) / viewSpanMs) * 100,
         };
       }),
     [year, viewStartMs, viewSpanMs, viewEndMs],
   );
 
-  const dayLines = useMemo(() => getDayLines({ visibleDays, viewStartMs }), [visibleDays, viewStartMs]);
+  const dayLines = useMemo(() => getDayLines({ visibleDays }), [visibleDays]);
   const lineVisualLevel = useMemo(
     () => getLineVisualLevel({ leftRatio, rightRatio, minRangeRatio }),
     [leftRatio, rightRatio, minRangeRatio],
   );
 
   const isTodayVisible = todayMs >= viewStartMs && todayMs <= viewEndMs;
-  const todayLeftPercent = ((todayMs - viewStartMs) / viewSpanMs) * 100;
+  const todayLeftPercent = ((todayMs + DAY_MS / 2 - viewStartMs) / viewSpanMs) * 100;
 
   const setRatios = useCallback((nextLeft, nextRight) => {
     const { minRangeRatio: minGap } = ratiosRef.current;
