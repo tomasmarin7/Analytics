@@ -5,12 +5,14 @@ import { resolveEventAnchorPx } from "./eventActivationMath";
 const EventActivationOverlay = ({
   activeEvents,
   containerWidth,
+  defaultAnchorPx = null,
   overlayZIndex = 2,
   onRequestForeground,
   isDataRecordsContent = false,
   children,
 }) => {
-  const anchorPx = resolveEventAnchorPx({ activeEvents, containerWidth });
+  const resolvedAnchorPx = resolveEventAnchorPx({ activeEvents, containerWidth });
+  const anchorPx = resolvedAnchorPx ?? defaultAnchorPx;
   if (anchorPx === null) return null;
 
   const panelLeftPx = anchorPx + EVENT_BULLET_HORIZONTAL_GAP_PX;

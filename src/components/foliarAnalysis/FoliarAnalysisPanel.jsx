@@ -36,6 +36,13 @@ const EVENT_DEFINITION_BY_ID = {
   [POST_PRUNING_COUNT_EVENT_ID]: POST_PRUNING_COUNT_EVENT,
 };
 
+const YEAR_SELECTOR_SOURCE_DATASETS = [
+  { eventId: FOLIAR_ANALYSIS_EVENT_ID, mappedRows: FOLIAR_MAPPED_ROWS },
+  { eventId: BUD_ANALYSIS_EVENT_ID, mappedRows: BUD_MAPPED_ROWS },
+  { eventId: PRE_PRUNING_COUNT_EVENT_ID, mappedRows: PRE_PRUNING_MAPPED_ROWS },
+  { eventId: POST_PRUNING_COUNT_EVENT_ID, mappedRows: POST_PRUNING_MAPPED_ROWS },
+];
+
 const mapYearSelectorRow = (row) => row;
 
 const TONE_BY_DATASET_ID = {
@@ -194,7 +201,7 @@ const FoliarAnalysisPanel = ({
 
   const yearSelectorRowsMapped = useMemo(
     () =>
-      activeDatasets.flatMap((dataset) =>
+      YEAR_SELECTOR_SOURCE_DATASETS.flatMap((dataset) =>
         filterRowsByTimelineMoment({
           rows: dataset.mappedRows,
           eventId: dataset.eventId,
@@ -204,7 +211,7 @@ const FoliarAnalysisPanel = ({
           cuartel: row.cuartel,
         })),
       ),
-    [activeDatasets, currentDate],
+    [currentDate],
   );
 
   const rowsByDataset = useMemo(

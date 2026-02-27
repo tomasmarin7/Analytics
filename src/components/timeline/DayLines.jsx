@@ -3,7 +3,7 @@ import TimelineEventMarker from "./eventMarker/TimelineEventMarker";
 import { EventActivationOverlay } from "./eventActivation";
 import { EVENT_ACTIVATION_VERTICAL_TOP_PX } from "./eventActivation/constants";
 import FoliarAnalysisPanel from "../foliarAnalysis/FoliarAnalysisPanel";
-import { DATA_RECORDS_EVENT_IDS } from "../../features/timelineEvents";
+import { DATA_RECORDS_EVENT_CONNECTOR } from "../../features/timelineEvents/shared/connectors";
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
@@ -45,7 +45,6 @@ const DayLines = ({
 
   const currentActiveEventSet = useMemo(() => new Set(activeEventIds ?? []), [activeEventIds]);
   const activeEvents = timelineEvents.filter((event) => currentActiveEventSet.has(event.id));
-  const hasDataRecordsContent = activeEvents.some((event) => DATA_RECORDS_EVENT_IDS.includes(event.id));
   const renderedMarkerEvents = timelineEvents
     .filter((event) => event.isVisible || currentActiveEventSet.has(event.id))
     .map((event) => {
@@ -95,20 +94,19 @@ const DayLines = ({
       <EventActivationOverlay
         activeEvents={activeEvents}
         containerWidth={containerWidth}
+        defaultAnchorPx={DATA_RECORDS_EVENT_CONNECTOR.fixedLeftPx}
         overlayZIndex={dataRecordsZIndex}
         onRequestForeground={onRequestDataRecordsForeground}
-        isDataRecordsContent={hasDataRecordsContent}
+        isDataRecordsContent
       >
-        {hasDataRecordsContent ? (
-          <FoliarAnalysisPanel
-            activeEvents={activeEvents}
-            selectedHuerto={selectedHuerto}
-            selectedCuartel={selectedCuartel}
-            selectedYears={selectedYears}
-            onSelectedYearsChange={onSelectedYearsChange}
-            currentDate={currentDate}
-          />
-        ) : null}
+        <FoliarAnalysisPanel
+          activeEvents={activeEvents}
+          selectedHuerto={selectedHuerto}
+          selectedCuartel={selectedCuartel}
+          selectedYears={selectedYears}
+          onSelectedYearsChange={onSelectedYearsChange}
+          currentDate={currentDate}
+        />
       </EventActivationOverlay>
 
       {renderedMarkerEvents.map((event) => (

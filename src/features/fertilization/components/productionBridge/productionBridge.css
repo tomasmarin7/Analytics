@@ -12,6 +12,15 @@
   );
 }
 
+.lower-dots-bridge__production-bridge--post-pruning {
+  background: linear-gradient(
+    180deg,
+    rgba(118, 64, 82, 0.28) 0%,
+    rgba(118, 64, 82, 0.16) 52%,
+    rgba(118, 64, 82, 0) 100%
+  );
+}
+
 .lower-dots-bridge__production-bridge-content {
   position: absolute;
   top: 14px;

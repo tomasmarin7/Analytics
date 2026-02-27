@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import budAnalysisRows from "../../../../data/budAnalysisRows.json";
 import prePruningCountRows from "../../../../data/prePruningCountRows.json";
+import postPruningCountRows from "../../../../data/postPruningCountRows.json";
 import fruitSetAndCaliberProfiles from "../../../../data/fruitSetAndCaliberProfiles.json";
 import { mapBudRow } from "../../../../components/foliarAnalysis/budAnalysisConfig";
 import { mapPrePruningCountRow } from "../../../../components/foliarAnalysis/prePruningCountConfig";
@@ -12,6 +13,7 @@ const PRODUCTION_POTENTIAL_DARDO_BLOCK_HEIGHT_PX = 425;
 const normalizeText = (value) => String(value ?? "").trim().toUpperCase();
 const BUD_MAPPED_ROWS = budAnalysisRows.map(mapBudRow);
 const PRE_PRUNING_MAPPED_ROWS = prePruningCountRows.map(mapPrePruningCountRow);
+const POST_PRUNING_MAPPED_ROWS = postPruningCountRows.map(mapPrePruningCountRow);
 const SERIES_BASE_YEAR = 2017;
 
 const toNumber = (value) => {
@@ -134,10 +136,22 @@ const ProductionHistoricalBridge = ({
     return { left: clampedStart, width };
   }, [periods, timelineEvents]);
 
+  const postBridgeGeometry = useMemo(() => {
+    if (!bridgeGeometry) return null;
+
+    const start = bridgeGeometry.left + bridgeGeometry.width;
+    if (start >= 99.95) return null;
+
+    const width = Math.min(bridgeGeometry.width, 100 - start);
+    if (width <= 0.05) return null;
+
+    return { left: start, width };
+  }, [bridgeGeometry]);
+
   const bridgeData = useMemo(() => {
     const normalizedSelectedCuartel = normalizeText(selectedCuartel);
     if (!normalizedSelectedCuartel || !Number.isFinite(referenceYear)) {
-      return { heightPx: 0, kgHa: 0, year: null };
+      return { pre: { heightPx: 0, kgHa: 0, year: null }, post: { heightPx: 0, kgHa: 0, year: null } };
     }
 
     const currentYear = safeCurrentDate.getFullYear();
@@ -151,8 +165,8 @@ const ProductionHistoricalBridge = ({
 
     const profileMap = resolveProfileMap(fruitSetAndCaliberProfiles);
 
-    const computePreTotalForYearUsingCurrentParams = (targetYear) => {
-      const preRows = PRE_PRUNING_MAPPED_ROWS.filter(
+    const computeTotalForYearUsingCurrentParams = (sourceRows, targetYear) => {
+      const rows = sourceRows.filter(
         (row) => normalizeText(row.cuartel) === normalizedSelectedCuartel && row.year === targetYear,
       );
       const budByKey = new Map(
@@ -163,12 +177,12 @@ const ProductionHistoricalBridge = ({
           .map((row) => [buildRowKey(row), row]),
       );
 
-      return preRows.reduce((total, preRow) => {
-        const budRow = budByKey.get(buildRowKey(preRow));
+      return rows.reduce((total, sourceRow) => {
+        const budRow = budByKey.get(buildRowKey(sourceRow));
         if (!budRow) return total;
 
-        const registeredVarietyRow = registeredByVariety.get(normalizeText(preRow.variedad));
-        const profile = resolveProfile(profileMap, preRow.cuartel, preRow.variedad);
+        const registeredVarietyRow = registeredByVariety.get(normalizeText(sourceRow.variedad));
+        const profile = resolveProfile(profileMap, sourceRow.cuartel, sourceRow.variedad);
         const cuajaPercent =
           toPercent(registeredVarietyRow?.cuajaEsperada) ??
           pickSeriesValueForYear(profile?.cuajaEstimadaPct, currentYear);
@@ -177,67 +191,122 @@ const ProductionHistoricalBridge = ({
           pickSeriesValueForYear(profile?.calibreEstimado, currentYear);
 
         const kgHa = calculateProductionKgHa({
-          dardosPlanta: preRow.dardosPlanta,
+          dardosPlanta: sourceRow.dardosPlanta,
           floresDardo: budRow.floresDardo,
           danoPercent: budRow.dano,
           cuajaPercent,
-          plantasHaProductivas: preRow.plantasHaProductivas,
+          plantasHaProductivas: sourceRow.plantasHaProductivas,
           calibreGr,
         });
         return total + (Number(kgHa) || 0);
       }, 0);
     };
 
-    const fallbackCurrentPre = computePreTotalForYearUsingCurrentParams(currentYear);
+    const fallbackCurrentPre = computeTotalForYearUsingCurrentParams(PRE_PRUNING_MAPPED_ROWS, currentYear);
     const grayBlockKgHa =
       Number.isFinite(registeredCurrentTotal) && registeredCurrentTotal > 0
         ? registeredCurrentTotal
         : fallbackCurrentPre;
-    if (!(grayBlockKgHa > 0)) return { heightPx: 0, kgHa: 0, year: referenceYear };
-
-    const preReferenceUsingCurrentParams = computePreTotalForYearUsingCurrentParams(referenceYear);
-    if (!(preReferenceUsingCurrentParams > 0)) {
-      return { heightPx: 0, kgHa: 0, year: referenceYear };
+    if (!(grayBlockKgHa > 0)) {
+      return {
+        pre: { heightPx: 0, kgHa: 0, year: referenceYear },
+        post: { heightPx: 0, kgHa: 0, year: referenceYear },
+      };
     }
 
+    const preReferenceUsingCurrentParams = computeTotalForYearUsingCurrentParams(
+      PRE_PRUNING_MAPPED_ROWS,
+      referenceYear,
+    );
+    const postReferenceUsingCurrentParams = computeTotalForYearUsingCurrentParams(
+      POST_PRUNING_MAPPED_ROWS,
+      referenceYear,
+    );
+
     return {
-      heightPx: (preReferenceUsingCurrentParams / grayBlockKgHa) * PRODUCTION_POTENTIAL_DARDO_BLOCK_HEIGHT_PX,
-      kgHa: preReferenceUsingCurrentParams,
-      year: referenceYear,
+      pre: {
+        heightPx:
+          preReferenceUsingCurrentParams > 0
+            ? (preReferenceUsingCurrentParams / grayBlockKgHa) * PRODUCTION_POTENTIAL_DARDO_BLOCK_HEIGHT_PX
+            : 0,
+        kgHa: preReferenceUsingCurrentParams > 0 ? preReferenceUsingCurrentParams : 0,
+        year: referenceYear,
+      },
+      post: {
+        heightPx:
+          postReferenceUsingCurrentParams > 0
+            ? (postReferenceUsingCurrentParams / grayBlockKgHa) * PRODUCTION_POTENTIAL_DARDO_BLOCK_HEIGHT_PX
+            : 0,
+        kgHa: postReferenceUsingCurrentParams > 0 ? postReferenceUsingCurrentParams : 0,
+        year: referenceYear,
+      },
     };
   }, [referenceYear, registeredProductionByCuartel, safeCurrentDate, selectedCuartel]);
 
-  if (!bridgeGeometry || bridgeData.year === null) return null;
+  if (!bridgeGeometry || bridgeData.pre.year === null) return null;
 
   return (
-    <span
-      className="lower-dots-bridge__production-bridge"
-      style={{
-        left: `${bridgeGeometry.left}%`,
-        width: `${bridgeGeometry.width}%`,
-        height: `${bridgeData.heightPx}px`,
-      }}
-      aria-hidden="true"
-    >
-      {bridgeData.kgHa > 0 ? (
-        <span className="lower-dots-bridge__production-bridge-content">
-          <span
-            className={`lower-dots-bridge__production-bridge-title${
-              showProductionPotentialTitle ? "" : " lower-dots-bridge__production-bridge-title--hidden"
-            }`}
-          >
-            {bridgeData.year}
+    <>
+      <span
+        className="lower-dots-bridge__production-bridge"
+        style={{
+          left: `${bridgeGeometry.left}%`,
+          width: `${bridgeGeometry.width}%`,
+          height: `${bridgeData.pre.heightPx}px`,
+        }}
+        aria-hidden="true"
+      >
+        {bridgeData.pre.kgHa > 0 ? (
+          <span className="lower-dots-bridge__production-bridge-content">
+            <span
+              className={`lower-dots-bridge__production-bridge-title${
+                showProductionPotentialTitle ? "" : " lower-dots-bridge__production-bridge-title--hidden"
+              }`}
+            >
+              {bridgeData.pre.year}
+            </span>
+            <span
+              className={`lower-dots-bridge__production-bridge-value${
+                showProductionPotentialValue ? "" : " lower-dots-bridge__production-bridge-value--hidden"
+              }`}
+            >
+              {formatKgHa(bridgeData.pre.kgHa)} kg/ha
+            </span>
           </span>
-          <span
-            className={`lower-dots-bridge__production-bridge-value${
-              showProductionPotentialValue ? "" : " lower-dots-bridge__production-bridge-value--hidden"
-            }`}
-          >
-            {formatKgHa(bridgeData.kgHa)} kg/ha
-          </span>
+        ) : null}
+      </span>
+
+      {postBridgeGeometry ? (
+        <span
+          className="lower-dots-bridge__production-bridge lower-dots-bridge__production-bridge--post-pruning"
+          style={{
+            left: `${postBridgeGeometry.left}%`,
+            width: `${postBridgeGeometry.width}%`,
+            height: `${bridgeData.post.heightPx}px`,
+          }}
+          aria-hidden="true"
+        >
+          {bridgeData.post.kgHa > 0 ? (
+            <span className="lower-dots-bridge__production-bridge-content">
+              <span
+                className={`lower-dots-bridge__production-bridge-title${
+                  showProductionPotentialTitle ? "" : " lower-dots-bridge__production-bridge-title--hidden"
+                }`}
+              >
+                {bridgeData.post.year}
+              </span>
+              <span
+                className={`lower-dots-bridge__production-bridge-value${
+                  showProductionPotentialValue ? "" : " lower-dots-bridge__production-bridge-value--hidden"
+                }`}
+              >
+                {formatKgHa(bridgeData.post.kgHa)} kg/ha
+              </span>
+            </span>
+          ) : null}
         </span>
       ) : null}
-    </span>
+    </>
   );
 };
 
