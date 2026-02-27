@@ -22,6 +22,9 @@ const TimelineTrack = ({
   selectedCuartel,
   selectedYears,
   onSelectedYearsChange,
+  showFertilizationTitle,
+  showProductionPotentialTitle,
+  showProductionPotentialValue,
 }) => {
   const [foregroundLayer, setForegroundLayer] = useState("data-records");
   const periodsZIndex = foregroundLayer === "fertilization" ? 4 : 1;
@@ -41,6 +44,9 @@ const TimelineTrack = ({
           selectedYears={selectedYears}
           zIndex={periodsZIndex}
           onRequestForeground={() => setForegroundLayer("fertilization")}
+          showFertilizationTitle={showFertilizationTitle}
+          showProductionPotentialTitle={showProductionPotentialTitle}
+          showProductionPotentialValue={showProductionPotentialValue}
         />
         <DayLines
           dayLines={dayLines}

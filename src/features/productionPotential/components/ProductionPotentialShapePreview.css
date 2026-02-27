@@ -1,0 +1,59 @@
+.production-potential-shape-preview {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.production-potential-shape-preview__baseline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-bottom: 2px dotted rgba(121, 127, 133, 0.5);
+}
+
+.production-potential-shape-preview__stacked {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.production-potential-shape-preview__segment {
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 2px;
+  padding: 6px 8px;
+  overflow: hidden;
+  font-family: var(--font-brand);
+  text-align: left;
+}
+
+.production-potential-shape-preview__segment--planta {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.production-potential-shape-preview__segment--laterales {
+  color: rgba(41, 47, 52, 0.92);
+}
+
+.production-potential-shape-preview__segment-title {
+  font-size: 13px;
+  line-height: 1.05;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.production-potential-shape-preview__segment-value {
+  font-size: 12px;
+  line-height: 1.05;
+  font-weight: 500;
+}

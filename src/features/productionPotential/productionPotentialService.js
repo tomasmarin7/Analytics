@@ -1,4 +1,5 @@
 const SERIES_BASE_YEAR = 2017;
+const VARIETY_HUES = [352, 9, 24, 340, 356, 16, 332, 40];
 
 const normalizeText = (value) => String(value ?? "").trim().toUpperCase();
 
@@ -28,6 +29,25 @@ const round = (value, decimals = 2) => {
   if (!Number.isFinite(value)) return null;
   const factor = 10 ** decimals;
   return Math.round(value * factor) / factor;
+};
+
+const hashText = (value) => {
+  const text = String(value ?? "").trim().toUpperCase();
+  let hash = 0;
+  for (let index = 0; index < text.length; index += 1) {
+    hash = (hash * 31 + text.charCodeAt(index)) >>> 0;
+  }
+  return hash;
+};
+
+const resolveVarietyHue = (variedad) => VARIETY_HUES[hashText(variedad) % VARIETY_HUES.length];
+
+const buildVarietyColorPair = (variedad) => {
+  const hue = resolveVarietyHue(variedad);
+  return {
+    strong: `hsl(${hue} 66% 31%)`,
+    soft: `hsl(${hue} 32% 63%)`,
+  };
 };
 
 const pickSeriesValueForYear = (series, year) => {
@@ -232,5 +252,65 @@ export const buildDraftProductionRow = ({
     produccionEsperadaKgHa,
     produccionRealKgHa: null,
     isDraft: true,
+  };
+};
+
+export const buildRegisteredProductionVisual = ({ draftRows = [], lateralShare = 0.35 } = {}) => {
+  const normalizedLateralShare = Math.min(0.9, Math.max(0.1, toNumber(lateralShare) ?? 0.35));
+
+  const varieties = draftRows
+    .map((row) => {
+      const totalKgHa = toNumber(row?.produccionEsperadaKgHa);
+      if (!Number.isFinite(totalKgHa) || totalKgHa <= 0) return null;
+
+      const variedad = String(row?.variedad ?? "").trim();
+      if (!variedad) return null;
+
+      const lateralKgHa = round(totalKgHa * normalizedLateralShare, 2);
+      const plantaKgHa = round(totalKgHa - lateralKgHa, 2);
+      const colors = buildVarietyColorPair(variedad);
+
+      return {
+        variedad,
+        totalKgHa: round(totalKgHa, 2),
+        lateralKgHa,
+        plantaKgHa,
+        colors,
+      };
+    })
+    .filter(Boolean);
+
+  const totalKgHa = round(
+    varieties.reduce((accumulator, current) => accumulator + (toNumber(current.totalKgHa) ?? 0), 0),
+    2,
+  );
+
+  const segments = varieties.flatMap((variety) => {
+    const lateralSharePercent = totalKgHa > 0 ? (variety.lateralKgHa / totalKgHa) * 100 : 0;
+    const plantaSharePercent = totalKgHa > 0 ? (variety.plantaKgHa / totalKgHa) * 100 : 0;
+
+    return [
+      {
+        variedad: variety.variedad,
+        part: "planta",
+        kgHa: variety.plantaKgHa,
+        sharePercent: plantaSharePercent,
+        color: variety.colors.strong,
+      },
+      {
+        variedad: variety.variedad,
+        part: "laterales",
+        kgHa: variety.lateralKgHa,
+        sharePercent: lateralSharePercent,
+        color: variety.colors.soft,
+      },
+    ];
+  });
+
+  return {
+    totalKgHa,
+    varietyCount: varieties.length,
+    varieties,
+    segments,
   };
 };

@@ -146,6 +146,11 @@
   background: rgba(24, 37, 28, 0.9);
 }
 
+.production-potential-table__register-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 @media (max-width: 900px) {
   .production-potential-table {
     font-size: 14px;

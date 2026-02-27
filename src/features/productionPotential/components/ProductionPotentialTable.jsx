@@ -7,6 +7,7 @@ import { mapPrePruningCountRow } from "../../../components/foliarAnalysis/prePru
 import {
   buildDraftProductionRow,
   buildHistoricalProductionRows,
+  buildRegisteredProductionVisual,
   getAvailableVarietiesForCuartel,
 } from "../productionPotentialService";
 import { PRODUCTION_POTENTIAL_TABLE_COLUMNS } from "../config/tableColumns";
@@ -20,7 +21,7 @@ const EMPTY_DRAFT_VALUES = { cuajaEsperada: "", calibreEsperado: "" };
 
 const formatCellValue = (value) => (value === null || value === undefined || value === "" ? "" : value);
 
-const ProductionPotentialTable = ({ selectedCuartel, selectedYears = [] }) => {
+const ProductionPotentialTable = ({ selectedCuartel, selectedYears = [], onRegisterProduction }) => {
   const normalizedSelectedCuartel = String(selectedCuartel ?? "").trim();
   const hasSelectedYears = selectedYears.length > 0;
 
@@ -108,6 +109,33 @@ const ProductionPotentialTable = ({ selectedCuartel, selectedYears = [] }) => {
     }));
   };
 
+  const registeredVisualPreview = useMemo(
+    () => buildRegisteredProductionVisual({ draftRows }),
+    [draftRows],
+  );
+
+  const hasRegisterableData = registeredVisualPreview.varietyCount > 0;
+
+  const handleRegister = () => {
+    if (!hasRegisterableData) return;
+
+    onRegisterProduction?.({
+      year: DRAFT_YEAR,
+      cuartel: normalizedSelectedCuartel,
+      generatedAtIso: new Date().toISOString(),
+      visual: registeredVisualPreview,
+      rows: draftRows
+        .filter((row) => Number.isFinite(Number(row.produccionEsperadaKgHa)))
+        .map((row) => ({
+          year: row.year,
+          variedad: row.variedad,
+          cuajaEsperada: row.cuajaEsperada,
+          calibreEsperado: row.calibreEsperado,
+          produccionEsperadaKgHa: row.produccionEsperadaKgHa,
+        })),
+    });
+  };
+
   if (!normalizedSelectedCuartel) {
     return (
       <div className="production-potential-table__empty">
@@ -186,7 +214,12 @@ const ProductionPotentialTable = ({ selectedCuartel, selectedYears = [] }) => {
       </div>
 
       <div className="production-potential-table__actions">
-        <button type="button" className="production-potential-table__register-button">
+        <button
+          type="button"
+          className="production-potential-table__register-button"
+          onClick={handleRegister}
+          disabled={!hasRegisterableData}
+        >
           Registrar
         </button>
       </div>

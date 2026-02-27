@@ -7,7 +7,7 @@
   bottom: 0;
   height: var(--fertilization-slot-height);
   pointer-events: none;
-  contain: layout paint;
+  contain: layout;
 }
 
 .lower-dots-bridge__fertilization-slot--raised {
@@ -70,6 +70,11 @@
 
 .lower-dots-bridge__fertilization-slot--production-potential {
   --fertilization-slot-height: 425px;
+}
+
+.lower-dots-bridge__fertilization-slot--production-dardo {
+  --fertilization-slot-height: 425px;
+  z-index: 3;
 }
 
 .lower-dots-bridge__fertilization-button--production-potential {
@@ -176,12 +181,41 @@
   transform: translateY(0);
 }
 
+.lower-dots-bridge__fertilization-title--hidden {
+  opacity: 0;
+}
+
+.lower-dots-bridge__fertilization-title--production-potential {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.lower-dots-bridge__fertilization-title-main {
+  display: block;
+}
+
+.lower-dots-bridge__fertilization-title-subtle {
+  display: block;
+  font-size: 42px;
+  line-height: 0.92;
+  color: rgba(57, 67, 76, 0.78);
+}
+
+.lower-dots-bridge__fertilization-title-subtle--hidden {
+  opacity: 0;
+}
+
 .lower-dots-bridge__fertilization-button--production-potential .lower-dots-bridge__fertilization-title {
-  top: 10px;
+  top: 14px;
   bottom: auto;
   left: 16px;
-  right: 16px;
-  transform: translateY(calc(var(--fertilization-height) - 47px));
+  right: 18px;
+  transform: none;
   transform-origin: left top;
   font-size: 26px;
   line-height: 1.1;
@@ -198,19 +232,12 @@
 .lower-dots-bridge__fertilization-button--production-potential .lower-dots-bridge__fertilization-title--docked {
   top: 14px;
   bottom: auto;
-  left: 18px;
+  left: 16px;
   right: 18px;
   transform: none;
   transform-origin: left top;
   font-size: 26px;
   letter-spacing: 0.004em;
-}
-
-.lower-dots-bridge__fertilization-button--production-potential:not(
-    .lower-dots-bridge__fertilization-button--raised
-  )
-  .lower-dots-bridge__fertilization-title {
-  display: none;
 }
 
 /* Expanded content */

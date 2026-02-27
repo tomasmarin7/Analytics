@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import fertilizationPlanRows from "../../../data/fertilizationPlanRows.json";
-import { ProductionPotentialPeriodPanel } from "../../productionPotential";
+import { ProductionPotentialPeriodPanel, ProductionPotentialShapePreview } from "../../productionPotential";
 import { PERIOD_PANEL_TYPES } from "../config/panelTypes";
 import FertilizationPeriodPanel from "./FertilizationPeriodPanel";
 import "../styles/FertilizationButton.css";
@@ -15,10 +15,18 @@ const TABLE_ROW_HEIGHT_PX = 36;
 const ACTIONS_BLOCK_HEIGHT_PX = 56;
 const PANEL_EXTRA_GAP_PX = 8;
 const PRODUCTION_POTENTIAL_BLOCK_HEIGHT_PX = 425;
+const PRODUCTION_POTENTIAL_DARDO_BLOCK_HEIGHT_PX = PRODUCTION_POTENTIAL_BLOCK_HEIGHT_PX;
 const PANEL_BASE_HEIGHT_BY_TYPE = {
   [PERIOD_PANEL_TYPES.FERTILIZATION]: null,
   [PERIOD_PANEL_TYPES.PRODUCTION_POTENTIAL]: PRODUCTION_POTENTIAL_BLOCK_HEIGHT_PX,
+  [PERIOD_PANEL_TYPES.PRODUCTION_POTENTIAL_VARIETY_DARDO]: PRODUCTION_POTENTIAL_DARDO_BLOCK_HEIGHT_PX,
 };
+const normalizeText = (value) => String(value ?? "").trim().toUpperCase();
+const formatKgHa = (value) =>
+  new Intl.NumberFormat("es-CL", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(value);
 
 const FertilizationButton = ({
   period,
@@ -28,16 +36,23 @@ const FertilizationButton = ({
   selectedCuartel,
   selectedYears,
   onRequestForeground,
+  onRegisterProduction,
+  registeredProductionByCuartel = {},
+  showFertilizationTitle = true,
+  showProductionPotentialTitle = true,
+  showProductionPotentialValue = true,
 }) => {
   const panelType = period?.panelType;
+  const isFertilizationPeriod = panelType === PERIOD_PANEL_TYPES.FERTILIZATION;
   const isProductionPotentialPeriod = panelType === PERIOD_PANEL_TYPES.PRODUCTION_POTENTIAL;
+  const isProductionPotentialDardoPeriod = panelType === PERIOD_PANEL_TYPES.PRODUCTION_POTENTIAL_VARIETY_DARDO;
   const [isTitleDocked, setIsTitleDocked] = useState(false);
   const [isPanelVisible, setIsPanelVisible] = useState(false);
   const panelTimeoutRef = useRef(null);
   const frameRef = useRef(null);
 
   const normalizedSelectedCuartel = useMemo(
-    () => String(selectedCuartel ?? "").trim().toUpperCase(),
+    () => normalizeText(selectedCuartel),
     [selectedCuartel],
   );
   const selectedYearSet = useMemo(() => new Set(selectedYears), [selectedYears]);
@@ -72,6 +87,19 @@ const FertilizationButton = ({
     }),
     [isRaised, period?.left, period?.raisedLeft, period?.raisedWidth, period?.width],
   );
+
+  const registeredProductionForSelectedCuartel = normalizedSelectedCuartel
+    ? registeredProductionByCuartel[normalizedSelectedCuartel]
+    : null;
+  const productionPotentialTotalKgHa = Number(registeredProductionForSelectedCuartel?.visual?.totalKgHa);
+  const productionPotentialTotalLabel = Number.isFinite(productionPotentialTotalKgHa)
+    ? `${formatKgHa(productionPotentialTotalKgHa)} kg/ha`
+    : "-- kg/ha";
+  const shouldShowTitle = isFertilizationPeriod
+    ? showFertilizationTitle
+    : isProductionPotentialPeriod
+      ? showProductionPotentialTitle
+      : true;
 
   useEffect(
     () => () => {
@@ -113,7 +141,13 @@ const FertilizationButton = ({
 
   const renderPanelContent = () => {
     if (panelType === PERIOD_PANEL_TYPES.PRODUCTION_POTENTIAL) {
-      return <ProductionPotentialPeriodPanel selectedCuartel={selectedCuartel} selectedYears={selectedYears} />;
+      return (
+        <ProductionPotentialPeriodPanel
+          selectedCuartel={selectedCuartel}
+          selectedYears={selectedYears}
+          onRegisterProduction={onRegisterProduction}
+        />
+      );
     }
 
     return (
@@ -124,6 +158,25 @@ const FertilizationButton = ({
       />
     );
   };
+
+  if (isProductionPotentialDardoPeriod) {
+    return (
+      <div
+        className="lower-dots-bridge__fertilization-slot lower-dots-bridge__fertilization-slot--production-dardo"
+        style={{
+          left: `${slotGeometry.left}%`,
+          width: `${slotGeometry.width}%`,
+          "--fertilization-raised-height": `${PRODUCTION_POTENTIAL_DARDO_BLOCK_HEIGHT_PX}px`,
+        }}
+        aria-hidden="true"
+      >
+        <ProductionPotentialShapePreview
+          visual={registeredProductionForSelectedCuartel?.visual}
+          showLabels={showProductionPotentialTitle}
+        />
+      </div>
+    );
+  }
 
   return (
     <div
@@ -151,9 +204,26 @@ const FertilizationButton = ({
           <span
             className={`lower-dots-bridge__fertilization-title ${
               isTitleDocked ? "lower-dots-bridge__fertilization-title--docked" : ""
+            } ${isProductionPotentialPeriod ? "lower-dots-bridge__fertilization-title--production-potential" : ""} ${
+              shouldShowTitle ? "" : "lower-dots-bridge__fertilization-title--hidden"
             }`}
           >
-            {period.label}
+            {isProductionPotentialPeriod ? (
+              <>
+                <span className="lower-dots-bridge__fertilization-title-main">{period.label}</span>
+                <span
+                  className={`lower-dots-bridge__fertilization-title-subtle ${
+                    showProductionPotentialValue && !isRaised
+                      ? ""
+                      : "lower-dots-bridge__fertilization-title-subtle--hidden"
+                  }`}
+                >
+                  {productionPotentialTotalLabel}
+                </span>
+              </>
+            ) : (
+              period.label
+            )}
           </span>
           <span
             className={`lower-dots-bridge__fertilization-stain ${

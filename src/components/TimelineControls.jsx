@@ -4,6 +4,10 @@ import TimelineTrack from "./timeline/TimelineTrack";
 import { useTimelineController } from "./timeline/useTimelineController";
 import { useFertilizationInteraction } from "../features/fertilization";
 
+const MAX_VISIBLE_DAYS_FOR_FERTILIZATION_TITLE = 183;
+const MAX_VISIBLE_DAYS_FOR_PRODUCTION_POTENTIAL_TITLE = 92;
+const MAX_VISIBLE_DAYS_FOR_PRODUCTION_POTENTIAL_VALUE = 76;
+
 const TimelineControls = ({
   activeEventIds,
   onTimelineEventToggle,
@@ -48,6 +52,10 @@ const TimelineControls = ({
     onHandleKeyDown,
   });
 
+  const showFertilizationTitle = visibleDays <= MAX_VISIBLE_DAYS_FOR_FERTILIZATION_TITLE;
+  const showProductionPotentialTitle = visibleDays <= MAX_VISIBLE_DAYS_FOR_PRODUCTION_POTENTIAL_TITLE;
+  const showProductionPotentialValue = visibleDays <= MAX_VISIBLE_DAYS_FOR_PRODUCTION_POTENTIAL_VALUE;
+
   return (
     <section className="lower-dots-bridge" aria-label={TIMELINE_ARIA_LABEL}>
       <TimelineTrack
@@ -67,6 +75,9 @@ const TimelineControls = ({
         selectedCuartel={selectedCuartel}
         selectedYears={selectedYears}
         onSelectedYearsChange={onSelectedYearsChange}
+        showFertilizationTitle={showFertilizationTitle}
+        showProductionPotentialTitle={showProductionPotentialTitle}
+        showProductionPotentialValue={showProductionPotentialValue}
       />
 
       <RangeSlider
