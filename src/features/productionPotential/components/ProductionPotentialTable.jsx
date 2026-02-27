@@ -12,6 +12,7 @@ import {
 } from "../productionPotentialService";
 import { PRODUCTION_POTENTIAL_TABLE_COLUMNS } from "../config/tableColumns";
 import { buildYearBandByYear, getYearBandClass } from "../utils/yearBanding";
+import { PRE_PRUNING_COUNT_EVENT } from "../../timelineEvents/prePruningCount/event";
 import "../styles/ProductionPotentialTable.css";
 
 const BUD_MAPPED_ROWS = budAnalysisRows.map(mapBudRow);
@@ -21,9 +22,21 @@ const EMPTY_DRAFT_VALUES = { cuajaEsperada: "", calibreEsperado: "" };
 
 const formatCellValue = (value) => (value === null || value === undefined || value === "" ? "" : value);
 
-const ProductionPotentialTable = ({ selectedCuartel, selectedYears = [], onRegisterProduction }) => {
+const ProductionPotentialTable = ({ selectedCuartel, selectedYears = [], currentDate, onRegisterProduction }) => {
   const normalizedSelectedCuartel = String(selectedCuartel ?? "").trim();
   const hasSelectedYears = selectedYears.length > 0;
+  const safeCurrentDate =
+    currentDate instanceof Date && !Number.isNaN(currentDate.getTime()) ? currentDate : new Date();
+
+  const isDraftYearEnabled = useMemo(() => {
+    const draftUnlockDateMs = Date.UTC(DRAFT_YEAR, PRE_PRUNING_COUNT_EVENT.month, PRE_PRUNING_COUNT_EVENT.day);
+    const currentDateMs = Date.UTC(
+      safeCurrentDate.getFullYear(),
+      safeCurrentDate.getMonth(),
+      safeCurrentDate.getDate(),
+    );
+    return currentDateMs >= draftUnlockDateMs;
+  }, [safeCurrentDate]);
 
   const historicalRows = useMemo(
     () =>
@@ -94,9 +107,19 @@ const ProductionPotentialTable = ({ selectedCuartel, selectedYears = [], onRegis
     [draftByVariety, selectedCuartel, varieties],
   );
 
+  const visibleHistoricalRows = useMemo(
+    () => (isDraftYearEnabled ? historicalRows : historicalRows.filter((row) => row.year !== DRAFT_YEAR)),
+    [historicalRows, isDraftYearEnabled],
+  );
+
+  const visibleDraftRows = useMemo(
+    () => (isDraftYearEnabled ? draftRows : []),
+    [draftRows, isDraftYearEnabled],
+  );
+
   const yearBandByYear = useMemo(
-    () => buildYearBandByYear({ historicalRows, draftRows }),
-    [draftRows, historicalRows],
+    () => buildYearBandByYear({ historicalRows: visibleHistoricalRows, draftRows: visibleDraftRows }),
+    [visibleDraftRows, visibleHistoricalRows],
   );
 
   const updateDraftField = (variedad, field, value) => {
@@ -110,21 +133,21 @@ const ProductionPotentialTable = ({ selectedCuartel, selectedYears = [], onRegis
   };
 
   const registeredVisualPreview = useMemo(
-    () => buildRegisteredProductionVisual({ draftRows }),
-    [draftRows],
+    () => buildRegisteredProductionVisual({ draftRows: visibleDraftRows }),
+    [visibleDraftRows],
   );
 
-  const hasRegisterableData = registeredVisualPreview.varietyCount > 0;
+  const hasRegisterableData = isDraftYearEnabled && registeredVisualPreview.varietyCount > 0;
 
   const handleRegister = () => {
-    if (!hasRegisterableData) return;
+    if (!hasRegisterableData || !isDraftYearEnabled) return;
 
     onRegisterProduction?.({
       year: DRAFT_YEAR,
       cuartel: normalizedSelectedCuartel,
       generatedAtIso: new Date().toISOString(),
       visual: registeredVisualPreview,
-      rows: draftRows
+      rows: visibleDraftRows
         .filter((row) => Number.isFinite(Number(row.produccionEsperadaKgHa)))
         .map((row) => ({
           year: row.year,
@@ -159,7 +182,7 @@ const ProductionPotentialTable = ({ selectedCuartel, selectedYears = [], onRegis
           </thead>
           <tbody>
             {hasSelectedYears
-              ? historicalRows.map((row) => (
+              ? visibleHistoricalRows.map((row) => (
                   <tr
                     key={`hist-${row.year}-${row.variedad}`}
                     className={getYearBandClass(yearBandByYear, row.year)}
@@ -176,7 +199,7 @@ const ProductionPotentialTable = ({ selectedCuartel, selectedYears = [], onRegis
                 ))
               : null}
 
-            {draftRows.map((row) => (
+            {visibleDraftRows.map((row) => (
               <tr
                 key={`draft-${row.variedad}`}
                 className={`production-potential-table__draft-row ${getYearBandClass(yearBandByYear, row.year)}`}
@@ -212,6 +235,11 @@ const ProductionPotentialTable = ({ selectedCuartel, selectedYears = [], onRegis
           </tbody>
         </table>
       </div>
+      {!isDraftYearEnabled ? (
+        <div className="production-potential-table__notice">
+          La temporada 2026 se habilita después del rombo de Conteo Pre Poda.
+        </div>
+      ) : null}
 
       <div className="production-potential-table__actions">
         <button

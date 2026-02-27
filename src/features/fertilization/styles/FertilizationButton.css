@@ -75,6 +75,8 @@
 .lower-dots-bridge__fertilization-slot--production-dardo {
   --fertilization-slot-height: 425px;
   z-index: 3;
+  pointer-events: auto;
+  cursor: pointer;
 }
 
 .lower-dots-bridge__fertilization-button--production-potential {

@@ -43,6 +43,7 @@ const TimelineControls = ({
     handleFertilizationClick,
     handleStartDrag,
     handleHandleKeyDown,
+    handleBandDoubleClick,
   } = useFertilizationInteraction({
     viewStartMs,
     viewEndMs,
@@ -88,6 +89,7 @@ const TimelineControls = ({
         rightHandleExpr={rightHandleExpr}
         startDrag={handleStartDrag}
         onHandleKeyDown={handleHandleKeyDown}
+        onBandDoubleClick={handleBandDoubleClick}
       />
     </section>
   );

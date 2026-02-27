@@ -43,6 +43,7 @@ const TimelineTrack = ({
           selectedHuerto={selectedHuerto}
           selectedCuartel={selectedCuartel}
           selectedYears={selectedYears}
+          currentDate={currentDate}
           zIndex={periodsZIndex}
           onRequestForeground={() => setForegroundLayer("fertilization")}
           showFertilizationTitle={showFertilizationTitle}

@@ -35,6 +35,7 @@ const FertilizationButton = ({
   selectedHuerto,
   selectedCuartel,
   selectedYears,
+  currentDate,
   onRequestForeground,
   onRegisterProduction,
   registeredProductionByCuartel = {},
@@ -145,6 +146,7 @@ const FertilizationButton = ({
         <ProductionPotentialPeriodPanel
           selectedCuartel={selectedCuartel}
           selectedYears={selectedYears}
+          currentDate={currentDate}
           onRegisterProduction={onRegisterProduction}
         />
       );
@@ -160,6 +162,10 @@ const FertilizationButton = ({
   };
 
   if (isProductionPotentialDardoPeriod) {
+    const handleDardoClick = () => {
+      onClick?.(period);
+    };
+
     return (
       <div
         className="lower-dots-bridge__fertilization-slot lower-dots-bridge__fertilization-slot--production-dardo"
@@ -168,7 +174,17 @@ const FertilizationButton = ({
           width: `${slotGeometry.width}%`,
           "--fertilization-raised-height": `${PRODUCTION_POTENTIAL_DARDO_BLOCK_HEIGHT_PX}px`,
         }}
-        aria-hidden="true"
+        role="button"
+        tabIndex={0}
+        aria-label={period.label}
+        onClick={handleDardoClick}
+        onPointerDown={onRequestForeground}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            handleDardoClick();
+          }
+        }}
       >
         <ProductionPotentialShapePreview
           visual={registeredProductionForSelectedCuartel?.visual}

@@ -12,6 +12,7 @@ const PeriodLayer = ({
   selectedHuerto,
   selectedCuartel,
   selectedYears,
+  currentDate,
   zIndex = 1,
   onRequestForeground,
   showFertilizationTitle = true,
@@ -68,6 +69,7 @@ const PeriodLayer = ({
           selectedHuerto={selectedHuerto}
           selectedCuartel={selectedCuartel}
           selectedYears={selectedYears}
+          currentDate={currentDate}
           onRequestForeground={onRequestForeground}
           onRegisterProduction={handleProductionRegister}
           registeredProductionByCuartel={productionRegisterByCuartel}

@@ -1,12 +1,20 @@
 import { RANGE_SLIDER_ARIA_LABEL } from "../timeline/constants";
 import "./RangeSlider.css";
 
-const RangeSlider = ({ sliderRef, leftHandleExpr, rightHandleExpr, startDrag, onHandleKeyDown }) => (
+const RangeSlider = ({
+  sliderRef,
+  leftHandleExpr,
+  rightHandleExpr,
+  startDrag,
+  onHandleKeyDown,
+  onBandDoubleClick,
+}) => (
   <section className="lower-dots-bridge__extra" ref={sliderRef} aria-label={RANGE_SLIDER_ARIA_LABEL}>
     <span
       className="lower-dots-bridge__extra-band"
       style={{ left: leftHandleExpr, right: `calc(100% - ${rightHandleExpr})` }}
       onPointerDown={startDrag("band")}
+      onDoubleClick={onBandDoubleClick}
     />
 
     <button

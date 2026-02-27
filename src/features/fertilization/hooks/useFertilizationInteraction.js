@@ -65,10 +65,20 @@ export const useFertilizationInteraction = ({
       onHandleKeyDown(handle)(event);
     };
 
+  const handleBandDoubleClick = useCallback(() => {
+    clearRaisedPeriod();
+    setVisibleRangeByDates({
+      startMs: yearStartMs,
+      endMs: yearEndMs,
+      animate: true,
+    });
+  }, [clearRaisedPeriod, setVisibleRangeByDates, yearEndMs, yearStartMs]);
+
   return {
     raisedPeriodId,
     handleFertilizationClick,
     handleStartDrag,
     handleHandleKeyDown,
+    handleBandDoubleClick,
   };
 };
