@@ -51,7 +51,7 @@ const hashText = (value) => {
 
 const resolveVarietyColorPair = (variedad) => VARIETY_COLORS[hashText(variedad) % VARIETY_COLORS.length];
 
-const buildVarietyColorPair = (variedad) => {
+export const buildVarietyColorPair = (variedad) => {
   const colors = resolveVarietyColorPair(variedad);
   return { strong: colors.strong, soft: colors.soft, text: colors.text };
 };

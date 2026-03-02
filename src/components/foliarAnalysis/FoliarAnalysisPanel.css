@@ -1,0 +1,23 @@
+.foliar-analysis-panel__porciones-frios-layout {
+  width: 100%;
+  display: flex;
+  align-items: stretch;
+  gap: 24px;
+}
+
+.foliar-analysis-panel__porciones-frios-side-panel {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+@media (max-width: 1720px) {
+  .foliar-analysis-panel__porciones-frios-layout {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .foliar-analysis-panel__porciones-frios-side-panel {
+    flex-basis: auto;
+    width: 100%;
+  }
+}

@@ -30,7 +30,7 @@
   min-width: 0;
   padding-top: var(--bridge-lines-top-offset);
   padding-bottom: 78px;
-  isolation: isolate;
+  isolation: auto;
 }
 
 .lower-dots-bridge__periods {
@@ -137,6 +137,38 @@
   border-radius: 999px;
   transform: translateX(-50%);
   transform-origin: center top;
+}
+
+.lower-dots-bridge__dormancy-breaker-marker {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 6;
+}
+
+.lower-dots-bridge__dormancy-breaker-marker-line {
+  width: 6px;
+  height: 330px;
+  background: var(--dormancy-breaker-color, #7d0c16);
+}
+
+.lower-dots-bridge__dormancy-breaker-marker-label {
+  position: absolute;
+  bottom: 118px;
+  left: -14px;
+  transform: rotate(-90deg);
+  transform-origin: left bottom;
+  font-family: var(--font-brand);
+  font-size: 18px;
+  line-height: 1;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--dormancy-breaker-color, #7d0c16);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .lower-dots-bridge__month-label {

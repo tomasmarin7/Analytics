@@ -5,8 +5,40 @@ import { EVENT_ACTIVATION_VERTICAL_TOP_PX } from "./eventActivation/constants";
 import FoliarAnalysisPanel from "../foliarAnalysis/FoliarAnalysisPanel";
 import { PorcionesFriosLayer } from "../../features/porcionesFrios";
 import { DATA_RECORDS_EVENT_CONNECTOR } from "../../features/timelineEvents/shared/connectors";
+import { buildVarietyColorPair } from "../../features/productionPotential/productionPotentialService";
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+const DAY_MS = 86400000;
+
+const ISO_DATE_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
+const DISPLAY_DATE_PATTERN = /^(\d{2})\/(\d{2})$/;
+const DISPLAY_DATE_WITH_YEAR_PATTERN = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+
+const parseDormancyDateToUtcMs = (value, fallbackYear) => {
+  const normalized = String(value ?? "").trim();
+  if (!normalized) return null;
+
+  const isoMatch = normalized.match(ISO_DATE_PATTERN);
+  if (isoMatch) {
+    const [, year, month, day] = isoMatch;
+    return Date.UTC(Number(year), Number(month) - 1, Number(day));
+  }
+
+  const displayMatch = normalized.match(DISPLAY_DATE_PATTERN);
+  if (displayMatch) {
+    const [, day, month] = displayMatch;
+    if (!Number.isFinite(Number(fallbackYear))) return null;
+    return Date.UTC(Number(fallbackYear), Number(month) - 1, Number(day));
+  }
+
+  const displayWithYearMatch = normalized.match(DISPLAY_DATE_WITH_YEAR_PATTERN);
+  if (displayWithYearMatch) {
+    const [, day, month, year] = displayWithYearMatch;
+    return Date.UTC(Number(year), Number(month) - 1, Number(day));
+  }
+
+  return null;
+};
 
 const DayLines = ({
   dayLines,
@@ -34,6 +66,8 @@ const DayLines = ({
   viewEndMs,
   viewSpanMs,
   currentDate,
+  onRegisterDormancyBreakers,
+  registeredDormancyBreakers,
 }) => {
   const linesRef = useRef(null);
   const [containerWidth, setContainerWidth] = useState(0);
@@ -69,7 +103,45 @@ const DayLines = ({
         markerOutOfView: event.leftPercent !== markerLeftPercent,
       };
     });
+  const dormancyBreakerMarkers = useMemo(() => {
+    const registeredRows = Array.isArray(registeredDormancyBreakers?.rows)
+      ? registeredDormancyBreakers.rows
+      : [];
+    if (!registeredRows.length || !Number.isFinite(viewStartMs) || !Number.isFinite(viewSpanMs) || viewSpanMs <= 0) {
+      return [];
+    }
 
+    return registeredRows.flatMap((row) => {
+      const variedad = String(row?.variedad ?? "").trim();
+      if (!variedad) return [];
+
+      const colorPair = buildVarietyColorPair(variedad);
+      const applications = [
+        {
+          id: "1",
+          dateMs: parseDormancyDateToUtcMs(row?.fechaAplicacionRompedor1, row?.year),
+          label: `${variedad} - Rompedor 1`,
+        },
+        {
+          id: "2",
+          dateMs: parseDormancyDateToUtcMs(row?.fechaAplicacionRompedor2, row?.year),
+          label: `${variedad} - Rompedor 2`,
+        },
+      ];
+
+      return applications
+        .filter((application) => Number.isFinite(application.dateMs))
+        .map((application) => ({
+          key: `${registeredDormancyBreakers?.year ?? "year"}-${variedad}-${application.id}`,
+          label: application.label,
+          leftPercent: clamp((((application.dateMs + DAY_MS / 2) - viewStartMs) / viewSpanMs) * 100, 0, 100),
+          isVisible: application.dateMs >= viewStartMs && application.dateMs <= viewEndMs,
+          color: colorPair.strong,
+          textColor: colorPair.text,
+        }))
+        .filter((application) => application.isVisible);
+    });
+  }, [registeredDormancyBreakers, viewEndMs, viewSpanMs, viewStartMs]);
   return (
     <div
       ref={linesRef}
@@ -110,6 +182,22 @@ const DayLines = ({
         zIndex={porcionesFriosZIndex}
       />
 
+      {dormancyBreakerMarkers.map((marker) => (
+        <span
+          key={marker.key}
+          className="lower-dots-bridge__dormancy-breaker-marker"
+          style={{
+            left: `${marker.leftPercent}%`,
+            "--dormancy-breaker-color": marker.color,
+            "--dormancy-breaker-text-color": marker.textColor,
+          }}
+          aria-hidden="true"
+        >
+          <span className="lower-dots-bridge__dormancy-breaker-marker-line" />
+          <span className="lower-dots-bridge__dormancy-breaker-marker-label">{marker.label}</span>
+        </span>
+      ))}
+
       {monthMarkers.map((marker) => (
         <span
           key={`month-line-${marker.id}`}
@@ -137,6 +225,7 @@ const DayLines = ({
           currentDate={currentDate}
           showPorcionesFriosPanel={isPorcionesFriosPanelOpen}
           porcionesFriosSummary={porcionesFriosSummary}
+          onRegisterDormancyBreakers={onRegisterDormancyBreakers}
         />
       </EventActivationOverlay>
 

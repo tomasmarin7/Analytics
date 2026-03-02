@@ -6,6 +6,9 @@ import { PeriodLayer } from "../../features/fertilization";
 import { DAY_MS } from "./constants";
 import "./Timeline.css";
 
+const DORMANCY_BREAKERS_REGISTER_STORAGE_KEY = "dormancyBreakersRegisterByCuartel";
+const normalizeText = (value) => String(value ?? "").trim().toUpperCase();
+
 const TimelineTrack = ({
   dayLines,
   porcionesFriosSummary,
@@ -37,6 +40,7 @@ const TimelineTrack = ({
   const [foregroundLayer, setForegroundLayer] = useState("porciones-frios");
   const [isPorcionesFriosPanelOpen, setIsPorcionesFriosPanelOpen] = useState(false);
   const [isPorcionesFriosZoomPending, setIsPorcionesFriosZoomPending] = useState(false);
+  const [registeredDormancyBreakersByCuartel, setRegisteredDormancyBreakersByCuartel] = useState({});
   const referenceYear = new Date(currentDate ?? Date.now()).getFullYear();
   const porcionesFriosZoomStartMs = useMemo(() => Date.UTC(referenceYear, 4, 1), [referenceYear]);
   const porcionesFriosZoomEndMs = useMemo(() => Date.UTC(referenceYear, 8, 1), [referenceYear]);
@@ -48,6 +52,33 @@ const TimelineTrack = ({
   const periodsZIndex = foregroundLayer === "fertilization" ? 4 : 2;
   const dataRecordsZIndex = foregroundLayer === "data-records" ? 4 : 3;
   const porcionesFriosZIndex = foregroundLayer === "porciones-frios" ? 5 : 1;
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const raw = window.localStorage.getItem(DORMANCY_BREAKERS_REGISTER_STORAGE_KEY);
+      if (!raw) return;
+
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === "object") {
+        setRegisteredDormancyBreakersByCuartel(parsed);
+      }
+    } catch {
+      setRegisteredDormancyBreakersByCuartel({});
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem(
+        DORMANCY_BREAKERS_REGISTER_STORAGE_KEY,
+        JSON.stringify(registeredDormancyBreakersByCuartel),
+      );
+    } catch {
+      // noop
+    }
+  }, [registeredDormancyBreakersByCuartel]);
 
   useEffect(() => {
     if (isPorcionesFriosZoomPending && isPorcionesFriosZoomed) {
@@ -82,6 +113,18 @@ const TimelineTrack = ({
     });
   };
 
+  const handleRegisterDormancyBreakers = (payload) => {
+    const normalizedCuartel = normalizeText(payload?.cuartel ?? selectedCuartel);
+    if (!normalizedCuartel) return;
+
+    setRegisteredDormancyBreakersByCuartel((current) => ({
+      ...current,
+      [normalizedCuartel]: {
+        ...payload,
+        cuartel: normalizedCuartel,
+      },
+    }));
+  };
   return (
     <div className="lower-dots-bridge__inner">
       <span className="lower-dots-bridge__dot" aria-hidden="true" />
@@ -135,6 +178,10 @@ const TimelineTrack = ({
           viewEndMs={viewEndMs}
           viewSpanMs={viewSpanMs}
           currentDate={currentDate}
+          onRegisterDormancyBreakers={handleRegisterDormancyBreakers}
+          registeredDormancyBreakers={
+            registeredDormancyBreakersByCuartel[normalizeText(selectedCuartel)]
+          }
         />
         <MonthLabels markers={monthMarkers} />
         {isTodayVisible ? (

@@ -6,6 +6,8 @@ import { useMemo } from "react";
 import DataRecordsSection from "../dataRecordsSection/DataRecordsSection";
 import FoliarAnalysisTableCard from "./FoliarAnalysisTableCard";
 import { PorcionesFriosPanel } from "../../features/porcionesFrios";
+import { DormancyBreakersTable } from "../../features/dormancyBreakers";
+import "./FoliarAnalysisPanel.css";
 import { FOLIAR_COLUMNS, FOLIAR_SCORE_FIELDS, mapFoliarRow } from "./foliarAnalysisConfig";
 import { BUD_COLUMNS, BUD_SCORE_FIELDS, mapBudRow, sortBudRows } from "./budAnalysisConfig";
 import {
@@ -135,6 +137,7 @@ const FoliarAnalysisPanel = ({
   currentDate,
   showPorcionesFriosPanel = false,
   porcionesFriosSummary = null,
+  onRegisterDormancyBreakers,
 }) => {
   const activeEventIds = useMemo(() => new Set(activeEvents.map((event) => event.id)), [activeEvents]);
 
@@ -356,11 +359,21 @@ const FoliarAnalysisPanel = ({
     >
       {({ selectedYearsCount }) =>
         showPorcionesFriosPanel ? (
-          <PorcionesFriosPanel
-            summary={porcionesFriosSummary}
-            selectedYears={selectedYears}
-            currentDate={currentDate}
-          />
+          <div className="foliar-analysis-panel__porciones-frios-layout">
+            <PorcionesFriosPanel
+              summary={porcionesFriosSummary}
+              selectedYears={selectedYears}
+              currentDate={currentDate}
+            />
+            <div className="foliar-analysis-panel__porciones-frios-side-panel">
+              <DormancyBreakersTable
+                selectedCuartel={selectedCuartel}
+                selectedYears={selectedYears}
+                currentDate={currentDate}
+                onRegisterDormancyBreakers={onRegisterDormancyBreakers}
+              />
+            </div>
+          </div>
         ) : hasDataTable ? (
           isCountPairOnly ? (
             <div className="foliar-analysis-table-card-stack foliar-analysis-table-card-stack--count-only">

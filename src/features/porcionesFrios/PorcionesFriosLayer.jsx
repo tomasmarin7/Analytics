@@ -19,6 +19,12 @@ const PorcionesFriosLayer = ({
   onFocus,
   zIndex = 1,
 }) => {
+  if (!Array.isArray(bars) || !bars.length) return null;
+  if (!Number.isFinite(chartStartMs) || !Number.isFinite(chartEndMs)) return null;
+  if (!Number.isFinite(viewStartMs) || !Number.isFinite(viewEndMs) || !Number.isFinite(viewSpanMs) || viewSpanMs <= 0) {
+    return null;
+  }
+
   const visibleStartMs = Math.max(chartStartMs, viewStartMs);
   const visibleEndMs = Math.min(chartEndMs, viewEndMs);
   const visibleSpanMs = visibleEndMs - visibleStartMs + DAY_MS;
