@@ -21,12 +21,14 @@ const TimelineControls = ({
   const {
     sliderRef,
     dayLines,
+    porcionesFriosSummary,
     lineVisualLevel,
     monthMarkers,
     visiblePeriods,
     timelineEvents,
     viewStartMs,
     viewEndMs,
+    viewSpanMs,
     yearStartMs,
     yearEndMs,
     isTodayVisible,
@@ -76,6 +78,7 @@ const TimelineControls = ({
     <section className="lower-dots-bridge" aria-label={TIMELINE_ARIA_LABEL}>
       <TimelineTrack
         dayLines={dayLines}
+        porcionesFriosSummary={porcionesFriosSummary}
         lineVisualLevel={lineVisualLevel}
         visibleDays={visibleDays}
         monthMarkers={monthMarkers}
@@ -95,6 +98,10 @@ const TimelineControls = ({
         showProductionPotentialTitle={showProductionPotentialTitle}
         showProductionPotentialValue={showProductionPotentialValue}
         showPruningTitle={showPruningTitle}
+        viewStartMs={viewStartMs}
+        viewEndMs={viewEndMs}
+        viewSpanMs={viewSpanMs}
+        onSetVisibleRangeByDates={setVisibleRangeByDates}
         currentDate={currentDate}
       />
 

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DAY_MS, HANDLE_EDGE_OFFSET_PX, MIN_VISIBLE_DAYS } from "./constants";
 import { createDefaultPeriods } from "../../features/fertilization";
+import { getPorcionesFriosSummary } from "../../features/porcionesFrios";
 import { TIMELINE_EVENT_DEFINITIONS } from "../../features/timelineEvents";
 import { clamp, getDayLines, getLineVisualLevel, getMonthMarkers, getVisiblePeriods, getYearDomain, toRatio } from "./timelineMath";
 
@@ -52,6 +53,7 @@ export const useTimelineController = ({ periods, currentDate } = {}) => {
   );
 
   const periodItems = useMemo(() => periods ?? createDefaultPeriods(year), [periods, year]);
+  const porcionesFriosSummary = useMemo(() => getPorcionesFriosSummary(year), [year]);
 
   const visiblePeriods = useMemo(
     () =>
@@ -309,12 +311,14 @@ export const useTimelineController = ({ periods, currentDate } = {}) => {
   return {
     sliderRef,
     dayLines,
+    porcionesFriosSummary,
     lineVisualLevel,
     monthMarkers,
     visiblePeriods,
     timelineEvents,
     viewStartMs,
     viewEndMs,
+    viewSpanMs,
     yearStartMs,
     yearEndMs,
     isTodayVisible,

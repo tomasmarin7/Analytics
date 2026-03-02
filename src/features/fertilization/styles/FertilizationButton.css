@@ -113,7 +113,7 @@
   transition: none;
 }
 
-.lower-dots-bridge__fertilization-button:not(.lower-dots-bridge__fertilization-button--raised)
+.lower-dots-bridge__fertilization-button:not(.lower-dots-bridge__fertilization-button--raised):not(.lower-dots-bridge__fertilization-button--production-potential)
   .lower-dots-bridge__fertilization-stain {
   opacity: 0.72;
 }
@@ -136,7 +136,7 @@
   border-radius: 0;
   border: none;
   box-shadow: none;
-  background: linear-gradient(160deg, rgba(208, 208, 208, 0.9) 0%, rgba(188, 192, 196, 0.86) 100%);
+  background: linear-gradient(160deg, #d0d0d0 0%, #bcc0c4 100%);
 }
 
 .lower-dots-bridge__fertilization-button--production-potential.lower-dots-bridge__fertilization-button--raised
@@ -205,7 +205,7 @@
   display: block;
   font-size: 42px;
   line-height: 0.92;
-  color: rgba(57, 67, 76, 0.78);
+  color: #5c6670;
 }
 
 .lower-dots-bridge__fertilization-title-subtle--hidden {
@@ -346,7 +346,7 @@
   right: 0;
   top: calc(100% - var(--pruning-line-height, 340px) - 13px);
   bottom: 0;
-  background: rgba(168, 21, 13, 0.9);
+  background: #a8150d;
   pointer-events: none;
   z-index: 1;
 }

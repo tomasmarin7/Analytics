@@ -5,6 +5,7 @@ import prePruningCountRows from "../../data/prePruningCountRows.json";
 import { useMemo } from "react";
 import DataRecordsSection from "../dataRecordsSection/DataRecordsSection";
 import FoliarAnalysisTableCard from "./FoliarAnalysisTableCard";
+import { PorcionesFriosPanel } from "../../features/porcionesFrios";
 import { FOLIAR_COLUMNS, FOLIAR_SCORE_FIELDS, mapFoliarRow } from "./foliarAnalysisConfig";
 import { BUD_COLUMNS, BUD_SCORE_FIELDS, mapBudRow, sortBudRows } from "./budAnalysisConfig";
 import {
@@ -132,6 +133,8 @@ const FoliarAnalysisPanel = ({
   selectedYears,
   onSelectedYearsChange,
   currentDate,
+  showPorcionesFriosPanel = false,
+  porcionesFriosSummary = null,
 }) => {
   const activeEventIds = useMemo(() => new Set(activeEvents.map((event) => event.id)), [activeEvents]);
 
@@ -352,7 +355,13 @@ const FoliarAnalysisPanel = ({
       onSelectedYearsChange={onSelectedYearsChange}
     >
       {({ selectedYearsCount }) =>
-        hasDataTable ? (
+        showPorcionesFriosPanel ? (
+          <PorcionesFriosPanel
+            summary={porcionesFriosSummary}
+            selectedYears={selectedYears}
+            currentDate={currentDate}
+          />
+        ) : hasDataTable ? (
           isCountPairOnly ? (
             <div className="foliar-analysis-table-card-stack foliar-analysis-table-card-stack--count-only">
               {activeDatasets.map((dataset) => {

@@ -1,5 +1,14 @@
 const SERIES_BASE_YEAR = 2017;
-const VARIETY_HUES = [352, 9, 24, 340, 356, 16, 332, 40];
+const VARIETY_COLORS = [
+  { strong: "#4E0000", soft: "#7A1E1E", text: "#FFF4F3" },
+  { strong: "#8F1D2C", soft: "#B24A5D", text: "#FFF6F6" },
+  { strong: "#FFB3B1", soft: "#FFD2D0", text: "#4E0000" },
+  { strong: "#6E0F1F", soft: "#9C4154", text: "#FFF5F5" },
+  { strong: "#C44A57", soft: "#E49AA0", text: "#2C090B" },
+  { strong: "#7D0C16", soft: "#A93C49", text: "#FFF4F4" },
+  { strong: "#D86C74", soft: "#F0B8BC", text: "#3F0A0D" },
+  { strong: "#5A0A0A", soft: "#874343", text: "#FFF5F4" },
+];
 
 const normalizeText = (value) => String(value ?? "").trim().toUpperCase();
 
@@ -40,14 +49,11 @@ const hashText = (value) => {
   return hash;
 };
 
-const resolveVarietyHue = (variedad) => VARIETY_HUES[hashText(variedad) % VARIETY_HUES.length];
+const resolveVarietyColorPair = (variedad) => VARIETY_COLORS[hashText(variedad) % VARIETY_COLORS.length];
 
 const buildVarietyColorPair = (variedad) => {
-  const hue = resolveVarietyHue(variedad);
-  return {
-    strong: `hsl(${hue} 66% 31%)`,
-    soft: `hsl(${hue} 32% 63%)`,
-  };
+  const colors = resolveVarietyColorPair(variedad);
+  return { strong: colors.strong, soft: colors.soft, text: colors.text };
 };
 
 const pickSeriesValueForYear = (series, year) => {
@@ -255,62 +261,100 @@ export const buildDraftProductionRow = ({
   };
 };
 
-export const buildRegisteredProductionVisual = ({ draftRows = [], lateralShare = 0.35 } = {}) => {
-  const normalizedLateralShare = Math.min(0.9, Math.max(0.1, toNumber(lateralShare) ?? 0.35));
-
-  const varieties = draftRows
-    .map((row) => {
+export const buildRegisteredProductionVisual = ({ draftRows = [] } = {}) => {
+  const varietiesByName = draftRows.reduce((accumulator, row) => {
       const totalKgHa = toNumber(row?.produccionEsperadaKgHa);
-      if (!Number.isFinite(totalKgHa) || totalKgHa <= 0) return null;
+      if (!Number.isFinite(totalKgHa) || totalKgHa <= 0) return accumulator;
 
       const variedad = String(row?.variedad ?? "").trim();
-      if (!variedad) return null;
+      if (!variedad) return accumulator;
 
-      const lateralKgHa = round(totalKgHa * normalizedLateralShare, 2);
-      const plantaKgHa = round(totalKgHa - lateralKgHa, 2);
-      const colors = buildVarietyColorPair(variedad);
+      const current = accumulator.get(variedad);
+      const nextTotalKgHa = round((current?.totalKgHa ?? 0) + totalKgHa, 2);
 
-      return {
+      accumulator.set(variedad, {
         variedad,
-        totalKgHa: round(totalKgHa, 2),
-        lateralKgHa,
-        plantaKgHa,
-        colors,
-      };
-    })
-    .filter(Boolean);
+        totalKgHa: nextTotalKgHa,
+        colors: current?.colors ?? buildVarietyColorPair(variedad),
+      });
+
+      return accumulator;
+    }, new Map());
+
+  const varieties = Array.from(varietiesByName.values());
 
   const totalKgHa = round(
     varieties.reduce((accumulator, current) => accumulator + (toNumber(current.totalKgHa) ?? 0), 0),
     2,
   );
 
-  const segments = varieties.flatMap((variety) => {
-    const lateralSharePercent = totalKgHa > 0 ? (variety.lateralKgHa / totalKgHa) * 100 : 0;
-    const plantaSharePercent = totalKgHa > 0 ? (variety.plantaKgHa / totalKgHa) * 100 : 0;
-
-    return [
-      {
-        variedad: variety.variedad,
-        part: "planta",
-        kgHa: variety.plantaKgHa,
-        sharePercent: plantaSharePercent,
-        color: variety.colors.strong,
-      },
-      {
-        variedad: variety.variedad,
-        part: "laterales",
-        kgHa: variety.lateralKgHa,
-        sharePercent: lateralSharePercent,
-        color: variety.colors.soft,
-      },
-    ];
-  });
+  const segments = varieties.map((variety) => ({
+    variedad: variety.variedad,
+    kgHa: variety.totalKgHa,
+    sharePercent: totalKgHa > 0 ? (variety.totalKgHa / totalKgHa) * 100 : 0,
+    color: variety.colors.strong,
+    textColor: variety.colors.text,
+  }));
 
   return {
     totalKgHa,
     varietyCount: varieties.length,
     varieties,
     segments,
+  };
+};
+
+export const normalizeRegisteredProductionVisual = (registeredProduction) => {
+  const registeredRows = Array.isArray(registeredProduction?.rows) ? registeredProduction.rows : [];
+  if (registeredRows.length > 0) {
+    return buildRegisteredProductionVisual({ draftRows: registeredRows });
+  }
+
+  const rawSegments = Array.isArray(registeredProduction?.visual?.segments)
+    ? registeredProduction.visual.segments
+    : [];
+  if (rawSegments.length === 0) {
+    return registeredProduction?.visual ?? null;
+  }
+
+  const varietiesByName = rawSegments.reduce((accumulator, segment) => {
+    const variedad = String(segment?.variedad ?? "").trim();
+    const kgHa = toNumber(segment?.kgHa);
+    if (!variedad || !Number.isFinite(kgHa) || kgHa <= 0) return accumulator;
+
+    const current = accumulator.get(variedad);
+      accumulator.set(variedad, {
+        variedad,
+        totalKgHa: round((current?.totalKgHa ?? 0) + kgHa, 2),
+        colors: {
+          strong: current?.colors?.strong ?? segment?.color ?? buildVarietyColorPair(variedad).strong,
+          text: current?.colors?.text ?? segment?.textColor ?? buildVarietyColorPair(variedad).text,
+        },
+      });
+    return accumulator;
+  }, new Map());
+
+  const varieties = Array.from(varietiesByName.values()).map((variety) => ({
+    variedad: variety.variedad,
+    totalKgHa: variety.totalKgHa,
+    colors: { strong: variety.colors.strong },
+  }));
+
+  const totalKgHa = round(
+    varieties.reduce((accumulator, current) => accumulator + (toNumber(current.totalKgHa) ?? 0), 0),
+    2,
+  );
+
+  return {
+    totalKgHa,
+    varietyCount: varieties.length,
+    varieties,
+    segments: varieties.map((variety) => ({
+      variedad: variety.variedad,
+      kgHa: variety.totalKgHa,
+      sharePercent: totalKgHa > 0 ? (variety.totalKgHa / totalKgHa) * 100 : 0,
+      color: variety.colors.strong,
+      textColor: variety.colors.text,
+    })),
   };
 };

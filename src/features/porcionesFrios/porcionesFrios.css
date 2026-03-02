@@ -1,0 +1,52 @@
+.lower-dots-bridge__porciones-frios {
+  position: absolute;
+  bottom: calc(50% + 18px);
+  height: 80px;
+  pointer-events: auto;
+  cursor: pointer;
+  z-index: 1;
+  transition: opacity 180ms ease;
+}
+
+.lower-dots-bridge__porciones-frios--foreground {
+  opacity: 1;
+}
+
+.lower-dots-bridge__porciones-frios--background {
+  opacity: 1;
+}
+
+.lower-dots-bridge__porciones-frios-bars {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.lower-dots-bridge__porciones-frios-bar-stack {
+  position: absolute;
+  bottom: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0;
+  padding-right: 4px;
+}
+
+.lower-dots-bridge__porciones-frios-bar-stack--with-fill {
+  gap: 3px;
+}
+
+.lower-dots-bridge__porciones-frios-bar {
+  position: relative;
+  width: 100%;
+  border-radius: 6px;
+  background: #a7c8d2;
+  overflow: hidden;
+}
+
+.lower-dots-bridge__porciones-frios-bar-fill {
+  width: 100%;
+  border-radius: 6px;
+  background: #17177a;
+}

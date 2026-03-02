@@ -10,7 +10,7 @@
   height: 100%;
   overflow: auto;
   border-radius: 10px;
-  background: rgba(19, 25, 20, 0.28);
+  background: #131914;
 }
 
 .pruning-decision-table {
@@ -33,16 +33,16 @@
   position: sticky;
   top: 0;
   z-index: 1;
-  background: rgba(17, 24, 18, 0.86);
+  background: #111812;
   font-weight: 500;
 }
 
 .pruning-decision-table__draft-row td {
-  background: rgba(23, 31, 25, 0.72);
+  background: #171f19;
 }
 
 .pruning-decision-table__draft-row td.pruning-decision-table__locked-cell {
-  background: rgba(23, 31, 25, 0.72);
+  background: #171f19;
 }
 
 .pruning-decision-table__input {
@@ -50,7 +50,7 @@
   min-width: 76px;
   border: 1px solid rgba(255, 255, 255, 0.28);
   border-radius: 6px;
-  background: rgba(8, 12, 9, 0.52);
+  background: #080c09;
   color: #ffffff;
   font-family: inherit;
   font-size: 14px;
@@ -64,7 +64,7 @@
 }
 
 .pruning-decision-table__input--readonly {
-  background: rgba(35, 43, 36, 0.72);
+  background: #232b24;
   cursor: default;
 }
 
@@ -81,7 +81,7 @@
 .pruning-decision-table__register-button {
   border: 1px solid rgba(255, 255, 255, 0.36);
   border-radius: 10px;
-  background: rgba(18, 28, 21, 0.82);
+  background: #121c15;
   color: #ffffff;
   font-family: var(--font-brand);
   font-size: 18px;
@@ -92,7 +92,7 @@
 }
 
 .pruning-decision-table__register-button:hover {
-  background: rgba(24, 37, 28, 0.9);
+  background: #18251c;
 }
 
 .pruning-decision-table__empty {

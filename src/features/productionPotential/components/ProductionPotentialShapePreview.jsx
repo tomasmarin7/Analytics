@@ -16,19 +16,18 @@ const ProductionPotentialShapePreview = ({ visual, showLabels = true }) => {
       <div className="production-potential-shape-preview__stacked">
         {visual.segments.map((segment, index) => (
           <div
-            key={`${segment.variedad}-${segment.part}-${index}`}
-            className={`production-potential-shape-preview__segment production-potential-shape-preview__segment--${segment.part}`}
+            key={`${segment.variedad}-${index}`}
+            className="production-potential-shape-preview__segment"
             style={{
               flexBasis: `${Math.max(0, segment.sharePercent ?? 0)}%`,
               background: segment.color,
+              color: segment.textColor,
             }}
-            title={`${segment.variedad} · ${segment.part}: ${segment.kgHa} kg/ha`}
+            title={`${segment.variedad}: ${segment.kgHa} kg/ha`}
           >
             {showLabels ? (
               <>
-                <span className="production-potential-shape-preview__segment-title">
-                  {segment.part === "laterales" ? `${segment.variedad}/Lateral` : segment.variedad}
-                </span>
+                <span className="production-potential-shape-preview__segment-title">{segment.variedad}</span>
                 <span className="production-potential-shape-preview__segment-value">
                   {formatKgHa(segment.kgHa)} kg/ha
                 </span>

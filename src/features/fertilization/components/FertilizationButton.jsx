@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import fertilizationPlanRows from "../../../data/fertilizationPlanRows.json";
-import { ProductionPotentialPeriodPanel, ProductionPotentialShapePreview } from "../../productionPotential";
+import {
+  normalizeRegisteredProductionVisual,
+  ProductionPotentialPeriodPanel,
+  ProductionPotentialShapePreview,
+} from "../../productionPotential";
 import { PERIOD_PANEL_TYPES } from "../config/panelTypes";
 import FertilizationPeriodPanel from "./FertilizationPeriodPanel";
 import PruningDecisionTable from "./pruningDecision";
@@ -101,7 +105,11 @@ const FertilizationButton = ({
   const registeredProductionForSelectedCuartel = normalizedSelectedCuartel
     ? registeredProductionByCuartel[normalizedSelectedCuartel]
     : null;
-  const productionPotentialTotalKgHa = Number(registeredProductionForSelectedCuartel?.visual?.totalKgHa);
+  const normalizedRegisteredProductionVisual = useMemo(
+    () => normalizeRegisteredProductionVisual(registeredProductionForSelectedCuartel),
+    [registeredProductionForSelectedCuartel],
+  );
+  const productionPotentialTotalKgHa = Number(normalizedRegisteredProductionVisual?.totalKgHa);
   const productionPotentialTotalLabel = Number.isFinite(productionPotentialTotalKgHa)
     ? `${formatKgHa(productionPotentialTotalKgHa)} kg/ha`
     : "-- kg/ha";
@@ -208,7 +216,7 @@ const FertilizationButton = ({
         }}
       >
         <ProductionPotentialShapePreview
-          visual={registeredProductionForSelectedCuartel?.visual}
+          visual={normalizedRegisteredProductionVisual}
           showLabels={showProductionPotentialTitle}
         />
       </div>
@@ -220,9 +228,13 @@ const FertilizationButton = ({
     const pruningLineHeight = Number.isFinite(pruningLineHeightRaw)
       ? pruningLineHeightRaw
       : PRODUCTION_POTENTIAL_BLOCK_HEIGHT_PX * 0.8;
+    const pruningSlotHeight = Math.max(
+      PRUNING_DECISION_BLOCK_HEIGHT_PX,
+      pruningLineHeight + PRUNING_LINE_TOP_PADDING_PX,
+    );
     const pruningLineHeightClamped = Math.max(
       PRUNING_LINE_MIN_HEIGHT_PX,
-      Math.min(PRODUCTION_POTENTIAL_BLOCK_HEIGHT_PX - PRUNING_LINE_TOP_PADDING_PX, pruningLineHeight),
+      Math.min(pruningSlotHeight - PRUNING_LINE_TOP_PADDING_PX, pruningLineHeight),
     );
 
     return (
@@ -233,8 +245,9 @@ const FertilizationButton = ({
         style={{
           left: `${slotGeometry.left}%`,
           width: `${slotGeometry.width}%`,
+          height: `${pruningSlotHeight}px`,
           "--pruning-line-height": `${pruningLineHeightClamped}px`,
-          "--fertilization-raised-height": `${PRUNING_DECISION_BLOCK_HEIGHT_PX}px`,
+          "--fertilization-raised-height": `${pruningSlotHeight}px`,
         }}
         onPointerDown={onRequestForeground}
       >

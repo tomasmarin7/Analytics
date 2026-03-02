@@ -9,6 +9,7 @@ const EventActivationOverlay = ({
   overlayZIndex = 2,
   onRequestForeground,
   isDataRecordsContent = false,
+  showVerticalLine = true,
   children,
 }) => {
   const resolvedAnchorPx = resolveEventAnchorPx({ activeEvents, containerWidth });
@@ -34,11 +35,13 @@ const EventActivationOverlay = ({
       >
         {children}
       </div>
-      <span
-        className="timeline-event-activation__vertical"
-        style={{ left: `${anchorPx}px`, zIndex: Math.max(1, overlayZIndex - 1) }}
-        aria-hidden="true"
-      />
+      {showVerticalLine ? (
+        <span
+          className="timeline-event-activation__vertical"
+          style={{ left: `${anchorPx}px`, zIndex: Math.max(1, overlayZIndex - 1) }}
+          aria-hidden="true"
+        />
+      ) : null}
     </>
   );
 };

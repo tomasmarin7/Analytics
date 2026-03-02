@@ -3,12 +3,14 @@ import TimelineEventMarker from "./eventMarker/TimelineEventMarker";
 import { EventActivationOverlay } from "./eventActivation";
 import { EVENT_ACTIVATION_VERTICAL_TOP_PX } from "./eventActivation/constants";
 import FoliarAnalysisPanel from "../foliarAnalysis/FoliarAnalysisPanel";
+import { PorcionesFriosLayer } from "../../features/porcionesFrios";
 import { DATA_RECORDS_EVENT_CONNECTOR } from "../../features/timelineEvents/shared/connectors";
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
 const DayLines = ({
   dayLines,
+  porcionesFriosSummary,
   monthMarkers = [],
   lineVisualLevel,
   visibleDays,
@@ -23,6 +25,14 @@ const DayLines = ({
   onSelectedYearsChange,
   dataRecordsZIndex = 2,
   onRequestDataRecordsForeground,
+  porcionesFriosZIndex = 1,
+  isPorcionesFriosForeground = false,
+  isPorcionesFriosPanelOpen = false,
+  onTogglePorcionesFriosPanel,
+  onRequestPorcionesFriosForeground,
+  viewStartMs,
+  viewEndMs,
+  viewSpanMs,
   currentDate,
 }) => {
   const linesRef = useRef(null);
@@ -45,6 +55,10 @@ const DayLines = ({
 
   const currentActiveEventSet = useMemo(() => new Set(activeEventIds ?? []), [activeEventIds]);
   const activeEvents = timelineEvents.filter((event) => currentActiveEventSet.has(event.id));
+  const handleTimelineEventToggle = (eventId) => {
+    onRequestDataRecordsForeground?.();
+    onTimelineEventToggle?.(eventId);
+  };
   const renderedMarkerEvents = timelineEvents
     .filter((event) => event.isVisible || currentActiveEventSet.has(event.id))
     .map((event) => {
@@ -82,6 +96,20 @@ const DayLines = ({
         return <span key={line.id} className={baseClass} style={{ transform: `scaleY(${scaleY})` }} />;
       })}
 
+      <PorcionesFriosLayer
+        bars={porcionesFriosSummary.bars}
+        chartStartMs={porcionesFriosSummary.barChartStartMs}
+        chartEndMs={porcionesFriosSummary.barChartEndMs}
+        maxAccumulatedPortions={porcionesFriosSummary.barMaxAccumulated}
+        viewStartMs={viewStartMs}
+        viewEndMs={viewEndMs}
+        viewSpanMs={viewSpanMs}
+        currentDate={currentDate}
+        isForeground={isPorcionesFriosForeground}
+        onFocus={onTogglePorcionesFriosPanel}
+        zIndex={porcionesFriosZIndex}
+      />
+
       {monthMarkers.map((marker) => (
         <span
           key={`month-line-${marker.id}`}
@@ -95,9 +123,10 @@ const DayLines = ({
         activeEvents={activeEvents}
         containerWidth={containerWidth}
         defaultAnchorPx={DATA_RECORDS_EVENT_CONNECTOR.fixedLeftPx}
-        overlayZIndex={dataRecordsZIndex}
-        onRequestForeground={onRequestDataRecordsForeground}
+        overlayZIndex={isPorcionesFriosPanelOpen ? porcionesFriosZIndex : dataRecordsZIndex}
+        onRequestForeground={isPorcionesFriosPanelOpen ? onRequestPorcionesFriosForeground : onRequestDataRecordsForeground}
         isDataRecordsContent
+        showVerticalLine={!isPorcionesFriosPanelOpen}
       >
         <FoliarAnalysisPanel
           activeEvents={activeEvents}
@@ -106,6 +135,8 @@ const DayLines = ({
           selectedYears={selectedYears}
           onSelectedYearsChange={onSelectedYearsChange}
           currentDate={currentDate}
+          showPorcionesFriosPanel={isPorcionesFriosPanelOpen}
+          porcionesFriosSummary={porcionesFriosSummary}
         />
       </EventActivationOverlay>
 
@@ -119,7 +150,7 @@ const DayLines = ({
           isActive={currentActiveEventSet.has(event.id)}
           isOutOfView={event.markerOutOfView}
           connector={event.connector}
-          onToggle={onTimelineEventToggle}
+          onToggle={handleTimelineEventToggle}
         />
       ))}
     </div>

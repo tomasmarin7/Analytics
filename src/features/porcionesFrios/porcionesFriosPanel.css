@@ -1,0 +1,201 @@
+.porciones-frios-panel {
+  width: min(100%, 820px);
+  min-width: 0;
+  padding: 22px 12px 14px 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  border: 0;
+  backdrop-filter: none;
+}
+
+.porciones-frios-panel__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 18px;
+}
+
+.porciones-frios-panel__eyebrow {
+  display: block;
+  margin-bottom: 6px;
+  font-family: "Lufga", var(--font-brand);
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(73, 83, 92, 0.58);
+}
+
+.porciones-frios-panel__title {
+  margin: 0;
+  font-family: "Lufga", var(--font-brand);
+  font-size: 31px;
+  line-height: 1;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  color: rgba(39, 47, 55, 0.96);
+}
+
+.porciones-frios-panel__legend {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding-top: 10px;
+}
+
+.porciones-frios-panel__legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: "Lufga", var(--font-brand);
+  font-size: 13px;
+  line-height: 1;
+  font-weight: 400;
+  color: rgba(77, 88, 99, 0.84);
+}
+
+.porciones-frios-panel__legend-swatch {
+  width: 30px;
+  height: 3px;
+  border-radius: 999px;
+}
+
+.porciones-frios-panel__metrics {
+  display: flex;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.porciones-frios-panel__metric {
+  min-width: 120px;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.porciones-frios-panel__metric-label {
+  font-family: "Lufga", var(--font-brand);
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(81, 92, 103, 0.62);
+}
+
+.porciones-frios-panel__metric-value {
+  font-family: "Lufga", var(--font-brand);
+  font-size: 32px;
+  line-height: 0.96;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: rgba(133, 176, 194, 0.96);
+}
+
+.porciones-frios-panel__metric-value--current {
+  color: rgba(37, 56, 154, 0.96);
+}
+
+.porciones-frios-panel__chart {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.porciones-frios-panel__grid-row line,
+.porciones-frios-panel__grid-column line {
+  stroke: rgba(103, 114, 123, 0.16);
+  stroke-width: 1;
+}
+
+.porciones-frios-panel__grid-row text,
+.porciones-frios-panel__grid-column text {
+  font-family: "Lufga", var(--font-brand);
+  font-size: 13px;
+  font-weight: 400;
+  fill: rgba(84, 95, 106, 0.72);
+}
+
+.porciones-frios-panel__current-area {
+  fill: url(#porciones-frios-panel-current-area);
+  opacity: 0;
+  animation: porciones-frios-panel-area-fade 420ms ease forwards;
+  animation-delay: 120ms;
+}
+
+.porciones-frios-panel__line {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 4.1;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: porciones-frios-panel-line-draw 520ms ease-out forwards;
+}
+
+.porciones-frios-panel__endpoint {
+  stroke-width: 2.8;
+  stroke: rgba(230, 232, 235, 0.9);
+  opacity: 0;
+  animation: porciones-frios-panel-endpoint-fade 180ms ease-out forwards;
+  animation-delay: 320ms;
+}
+
+.porciones-frios-panel__endpoint--current {
+  fill: #25389a;
+  stroke: rgba(230, 232, 235, 0.92);
+}
+
+@media (max-width: 1100px) {
+  .porciones-frios-panel {
+    padding: 18px 0 10px;
+  }
+
+  .porciones-frios-panel__header {
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .porciones-frios-panel__legend,
+  .porciones-frios-panel__metrics {
+    flex-wrap: wrap;
+  }
+}
+
+@keyframes porciones-frios-panel-line-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes porciones-frios-panel-area-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes porciones-frios-panel-endpoint-fade {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+    transform-origin: center;
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+    transform-origin: center;
+  }
+}
