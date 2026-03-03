@@ -1,0 +1,19 @@
+.lower-dots-bridge__produccion-post-poda-objetivo {
+  position: absolute;
+  bottom: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.lower-dots-bridge__produccion-post-poda-objetivo-shape {
+  position: absolute;
+  inset: 0;
+}
+
+.lower-dots-bridge__produccion-post-poda-objetivo-shape
+  .production-potential-shape-preview__segment:first-child {
+  justify-content: center;
+  padding-top: 26px;
+  padding-bottom: 8px;
+}

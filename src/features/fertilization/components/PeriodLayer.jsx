@@ -3,6 +3,7 @@ import { PERIODS_ARIA_LABEL } from "../../../components/timeline/constants";
 import { POST_PRUNING_COUNT_EVENT_ID } from "../../timelineEvents";
 import { PERIOD_PANEL_TYPES } from "../config/panelTypes";
 import FertilizationButton from "./FertilizationButton";
+import ProduccionPostPodaObjetivo from "./produccionPostPodaObjetivo";
 import ProductionHistoricalBridge from "./productionBridge/ProductionHistoricalBridge";
 
 const PRODUCTION_POTENTIAL_REGISTER_STORAGE_KEY = "productionPotentialRegisterByCuartel";
@@ -30,7 +31,7 @@ const PeriodLayer = ({
 }) => {
   const [productionRegisterByCuartel, setProductionRegisterByCuartel] = useState({});
   const [pruningRegisterByCuartel, setPruningRegisterByCuartel] = useState({});
-  const [historicalBridgeMetrics, setHistoricalBridgeMetrics] = useState(null);
+  const [postPruningObjectiveMetrics, setPostPruningObjectiveMetrics] = useState(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -93,8 +94,8 @@ const PeriodLayer = ({
     }));
   }, []);
 
-  const handleBridgeMetricsChange = useCallback((metrics) => {
-    setHistoricalBridgeMetrics(metrics);
+  const handlePostPruningObjectiveMetricsChange = useCallback((metrics) => {
+    setPostPruningObjectiveMetrics(metrics);
   }, []);
 
   const handlePruningRegister = useCallback((payload) => {
@@ -128,13 +129,13 @@ const PeriodLayer = ({
     const hasFallbackGeometry =
       Number.isFinite(dardoRight) && Number.isFinite(postPruningLeft) && postPruningLeft > dardoRight;
 
-    const pruningGeometry = historicalBridgeMetrics?.preGeometry ?? (hasFallbackGeometry
+    const pruningGeometry = postPruningObjectiveMetrics?.geometry ?? (hasFallbackGeometry
       ? { left: dardoRight, width: postPruningLeft - dardoRight }
       : null);
-    const postHeightPx = Number(historicalBridgeMetrics?.postHeightPx);
+    const pruningHeightPx = Number(postPruningObjectiveMetrics?.heightPx);
     const pruningLineHeightPx =
-      Number.isFinite(postHeightPx) && postHeightPx > 0
-        ? postHeightPx
+      Number.isFinite(pruningHeightPx) && pruningHeightPx > 0
+        ? pruningHeightPx
         : PRODUCTION_POTENTIAL_CURRENT_HEIGHT_PX * PRUNING_LINE_FALLBACK_RATIO;
 
     return periods.map((period) => {
@@ -155,7 +156,7 @@ const PeriodLayer = ({
           : period.pruningLineHeightPx,
       };
     });
-  }, [historicalBridgeMetrics, periods, timelineEvents]);
+  }, [periods, postPruningObjectiveMetrics, timelineEvents]);
 
   const visiblePeriods = useMemo(
     () =>
@@ -178,7 +179,14 @@ const PeriodLayer = ({
         registeredProductionByCuartel={productionRegisterByCuartel}
         showProductionPotentialTitle={showProductionPotentialTitle}
         showProductionPotentialValue={showProductionPotentialValue}
-        onMetricsChange={handleBridgeMetricsChange}
+      />
+      <ProduccionPostPodaObjetivo
+        periods={periods}
+        timelineEvents={timelineEvents}
+        selectedCuartel={selectedCuartel}
+        registeredProductionByCuartel={productionRegisterByCuartel}
+        registeredPruningByCuartel={pruningRegisterByCuartel}
+        onMetricsChange={handlePostPruningObjectiveMetricsChange}
       />
 
       {visiblePeriods.map((period) => (
