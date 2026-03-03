@@ -91,3 +91,6 @@ typings/
 # Electron-Forge
 out/
 dist/
+
+# Windows alternate data stream artifacts accidentally created on NTFS
+*:Zone.Identifier
