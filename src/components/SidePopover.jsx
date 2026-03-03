@@ -70,7 +70,7 @@ const buildPersistentPolygonCuartelMap = ({ rawStoredMap, availableCuarteles, po
 };
 
 const SidePopover = ({ onSelectedCuartelChange }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
   const [polygonCuartelMap, setPolygonCuartelMap] = useState({});
   const availableCuarteles = useMemo(
     () =>

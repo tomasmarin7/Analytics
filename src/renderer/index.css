@@ -3,7 +3,7 @@
 :root {
   --bg: #e5e5e5;
   --text-dark: #222527;
-  --font-brand: "Lufga";
+  --font-brand: "Lufga", "Segoe UI", sans-serif;
   --font-weight-light: 300;
   --font-weight-regular: 400;
   --font-weight-medium: 500;
@@ -43,11 +43,20 @@ body,
   min-height: 100%;
 }
 
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
   background: var(--bg);
   font-family: var(--font-brand);
   font-weight: var(--font-weight-regular);
   letter-spacing: var(--letter-spacing-normal);
+  font-synthesis: none;
+  text-rendering: geometricPrecision;
+  overflow: hidden;
 }
 
 .app {

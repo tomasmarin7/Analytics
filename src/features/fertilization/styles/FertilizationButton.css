@@ -250,6 +250,8 @@
   top: 70px;
   bottom: 16px;
   display: flex;
+  min-height: 0;
+  overflow: auto;
   pointer-events: auto;
   z-index: 2;
   contain: layout paint;
