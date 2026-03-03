@@ -8,6 +8,7 @@ import {
 import { PERIOD_PANEL_TYPES } from "../config/panelTypes";
 import FertilizationPeriodPanel from "./FertilizationPeriodPanel";
 import PruningDecisionTable from "./pruningDecision";
+import RaleoDecisionTable from "./raleoDecision";
 import "../styles/FertilizationButton.css";
 
 const TITLE_DOCK_ANIMATION_MS = 260;
@@ -29,6 +30,7 @@ const PANEL_BASE_HEIGHT_BY_TYPE = {
   [PERIOD_PANEL_TYPES.PRODUCTION_POTENTIAL]: PRODUCTION_POTENTIAL_BLOCK_HEIGHT_PX,
   [PERIOD_PANEL_TYPES.PRODUCTION_POTENTIAL_VARIETY_DARDO]: PRODUCTION_POTENTIAL_DARDO_BLOCK_HEIGHT_PX,
   [PERIOD_PANEL_TYPES.PRUNING_DECISION]: PRUNING_DECISION_BLOCK_HEIGHT_PX,
+  [PERIOD_PANEL_TYPES.RALEO_DECISION]: PRUNING_DECISION_BLOCK_HEIGHT_PX,
 };
 const normalizeText = (value) => String(value ?? "").trim().toUpperCase();
 const formatKgHa = (value) =>
@@ -60,6 +62,8 @@ const FertilizationButton = ({
   const isProductionPotentialPeriod = panelType === PERIOD_PANEL_TYPES.PRODUCTION_POTENTIAL;
   const isProductionPotentialDardoPeriod = panelType === PERIOD_PANEL_TYPES.PRODUCTION_POTENTIAL_VARIETY_DARDO;
   const isPruningDecisionPeriod = panelType === PERIOD_PANEL_TYPES.PRUNING_DECISION;
+  const isRaleoDecisionPeriod = panelType === PERIOD_PANEL_TYPES.RALEO_DECISION;
+  const isLineDecisionPeriod = isPruningDecisionPeriod || isRaleoDecisionPeriod;
   const [isTitleDocked, setIsTitleDocked] = useState(false);
   const [isPanelVisible, setIsPanelVisible] = useState(false);
   const panelTimeoutRef = useRef(null);
@@ -169,7 +173,21 @@ const FertilizationButton = ({
       );
     }
 
-    if (panelType === PERIOD_PANEL_TYPES.PRUNING_DECISION) {
+    if (
+      panelType === PERIOD_PANEL_TYPES.PRUNING_DECISION ||
+      panelType === PERIOD_PANEL_TYPES.RALEO_DECISION
+    ) {
+      if (panelType === PERIOD_PANEL_TYPES.RALEO_DECISION) {
+        return (
+          <RaleoDecisionTable
+            selectedCuartel={selectedCuartel}
+            selectedYears={selectedYears}
+            registeredProductionByCuartel={registeredProductionByCuartel}
+            registeredPruningByCuartel={registeredPruningByCuartel}
+          />
+        );
+      }
+
       return (
         <PruningDecisionTable
           selectedCuartel={selectedCuartel}
@@ -223,7 +241,7 @@ const FertilizationButton = ({
     );
   }
 
-  if (isPruningDecisionPeriod) {
+  if (isLineDecisionPeriod) {
     const pruningLineHeightRaw = Number(period?.pruningLineHeightPx);
     const pruningLineHeight = Number.isFinite(pruningLineHeightRaw)
       ? pruningLineHeightRaw

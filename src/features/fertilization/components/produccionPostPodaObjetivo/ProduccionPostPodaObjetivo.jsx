@@ -4,11 +4,14 @@ import {
   normalizeRegisteredProductionVisual,
   ProductionPotentialShapePreview,
 } from "../../../productionPotential";
-import { POST_PRUNING_COUNT_EVENT_ID } from "../../../timelineEvents";
+import { createDefaultPeriods } from "../../config/periods";
 import "./produccionPostPodaObjetivo.css";
 
 const PRODUCTION_POTENTIAL_DARDO_PERIOD_ID = "periodo-produccion-posible-variedad-dardo";
 const PRODUCTION_POTENTIAL_DARDO_BLOCK_HEIGHT_PX = 425;
+const DAY_MS = 86400000;
+const POST_PRUNING_COUNT_MONTH_INDEX = 6;
+const POST_PRUNING_COUNT_DAY = 15;
 const normalizeText = (value) => String(value ?? "").trim().toUpperCase();
 
 const toNumber = (value) => {
@@ -65,35 +68,56 @@ const buildRegisteredPruningVisual = (registeredPruning) => {
   };
 };
 
-const resolveGeometry = ({ periods = [], timelineEvents = [] }) => {
-  const dardoPeriod = periods.find((period) => period.id === PRODUCTION_POTENTIAL_DARDO_PERIOD_ID);
-  const postPruningEvent = timelineEvents.find((event) => event.id === POST_PRUNING_COUNT_EVENT_ID);
-  if (!dardoPeriod || !postPruningEvent) return null;
+const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
-  const startPercent = Number(dardoPeriod.left) + Number(dardoPeriod.width);
-  const endPercent = Number(postPruningEvent.leftPercent);
-  if (!Number.isFinite(startPercent) || !Number.isFinite(endPercent) || endPercent <= startPercent) {
+const resolveGeometry = ({ viewStartMs, viewEndMs, viewSpanMs }) => {
+  if (!Number.isFinite(viewStartMs) || !Number.isFinite(viewEndMs) || !Number.isFinite(viewSpanMs) || viewSpanMs <= 0) {
     return null;
   }
 
+  const referenceYear = new Date(viewStartMs).getUTCFullYear();
+  const dardoPeriod = createDefaultPeriods(referenceYear).find(
+    (period) => period.id === PRODUCTION_POTENTIAL_DARDO_PERIOD_ID,
+  );
+  if (!dardoPeriod) {
+    return null;
+  }
+
+  const viewportEndBoundaryMs = viewEndMs + DAY_MS;
+  const dardoRightBoundaryMs = dardoPeriod.endMs + DAY_MS;
+  const postPruningCenterMs = Date.UTC(referenceYear, POST_PRUNING_COUNT_MONTH_INDEX, POST_PRUNING_COUNT_DAY) + (DAY_MS / 2);
+  const clippedStartMs = Math.max(dardoRightBoundaryMs, viewStartMs);
+  const clippedEndMs = Math.min(postPruningCenterMs, viewportEndBoundaryMs);
+  if (clippedEndMs <= clippedStartMs) {
+    return null;
+  }
+
+  const startPercent = ((clippedStartMs - viewStartMs) / viewSpanMs) * 100;
+  const endPercent = ((clippedEndMs - viewStartMs) / viewSpanMs) * 100;
+
   return {
-    left: Math.max(0, Math.min(100, startPercent)),
-    width: Math.max(0, Math.min(100, endPercent) - Math.max(0, Math.min(100, startPercent))),
+    left: clamp(startPercent, 0, 100),
+    width: clamp(endPercent, 0, 100) - clamp(startPercent, 0, 100),
   };
 };
 
 const ProduccionPostPodaObjetivo = ({
   periods,
   timelineEvents,
+  viewStartMs,
+  viewEndMs,
+  viewSpanMs,
   selectedCuartel,
   registeredProductionByCuartel = {},
   registeredPruningByCuartel = {},
   showLabels = true,
   onMetricsChange,
+  onClick,
+  onPointerDown,
 }) => {
   const geometry = useMemo(
-    () => resolveGeometry({ periods, timelineEvents }),
-    [periods, timelineEvents],
+    () => resolveGeometry({ viewStartMs, viewEndMs, viewSpanMs }),
+    [viewEndMs, viewSpanMs, viewStartMs],
   );
 
   const normalizedSelectedCuartel = normalizeText(selectedCuartel);
@@ -144,15 +168,23 @@ const ProduccionPostPodaObjetivo = ({
     return null;
   }
 
+  const handleActivate = () => {
+    onClick?.();
+  };
+
   return (
-    <span
+    <button
+      type="button"
       className="lower-dots-bridge__produccion-post-poda-objetivo"
       style={{
         left: `${geometry.left}%`,
         width: `${geometry.width}%`,
         height: `${heightPx}px`,
       }}
-      aria-hidden="true"
+      aria-label="Zoom a produccion posible variedad dardo"
+      title="Zoom a produccion posible variedad dardo"
+      onClick={handleActivate}
+      onPointerDown={onPointerDown}
     >
       <ProductionPotentialShapePreview
         visual={registeredPruningVisual}
@@ -160,7 +192,7 @@ const ProduccionPostPodaObjetivo = ({
         showBaseline={false}
         className="lower-dots-bridge__produccion-post-poda-objetivo-shape"
       />
-    </span>
+    </button>
   );
 };
 

@@ -20,8 +20,8 @@
 }
 
 .dormancy-breakers-table__grid {
-  width: 100%;
-  min-width: 1380px;
+  width: max-content;
+  min-width: 100%;
   border-collapse: separate;
   border-spacing: 0;
   font-family: "Lufga", var(--font-brand);

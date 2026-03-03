@@ -30,6 +30,9 @@
   --bridge-edge-offset: 72px;
   --bridge-line-color: rgba(34, 37, 39, 0.38);
   --bridge-month-line-color: rgba(20, 22, 24, 0.72);
+  --app-viewport-height: 100vh;
+  --app-viewport-width: 100vw;
+  --app-content-height: calc(var(--app-viewport-height) - var(--header-height));
 }
 
 * {
@@ -40,6 +43,7 @@ html,
 body,
 #root {
   margin: 0;
+  height: 100%;
   min-height: 100%;
 }
 
@@ -50,6 +54,7 @@ html {
 }
 
 body {
+  min-height: var(--app-viewport-height);
   background: var(--bg);
   font-family: var(--font-brand);
   font-weight: var(--font-weight-regular);
@@ -60,15 +65,18 @@ body {
 }
 
 .app {
-  min-height: 100vh;
+  min-height: var(--app-viewport-height);
   background: var(--bg);
+  display: flex;
+  flex-direction: column;
 }
 
 .app__content {
   position: relative;
-  min-height: calc(100vh - var(--header-height));
+  flex: 1 1 auto;
+  min-height: var(--app-content-height);
   overflow-x: hidden;
-  overflow-y: visible;
+  overflow-y: hidden;
 }
 
 .side-popover {
@@ -79,10 +87,9 @@ body {
   isolation: isolate;
   top: 20px;
   right: 0;
-  width: min(40vw, 620px);
-  min-width: 420px;
-  height: calc((100vh - var(--header-height) - 32px) * 0.48);
-  min-height: 300px;
+  width: clamp(280px, 34vw, 620px);
+  max-width: calc(var(--app-viewport-width) - (var(--page-gutter) * 2));
+  height: clamp(260px, calc((var(--app-content-height) - 32px) * 0.48), 440px);
   max-height: 440px;
   transform: translateX(calc(100% - var(--side-popover-peek)));
   transition: transform 260ms ease;
@@ -228,10 +235,10 @@ body {
   position: absolute;
   z-index: 19000;
   isolation: isolate;
-  top: 40%;
+  top: clamp(104px, 40%, calc(100% - 170px));
   left: 0;
-  width: min(38vw, 460px);
-  min-width: 360px;
+  width: clamp(260px, 30vw, 460px);
+  max-width: calc(var(--app-viewport-width) - (var(--page-gutter) * 2));
   transform: translateX(calc(-100% + var(--side-popover-peek)));
   transition: transform 260ms ease;
 }
@@ -370,13 +377,13 @@ body {
     --page-gutter: 16px;
     --side-popover-peek: 5px;
     --bridge-edge-offset: 22px;
+    --header-height: 96px;
   }
 
   .side-popover {
     top: 16px;
-    width: min(72vw, 380px);
-    min-width: 260px;
-    min-height: 220px;
+    width: clamp(240px, 72vw, 380px);
+    height: clamp(220px, calc((var(--app-content-height) - 24px) * 0.42), 300px);
     max-height: 300px;
     --side-popover-inner-gap: 10px;
     transform: translateX(calc(100% - var(--side-popover-peek)));
@@ -400,9 +407,8 @@ body {
   }
 
   .date-side-popover {
-    top: 40%;
-    width: min(76vw, 380px);
-    min-width: 280px;
+    top: clamp(96px, 36%, calc(100% - 150px));
+    width: clamp(240px, 76vw, 380px);
   }
 
   .date-side-popover__toggle {

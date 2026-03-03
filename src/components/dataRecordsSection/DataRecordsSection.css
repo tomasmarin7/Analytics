@@ -40,7 +40,7 @@
 .data-records-section__tables-scroll {
   flex: 1 1 auto;
   min-width: 0;
-  overflow-x: hidden;
+  overflow-x: auto;
   overflow-y: visible;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -82,7 +82,7 @@
   }
 
   .data-records-section__tables-scroll {
-    overflow-x: hidden;
+    overflow-x: auto;
   }
 
   .data-records-section__tables-track {

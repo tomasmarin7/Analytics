@@ -14,16 +14,6 @@ if (started) {
   app.quit();
 }
 
-const getNormalizedZoomFactor = (window) => {
-  if (process.platform !== 'win32') {
-    return 1;
-  }
-
-  const display = screen.getDisplayMatching(window.getBounds());
-  const scaleFactor = Number(display?.scaleFactor ?? 1);
-  return scaleFactor > 0 ? 1 / scaleFactor : 1;
-};
-
 const getRendererAssetPath = (assetName) => (
   MAIN_WINDOW_VITE_DEV_SERVER_URL
     ? path.join(process.cwd(), 'public', assetName)
@@ -171,11 +161,7 @@ const createMainWindow = () => {
   mainWindow.removeMenu();
   mainWindow.setMenuBarVisibility(false);
   mainWindow.webContents.on('did-finish-load', () => {
-    mainWindow.webContents.setZoomFactor(getNormalizedZoomFactor(mainWindow));
     mainWindow.webContents.setVisualZoomLevelLimits(1, 1);
-  });
-  mainWindow.on('move', () => {
-    mainWindow.webContents.setZoomFactor(getNormalizedZoomFactor(mainWindow));
   });
 
   // and load the index.html of the app.

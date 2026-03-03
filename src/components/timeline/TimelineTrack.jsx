@@ -181,6 +181,9 @@ const TimelineTrack = ({
         <PeriodLayer
           periods={visiblePeriods}
           timelineEvents={timelineEvents}
+          viewStartMs={viewStartMs}
+          viewEndMs={viewEndMs}
+          viewSpanMs={viewSpanMs}
           onFertilizationClick={onFertilizationClick}
           raisedPeriodId={raisedPeriodId}
           selectedHuerto={selectedHuerto}

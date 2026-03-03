@@ -65,8 +65,8 @@
 }
 
 .foliar-analysis-table-card__table {
-  width: 100%;
-  min-width: 900px;
+  width: max-content;
+  min-width: 100%;
   border-collapse: separate;
   border-spacing: 0;
   font-family: var(--font-brand);
@@ -357,7 +357,7 @@
 
 @media (max-width: 900px) {
   .foliar-analysis-table-card__table {
-    min-width: 700px;
+    min-width: 100%;
     font-size: 13px;
   }
 }

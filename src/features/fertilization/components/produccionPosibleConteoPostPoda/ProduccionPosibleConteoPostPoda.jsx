@@ -6,11 +6,16 @@ import {
   normalizeRegisteredProductionVisual,
   ProductionPotentialShapePreview,
 } from "../../../productionPotential";
-import { POST_PRUNING_COUNT_EVENT_ID } from "../../../timelineEvents";
+import { createDefaultPeriods } from "../../config/periods";
 import "./produccionPosibleConteoPostPoda.css";
 
 const PRODUCTION_POTENTIAL_DARDO_PERIOD_ID = "periodo-produccion-posible-variedad-dardo";
 const PRODUCTION_POTENTIAL_DARDO_BLOCK_HEIGHT_PX = 425;
+const DAY_MS = 86400000;
+const POST_PRUNING_COUNT_MONTH_INDEX = 6;
+const POST_PRUNING_COUNT_DAY = 15;
+const POST_PRUNING_COUNT_END_MONTH_INDEX = 9;
+const POST_PRUNING_COUNT_END_DAY = 25;
 const BUD_MAPPED_ROWS = budAnalysisRows.map(mapBudRow);
 
 const normalizeText = (value) => String(value ?? "").trim().toUpperCase();
@@ -75,19 +80,41 @@ const calculateProductionKgHa = ({
   return round((frutosPlanta * parsedPlantasHaProductivas * parsedCalibreGr) / 1000, 2);
 };
 
-const resolveGeometry = ({ periods = [], timelineEvents = [] }) => {
-  const dardoPeriod = periods.find((period) => period.id === PRODUCTION_POTENTIAL_DARDO_PERIOD_ID);
-  const postPruningEvent = timelineEvents.find((event) => event.id === POST_PRUNING_COUNT_EVENT_ID);
-  if (!dardoPeriod || !postPruningEvent) return null;
+const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
-  const dardoRight = Number(dardoPeriod.left) + Number(dardoPeriod.width);
-  const postPruningLeft = Number(postPruningEvent.leftPercent);
-  if (!Number.isFinite(dardoRight) || !Number.isFinite(postPruningLeft) || postPruningLeft <= dardoRight) {
+const resolveGeometry = ({
+  viewStartMs,
+  viewEndMs,
+  viewSpanMs,
+}) => {
+  if (!Number.isFinite(viewStartMs) || !Number.isFinite(viewEndMs) || !Number.isFinite(viewSpanMs) || viewSpanMs <= 0) {
     return null;
   }
 
-  const start = Math.max(0, Math.min(100, postPruningLeft));
-  const width = Math.min(postPruningLeft - dardoRight, 100 - start);
+  const referenceYear = new Date(viewStartMs).getUTCFullYear();
+  const dardoPeriod = createDefaultPeriods(referenceYear).find(
+    (period) => period.id === PRODUCTION_POTENTIAL_DARDO_PERIOD_ID,
+  );
+  if (!dardoPeriod) {
+    return null;
+  }
+
+  const viewportEndBoundaryMs = viewEndMs + DAY_MS;
+  const postPruningCenterMs = Date.UTC(referenceYear, POST_PRUNING_COUNT_MONTH_INDEX, POST_PRUNING_COUNT_DAY) + (DAY_MS / 2);
+  const targetEndMs = Date.UTC(
+    referenceYear,
+    POST_PRUNING_COUNT_END_MONTH_INDEX,
+    POST_PRUNING_COUNT_END_DAY,
+  ) + DAY_MS;
+  const clippedStartMs = Math.max(postPruningCenterMs, viewStartMs);
+  const clippedEndMs = Math.min(targetEndMs, viewportEndBoundaryMs);
+  if (clippedEndMs <= clippedStartMs) {
+    return null;
+  }
+
+  const start = clamp(((clippedStartMs - viewStartMs) / viewSpanMs) * 100, 0, 100);
+  const end = clamp(((clippedEndMs - viewStartMs) / viewSpanMs) * 100, 0, 100);
+  const width = end - start;
   if (width <= 0.05) return null;
 
   return { left: start, width };
@@ -161,16 +188,19 @@ const buildVisual = ({
 };
 
 const ProduccionPosibleConteoPostPoda = ({
-  periods,
-  timelineEvents,
+  viewStartMs,
+  viewEndMs,
+  viewSpanMs,
   selectedCuartel,
   registeredProductionByCuartel = {},
   registeredPruningByCuartel = {},
   showLabels = true,
+  onClick,
+  onPointerDown,
 }) => {
   const geometry = useMemo(
-    () => resolveGeometry({ periods, timelineEvents }),
-    [periods, timelineEvents],
+    () => resolveGeometry({ viewStartMs, viewEndMs, viewSpanMs }),
+    [viewEndMs, viewSpanMs, viewStartMs],
   );
 
   const normalizedSelectedCuartel = normalizeText(selectedCuartel);
@@ -218,23 +248,32 @@ const ProduccionPosibleConteoPostPoda = ({
     return null;
   }
 
+  const handleActivate = () => {
+    onClick?.();
+  };
+
   return (
-    <span
+    <button
+      type="button"
       className="lower-dots-bridge__produccion-posible-conteo-post-poda"
       style={{
         left: `${geometry.left}%`,
         width: `${geometry.width}%`,
         height: `${heightPx}px`,
       }}
-      aria-hidden="true"
+      aria-label="Zoom a produccion posible variedad dardo"
+      title="Zoom a produccion posible variedad dardo"
+      onClick={handleActivate}
+      onPointerDown={onPointerDown}
     >
       <ProductionPotentialShapePreview
         visual={visual}
         showLabels={showLabels}
         showBaseline={false}
         className="lower-dots-bridge__produccion-posible-conteo-post-poda-shape"
+        opacityGradient={{ startOpacity: 1, endOpacity: 0.05 }}
       />
-    </span>
+    </button>
   );
 };
 

@@ -215,7 +215,7 @@ const PruningDecisionTable = ({
                 <th scope="col">% Cuaja Real</th>
                 <th scope="col">Producción Objetivo (kg/ha)</th>
                 <th scope="col">Producción Real (kg/ha)</th>
-                <th scope="col">Dardos a Eliminar</th>
+                <th scope="col">Dardos Objetivo por Arbol</th>
               </tr>
             </thead>
             <tbody>
@@ -227,7 +227,7 @@ const PruningDecisionTable = ({
                   <td>{formatCellValue(row.cuajaReal)}</td>
                   <td>{formatCellValue(row.produccionObjetivo)}</td>
                   <td>{formatCellValue(row.produccionReal)}</td>
-                  <td>{formatCellValue(row.dardosEliminar)}</td>
+                  <td>{formatCellValue(row.dardosDejarPorArbol)}</td>
                 </tr>
               ))}
 
@@ -260,7 +260,7 @@ const PruningDecisionTable = ({
                       />
                     </td>
                     <td className="pruning-decision-table__locked-cell" />
-                    <td>{formatCellValue(draftPruningMetrics?.dardosEliminar)}</td>
+                    <td>{formatCellValue(draftPruningMetrics?.dardosDejarPorArbol)}</td>
                   </tr>
                 );
               })}

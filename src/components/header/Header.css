@@ -2,10 +2,10 @@
   position: relative;
   height: var(--header-height);
   padding: 0 var(--page-gutter);
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
-  gap: 20px;
+  gap: clamp(12px, 2vw, 20px);
   border: 1px solid #bdbdbd;
 }
 
@@ -13,6 +13,7 @@
 .header__right {
   display: flex;
   align-items: center;
+  min-width: 0;
 }
 
 .header__left {
@@ -20,16 +21,14 @@
 }
 
 .header__center {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(100%, calc((114px * 7) + (8px * 6)));
+  width: 100%;
   min-width: 0;
   z-index: 1;
 }
 
 .header__right {
   flex: 0 0 auto;
+  justify-self: end;
 }
 
 .header__divider {
@@ -57,7 +56,7 @@
   }
 
   .header__center {
-    width: min(100%, calc((96px * 7) + (4px * 6)));
+    width: 100%;
   }
 
   .header__logo {

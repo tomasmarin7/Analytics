@@ -16,6 +16,9 @@ const normalizeText = (value) => String(value ?? "").trim().toUpperCase();
 const PeriodLayer = ({
   periods,
   timelineEvents = [],
+  viewStartMs,
+  viewEndMs,
+  viewSpanMs,
   onFertilizationClick,
   raisedPeriodId,
   selectedHuerto,
@@ -74,6 +77,19 @@ const PeriodLayer = ({
   const handlePostPruningObjectiveMetricsChange = useCallback((metrics) => {
     setPostPruningObjectiveMetrics(metrics);
   }, []);
+
+  const productionPotentialDardoPeriod = useMemo(
+    () =>
+      Array.isArray(periods)
+        ? periods.find((period) => period?.id === PRODUCTION_POTENTIAL_DARDO_PERIOD_ID) ?? null
+        : null,
+    [periods],
+  );
+
+  const handlePostPruningShapeClick = useCallback(() => {
+    if (!productionPotentialDardoPeriod) return;
+    onFertilizationClick?.(productionPotentialDardoPeriod);
+  }, [onFertilizationClick, productionPotentialDardoPeriod]);
 
   const normalizedSelectedCuartel = normalizeText(selectedCuartel);
   const registeredProductionForSelectedCuartel = normalizedSelectedCuartel
@@ -135,7 +151,8 @@ const PeriodLayer = ({
     () =>
       periodsWithPruningGeometry.filter(
         (period) =>
-          period?.panelType !== PERIOD_PANEL_TYPES.PRUNING_DECISION ||
+          (period?.panelType !== PERIOD_PANEL_TYPES.PRUNING_DECISION &&
+            period?.panelType !== PERIOD_PANEL_TYPES.RALEO_DECISION) ||
           hasDefinedProductionPotentialForSelectedCuartel,
       ),
     [hasDefinedProductionPotentialForSelectedCuartel, periodsWithPruningGeometry],
@@ -158,19 +175,29 @@ const PeriodLayer = ({
       <ProduccionPostPodaObjetivo
         periods={periods}
         timelineEvents={timelineEvents}
+        viewStartMs={viewStartMs}
+        viewEndMs={viewEndMs}
+        viewSpanMs={viewSpanMs}
         selectedCuartel={selectedCuartel}
         registeredProductionByCuartel={productionRegisterByCuartel}
         registeredPruningByCuartel={registeredPruningByCuartel}
         showLabels={showProductionPotentialTitle}
         onMetricsChange={handlePostPruningObjectiveMetricsChange}
+        onClick={handlePostPruningShapeClick}
+        onPointerDown={onRequestForeground}
       />
       <ProduccionPosibleConteoPostPoda
         periods={periods}
         timelineEvents={timelineEvents}
+        viewStartMs={viewStartMs}
+        viewEndMs={viewEndMs}
+        viewSpanMs={viewSpanMs}
         selectedCuartel={selectedCuartel}
         registeredProductionByCuartel={productionRegisterByCuartel}
         registeredPruningByCuartel={registeredPruningByCuartel}
         showLabels={showProductionPotentialTitle}
+        onClick={handlePostPruningShapeClick}
+        onPointerDown={onRequestForeground}
       />
 
       {visiblePeriods.map((period) => (

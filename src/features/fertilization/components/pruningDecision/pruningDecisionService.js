@@ -179,6 +179,7 @@ export const buildHistoricalRows = ({ selectedCuartel, selectedYears = [] }) => 
     const dardosEliminar = Number.isFinite(preDardos) && Number.isFinite(postDardos)
       ? Math.max(0, preDardos - postDardos)
       : null;
+    const dardosDejarPorArbol = Number.isFinite(postDardos) ? round(postDardos, 2) : null;
 
     rows.push({
       year,
@@ -188,6 +189,7 @@ export const buildHistoricalRows = ({ selectedCuartel, selectedYears = [] }) => 
       produccionObjetivo,
       produccionReal: round(produccionReal, 2),
       dardosEliminar: round(dardosEliminar, 2),
+      dardosDejarPorArbol,
     });
   }
 
@@ -227,9 +229,11 @@ export const buildDraftDardosEliminar = ({ preRow, budRow, registeredRow, produc
 
   const dardosMeta = frutosObjetivoPlanta / frutosPorDardo;
   const dardosEliminar = dardosPlanta - dardosMeta;
+  const dardosDejarPorArbol = Math.max(0, dardosMeta);
 
   return {
     dardosEliminar: round(dardosEliminar, 2),
+    dardosDejarPorArbol: round(dardosDejarPorArbol, 2),
   };
 };
 

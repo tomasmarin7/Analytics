@@ -46,6 +46,18 @@ export const createDefaultPeriods = (year) => [
     variant: "pruning-decision",
     panelType: PERIOD_PANEL_TYPES.PRUNING_DECISION,
   },
+  {
+    id: "periodo-raleo",
+    label: "Raleo",
+    startMs: Date.UTC(year, 9, 25),
+    endMs: Date.UTC(year, 10, 8),
+    raisedStartMs: Date.UTC(year, 9, 25),
+    raisedEndMs: Date.UTC(year, 10, 8),
+    focusStartMs: Date.UTC(year, 9, 25),
+    focusEndMs: Date.UTC(year, 10, 8),
+    variant: "raleo-decision",
+    panelType: PERIOD_PANEL_TYPES.RALEO_DECISION,
+  },
 ];
 
 export const getFallbackFocusRange = (year) => ({
