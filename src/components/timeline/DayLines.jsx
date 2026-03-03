@@ -68,6 +68,7 @@ const DayLines = ({
   currentDate,
   onRegisterDormancyBreakers,
   registeredDormancyBreakers,
+  registeredPruning,
 }) => {
   const linesRef = useRef(null);
   const [containerWidth, setContainerWidth] = useState(0);
@@ -226,6 +227,7 @@ const DayLines = ({
           showPorcionesFriosPanel={isPorcionesFriosPanelOpen}
           porcionesFriosSummary={porcionesFriosSummary}
           onRegisterDormancyBreakers={onRegisterDormancyBreakers}
+          registeredPruning={registeredPruning}
         />
       </EventActivationOverlay>
 

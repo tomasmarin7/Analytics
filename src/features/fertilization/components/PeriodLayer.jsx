@@ -3,11 +3,11 @@ import { PERIODS_ARIA_LABEL } from "../../../components/timeline/constants";
 import { POST_PRUNING_COUNT_EVENT_ID } from "../../timelineEvents";
 import { PERIOD_PANEL_TYPES } from "../config/panelTypes";
 import FertilizationButton from "./FertilizationButton";
+import ProduccionPosibleConteoPostPoda from "./produccionPosibleConteoPostPoda";
 import ProduccionPostPodaObjetivo from "./produccionPostPodaObjetivo";
 import ProductionHistoricalBridge from "./productionBridge/ProductionHistoricalBridge";
 
 const PRODUCTION_POTENTIAL_REGISTER_STORAGE_KEY = "productionPotentialRegisterByCuartel";
-const PRUNING_REGISTER_STORAGE_KEY = "pruningRegisterByCuartel";
 const PRODUCTION_POTENTIAL_DARDO_PERIOD_ID = "periodo-produccion-posible-variedad-dardo";
 const PRODUCTION_POTENTIAL_CURRENT_HEIGHT_PX = 425;
 const PRUNING_LINE_FALLBACK_RATIO = 0.8;
@@ -28,9 +28,10 @@ const PeriodLayer = ({
   showProductionPotentialTitle = true,
   showProductionPotentialValue = true,
   showPruningTitle = true,
+  registeredPruningByCuartel = {},
+  onRegisterPruning,
 }) => {
   const [productionRegisterByCuartel, setProductionRegisterByCuartel] = useState({});
-  const [pruningRegisterByCuartel, setPruningRegisterByCuartel] = useState({});
   const [postPruningObjectiveMetrics, setPostPruningObjectiveMetrics] = useState(null);
 
   useEffect(() => {
@@ -51,21 +52,6 @@ const PeriodLayer = ({
   useEffect(() => {
     if (typeof window === "undefined") return;
     try {
-      const raw = window.localStorage.getItem(PRUNING_REGISTER_STORAGE_KEY);
-      if (!raw) return;
-
-      const parsed = JSON.parse(raw);
-      if (parsed && typeof parsed === "object") {
-        setPruningRegisterByCuartel(parsed);
-      }
-    } catch {
-      setPruningRegisterByCuartel({});
-    }
-  }, []);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    try {
       window.localStorage.setItem(
         PRODUCTION_POTENTIAL_REGISTER_STORAGE_KEY,
         JSON.stringify(productionRegisterByCuartel),
@@ -74,15 +60,6 @@ const PeriodLayer = ({
       // noop: localStorage can fail in restricted contexts
     }
   }, [productionRegisterByCuartel]);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    try {
-      window.localStorage.setItem(PRUNING_REGISTER_STORAGE_KEY, JSON.stringify(pruningRegisterByCuartel));
-    } catch {
-      // noop
-    }
-  }, [pruningRegisterByCuartel]);
 
   const handleProductionRegister = useCallback((payload) => {
     const normalizedCuartel = normalizeText(payload?.cuartel);
@@ -98,19 +75,12 @@ const PeriodLayer = ({
     setPostPruningObjectiveMetrics(metrics);
   }, []);
 
-  const handlePruningRegister = useCallback((payload) => {
-    const normalizedCuartel = normalizeText(payload?.cuartel);
-    if (!normalizedCuartel) return;
-
-    setPruningRegisterByCuartel((current) => ({
-      ...current,
-      [normalizedCuartel]: payload,
-    }));
-  }, []);
-
   const normalizedSelectedCuartel = normalizeText(selectedCuartel);
   const registeredProductionForSelectedCuartel = normalizedSelectedCuartel
     ? productionRegisterByCuartel[normalizedSelectedCuartel]
+    : null;
+  const registeredPruningForSelectedCuartel = normalizedSelectedCuartel
+    ? registeredPruningByCuartel[normalizedSelectedCuartel]
     : null;
   const hasDefinedProductionPotentialForSelectedCuartel =
     Number.isFinite(Number(registeredProductionForSelectedCuartel?.visual?.totalKgHa)) ||
@@ -118,6 +88,9 @@ const PeriodLayer = ({
       registeredProductionForSelectedCuartel.visual.segments.length > 0) ||
     (Array.isArray(registeredProductionForSelectedCuartel?.rows) &&
       registeredProductionForSelectedCuartel.rows.length > 0);
+  const hasGeneratedPostPruningForSelectedCuartel =
+    Array.isArray(registeredPruningForSelectedCuartel?.generatedPostPruningRows) &&
+    registeredPruningForSelectedCuartel.generatedPostPruningRows.length > 0;
 
   const periodsWithPruningGeometry = useMemo(() => {
     if (!Array.isArray(periods)) return [];
@@ -170,23 +143,34 @@ const PeriodLayer = ({
 
   return (
     <div className="lower-dots-bridge__periods" style={{ zIndex }} aria-label={PERIODS_ARIA_LABEL}>
-      <ProductionHistoricalBridge
-        periods={periods}
-        timelineEvents={timelineEvents}
-        selectedCuartel={selectedCuartel}
-        selectedYears={selectedYears}
-        currentDate={currentDate}
-        registeredProductionByCuartel={productionRegisterByCuartel}
-        showProductionPotentialTitle={showProductionPotentialTitle}
-        showProductionPotentialValue={showProductionPotentialValue}
-      />
+      {!hasGeneratedPostPruningForSelectedCuartel ? (
+        <ProductionHistoricalBridge
+          periods={periods}
+          timelineEvents={timelineEvents}
+          selectedCuartel={selectedCuartel}
+          selectedYears={selectedYears}
+          currentDate={currentDate}
+          registeredProductionByCuartel={productionRegisterByCuartel}
+          showProductionPotentialTitle={showProductionPotentialTitle}
+          showProductionPotentialValue={showProductionPotentialValue}
+        />
+      ) : null}
       <ProduccionPostPodaObjetivo
         periods={periods}
         timelineEvents={timelineEvents}
         selectedCuartel={selectedCuartel}
         registeredProductionByCuartel={productionRegisterByCuartel}
-        registeredPruningByCuartel={pruningRegisterByCuartel}
+        registeredPruningByCuartel={registeredPruningByCuartel}
+        showLabels={showProductionPotentialTitle}
         onMetricsChange={handlePostPruningObjectiveMetricsChange}
+      />
+      <ProduccionPosibleConteoPostPoda
+        periods={periods}
+        timelineEvents={timelineEvents}
+        selectedCuartel={selectedCuartel}
+        registeredProductionByCuartel={productionRegisterByCuartel}
+        registeredPruningByCuartel={registeredPruningByCuartel}
+        showLabels={showProductionPotentialTitle}
       />
 
       {visiblePeriods.map((period) => (
@@ -201,9 +185,9 @@ const PeriodLayer = ({
           currentDate={currentDate}
           onRequestForeground={onRequestForeground}
           onRegisterProduction={handleProductionRegister}
-          onRegisterPruning={handlePruningRegister}
+          onRegisterPruning={onRegisterPruning}
           registeredProductionByCuartel={productionRegisterByCuartel}
-          registeredPruningByCuartel={pruningRegisterByCuartel}
+          registeredPruningByCuartel={registeredPruningByCuartel}
           showFertilizationTitle={showFertilizationTitle}
           showProductionPotentialTitle={showProductionPotentialTitle}
           showProductionPotentialValue={showProductionPotentialValue}

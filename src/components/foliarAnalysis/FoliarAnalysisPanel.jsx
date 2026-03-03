@@ -31,20 +31,12 @@ const FOLIAR_MAPPED_ROWS = foliarAnalysisRows.map(mapFoliarRow);
 const BUD_MAPPED_ROWS = budAnalysisRows.map(mapBudRow);
 const POST_PRUNING_MAPPED_ROWS = postPruningCountRows.map(mapPrePruningCountRow);
 const PRE_PRUNING_MAPPED_ROWS = prePruningCountRows.map(mapPrePruningCountRow);
-
 const EVENT_DEFINITION_BY_ID = {
   [FOLIAR_ANALYSIS_EVENT_ID]: FOLIAR_ANALYSIS_EVENT,
   [BUD_ANALYSIS_EVENT_ID]: BUD_ANALYSIS_EVENT,
   [PRE_PRUNING_COUNT_EVENT_ID]: PRE_PRUNING_COUNT_EVENT,
   [POST_PRUNING_COUNT_EVENT_ID]: POST_PRUNING_COUNT_EVENT,
 };
-
-const YEAR_SELECTOR_SOURCE_DATASETS = [
-  { eventId: FOLIAR_ANALYSIS_EVENT_ID, mappedRows: FOLIAR_MAPPED_ROWS },
-  { eventId: BUD_ANALYSIS_EVENT_ID, mappedRows: BUD_MAPPED_ROWS },
-  { eventId: PRE_PRUNING_COUNT_EVENT_ID, mappedRows: PRE_PRUNING_MAPPED_ROWS },
-  { eventId: POST_PRUNING_COUNT_EVENT_ID, mappedRows: POST_PRUNING_MAPPED_ROWS },
-];
 
 const mapYearSelectorRow = (row) => row;
 
@@ -129,6 +121,17 @@ const filterRowsByTimelineMoment = ({ rows, eventId, currentDate }) => {
   });
 };
 
+const buildCountRowKey = (row) =>
+  `${row.year ?? ""}::${String(row.cuartel ?? "").trim().toUpperCase()}::${String(row.variedad ?? "").trim().toUpperCase()}`;
+
+const mergeMappedPostPruningRows = ({ baseRows = [], generatedRows = [] }) => {
+  const merged = new Map(baseRows.map((row) => [buildCountRowKey(row), row]));
+  generatedRows.forEach((row) => {
+    merged.set(buildCountRowKey(row), row);
+  });
+  return [...merged.values()];
+};
+
 const FoliarAnalysisPanel = ({
   activeEvents = [],
   selectedCuartel,
@@ -138,8 +141,33 @@ const FoliarAnalysisPanel = ({
   showPorcionesFriosPanel = false,
   porcionesFriosSummary = null,
   onRegisterDormancyBreakers,
+  registeredPruning,
 }) => {
   const activeEventIds = useMemo(() => new Set(activeEvents.map((event) => event.id)), [activeEvents]);
+  const generatedPostPruningRows = useMemo(
+    () =>
+      Array.isArray(registeredPruning?.generatedPostPruningRows)
+        ? registeredPruning.generatedPostPruningRows
+        : [],
+    [registeredPruning],
+  );
+  const mergedPostPruningMappedRows = useMemo(
+    () =>
+      mergeMappedPostPruningRows({
+        baseRows: POST_PRUNING_MAPPED_ROWS,
+        generatedRows: generatedPostPruningRows,
+      }),
+    [generatedPostPruningRows],
+  );
+  const yearSelectorSourceDatasets = useMemo(
+    () => [
+      { eventId: FOLIAR_ANALYSIS_EVENT_ID, mappedRows: FOLIAR_MAPPED_ROWS },
+      { eventId: BUD_ANALYSIS_EVENT_ID, mappedRows: BUD_MAPPED_ROWS },
+      { eventId: PRE_PRUNING_COUNT_EVENT_ID, mappedRows: PRE_PRUNING_MAPPED_ROWS },
+      { eventId: POST_PRUNING_COUNT_EVENT_ID, mappedRows: mergedPostPruningMappedRows },
+    ],
+    [mergedPostPruningMappedRows],
+  );
 
   const activeDatasets = useMemo(
     () =>
@@ -187,7 +215,7 @@ const FoliarAnalysisPanel = ({
               eventId: POST_PRUNING_COUNT_EVENT_ID,
               label: "Post poda",
               columns: PRE_PRUNING_COUNT_COLUMNS,
-              mappedRows: POST_PRUNING_MAPPED_ROWS,
+              mappedRows: mergedPostPruningMappedRows,
               scoreFields: PRE_PRUNING_COUNT_SCORE_FIELDS,
               keepAllRowsPerYear: true,
               sortRows: sortPrePruningCountRows,
@@ -195,7 +223,7 @@ const FoliarAnalysisPanel = ({
             }
           : null,
       ].filter(Boolean),
-    [activeEventIds],
+    [activeEventIds, mergedPostPruningMappedRows],
   );
 
   const hasDataTable = activeDatasets.length > 0;
@@ -207,7 +235,7 @@ const FoliarAnalysisPanel = ({
 
   const yearSelectorRowsMapped = useMemo(
     () =>
-      YEAR_SELECTOR_SOURCE_DATASETS.flatMap((dataset) =>
+      yearSelectorSourceDatasets.flatMap((dataset) =>
         filterRowsByTimelineMoment({
           rows: dataset.mappedRows,
           eventId: dataset.eventId,
@@ -217,7 +245,7 @@ const FoliarAnalysisPanel = ({
           cuartel: row.cuartel,
         })),
       ),
-    [currentDate],
+    [currentDate, yearSelectorSourceDatasets],
   );
 
   const rowsByDataset = useMemo(

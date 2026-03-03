@@ -1,0 +1,241 @@
+import { useMemo } from "react";
+import budAnalysisRows from "../../../../data/budAnalysisRows.json";
+import { mapBudRow } from "../../../../components/foliarAnalysis/budAnalysisConfig";
+import {
+  buildVarietyColorPair,
+  normalizeRegisteredProductionVisual,
+  ProductionPotentialShapePreview,
+} from "../../../productionPotential";
+import { POST_PRUNING_COUNT_EVENT_ID } from "../../../timelineEvents";
+import "./produccionPosibleConteoPostPoda.css";
+
+const PRODUCTION_POTENTIAL_DARDO_PERIOD_ID = "periodo-produccion-posible-variedad-dardo";
+const PRODUCTION_POTENTIAL_DARDO_BLOCK_HEIGHT_PX = 425;
+const BUD_MAPPED_ROWS = budAnalysisRows.map(mapBudRow);
+
+const normalizeText = (value) => String(value ?? "").trim().toUpperCase();
+
+const toNumber = (value) => {
+  if (value === null || value === undefined || value === "") return null;
+  if (typeof value === "number") return Number.isFinite(value) ? value : null;
+
+  const normalized = String(value).trim().replace(",", ".");
+  if (!normalized) return null;
+
+  const parsed = Number(normalized);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
+const toPercent = (value) => {
+  if (value === null || value === undefined || value === "") return null;
+  if (typeof value === "number") return Number.isFinite(value) ? value : null;
+
+  const normalized = String(value).trim().replace("%", "").replace(",", ".");
+  if (!normalized) return null;
+
+  const parsed = Number(normalized);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
+const round = (value, decimals = 2) => {
+  if (!Number.isFinite(value)) return null;
+  const factor = 10 ** decimals;
+  return Math.round(value * factor) / factor;
+};
+
+const calculateProductionKgHa = ({
+  dardosPlanta,
+  floresDardo,
+  danoPercent,
+  cuajaPercent,
+  plantasHaProductivas,
+  calibreGr,
+}) => {
+  const parsedDardosPlanta = toNumber(dardosPlanta);
+  const parsedFloresDardo = toNumber(floresDardo);
+  const parsedDanoPercent = toPercent(danoPercent);
+  const parsedCuajaPercent = toPercent(cuajaPercent);
+  const parsedPlantasHaProductivas = toNumber(plantasHaProductivas);
+  const parsedCalibreGr = toNumber(calibreGr);
+
+  if (
+    parsedDardosPlanta === null ||
+    parsedFloresDardo === null ||
+    parsedDanoPercent === null ||
+    parsedCuajaPercent === null ||
+    parsedPlantasHaProductivas === null ||
+    parsedCalibreGr === null
+  ) {
+    return null;
+  }
+
+  const frutosPlanta =
+    parsedDardosPlanta * parsedFloresDardo * (1 - parsedDanoPercent / 100) * (parsedCuajaPercent / 100);
+
+  return round((frutosPlanta * parsedPlantasHaProductivas * parsedCalibreGr) / 1000, 2);
+};
+
+const resolveGeometry = ({ periods = [], timelineEvents = [] }) => {
+  const dardoPeriod = periods.find((period) => period.id === PRODUCTION_POTENTIAL_DARDO_PERIOD_ID);
+  const postPruningEvent = timelineEvents.find((event) => event.id === POST_PRUNING_COUNT_EVENT_ID);
+  if (!dardoPeriod || !postPruningEvent) return null;
+
+  const dardoRight = Number(dardoPeriod.left) + Number(dardoPeriod.width);
+  const postPruningLeft = Number(postPruningEvent.leftPercent);
+  if (!Number.isFinite(dardoRight) || !Number.isFinite(postPruningLeft) || postPruningLeft <= dardoRight) {
+    return null;
+  }
+
+  const start = Math.max(0, Math.min(100, postPruningLeft));
+  const width = Math.min(postPruningLeft - dardoRight, 100 - start);
+  if (width <= 0.05) return null;
+
+  return { left: start, width };
+};
+
+const buildVisual = ({
+  generatedPostPruningRows = [],
+  registeredProduction,
+  selectedCuartel,
+}) => {
+  const normalizedSelectedCuartel = normalizeText(selectedCuartel);
+  if (!normalizedSelectedCuartel || !Array.isArray(generatedPostPruningRows) || generatedPostPruningRows.length === 0) {
+    return null;
+  }
+
+  const registeredRows = Array.isArray(registeredProduction?.rows) ? registeredProduction.rows : [];
+  const registeredByVariety = new Map(
+    registeredRows.map((row) => [normalizeText(row?.variedad), row]),
+  );
+  const budByVariety = new Map(
+    BUD_MAPPED_ROWS
+      .filter(
+        (row) => normalizeText(row.cuartel) === normalizedSelectedCuartel,
+      )
+      .map((row) => [`${row.year}::${normalizeText(row.variedad)}`, row]),
+  );
+
+  const varieties = generatedPostPruningRows.reduce((accumulator, row) => {
+    if (normalizeText(row?.cuartel) !== normalizedSelectedCuartel) return accumulator;
+
+    const varietyKey = normalizeText(row.variedad);
+    const registeredRow = registeredByVariety.get(varietyKey);
+    const budRow = budByVariety.get(`${row.year}::${varietyKey}`);
+    const kgHa = calculateProductionKgHa({
+      dardosPlanta: row.dardosPlanta,
+      floresDardo: budRow?.floresDardo,
+      danoPercent: budRow?.dano,
+      cuajaPercent: registeredRow?.cuajaEsperada,
+      plantasHaProductivas: row.plantasHaProductivas,
+      calibreGr: registeredRow?.calibreEsperado,
+    });
+    if (!Number.isFinite(kgHa) || kgHa <= 0) return accumulator;
+
+    const variedad = String(row.variedad ?? "").trim();
+    const current = accumulator.get(variedad);
+    accumulator.set(variedad, {
+      variedad,
+      totalKgHa: round((current?.totalKgHa ?? 0) + kgHa, 2),
+      colors: current?.colors ?? buildVarietyColorPair(variedad),
+    });
+    return accumulator;
+  }, new Map());
+
+  const varietyList = Array.from(varieties.values());
+  const totalKgHa = round(
+    varietyList.reduce((accumulator, current) => accumulator + (toNumber(current.totalKgHa) ?? 0), 0),
+    2,
+  );
+  if (!Number.isFinite(totalKgHa) || totalKgHa <= 0) return null;
+
+  return {
+    totalKgHa,
+    segments: varietyList.map((variety) => ({
+      variedad: variety.variedad,
+      kgHa: variety.totalKgHa,
+      sharePercent: totalKgHa > 0 ? (variety.totalKgHa / totalKgHa) * 100 : 0,
+      color: variety.colors.strong,
+      textColor: variety.colors.text,
+    })),
+  };
+};
+
+const ProduccionPosibleConteoPostPoda = ({
+  periods,
+  timelineEvents,
+  selectedCuartel,
+  registeredProductionByCuartel = {},
+  registeredPruningByCuartel = {},
+  showLabels = true,
+}) => {
+  const geometry = useMemo(
+    () => resolveGeometry({ periods, timelineEvents }),
+    [periods, timelineEvents],
+  );
+
+  const normalizedSelectedCuartel = normalizeText(selectedCuartel);
+  const registeredProduction = normalizedSelectedCuartel
+    ? registeredProductionByCuartel[normalizedSelectedCuartel]
+    : null;
+  const normalizedProductionVisual = useMemo(
+    () => normalizeRegisteredProductionVisual(registeredProduction),
+    [registeredProduction],
+  );
+  const generatedPostPruningRows = Array.isArray(
+    normalizedSelectedCuartel
+      ? registeredPruningByCuartel[normalizedSelectedCuartel]?.generatedPostPruningRows
+      : null,
+  )
+    ? registeredPruningByCuartel[normalizedSelectedCuartel].generatedPostPruningRows
+    : [];
+
+  const visual = useMemo(
+    () =>
+      buildVisual({
+        generatedPostPruningRows,
+        registeredProduction,
+        selectedCuartel,
+      }),
+    [generatedPostPruningRows, registeredProduction, selectedCuartel],
+  );
+
+  const heightPx = useMemo(() => {
+    const referenceTotalKgHa = Number(normalizedProductionVisual?.totalKgHa);
+    const totalKgHa = Number(visual?.totalKgHa);
+    if (
+      !Number.isFinite(referenceTotalKgHa) ||
+      referenceTotalKgHa <= 0 ||
+      !Number.isFinite(totalKgHa) ||
+      totalKgHa <= 0
+    ) {
+      return 0;
+    }
+
+    return (totalKgHa / referenceTotalKgHa) * PRODUCTION_POTENTIAL_DARDO_BLOCK_HEIGHT_PX;
+  }, [normalizedProductionVisual, visual]);
+
+  if (!geometry || !visual?.segments?.length || !(heightPx > 0)) {
+    return null;
+  }
+
+  return (
+    <span
+      className="lower-dots-bridge__produccion-posible-conteo-post-poda"
+      style={{
+        left: `${geometry.left}%`,
+        width: `${geometry.width}%`,
+        height: `${heightPx}px`,
+      }}
+      aria-hidden="true"
+    >
+      <ProductionPotentialShapePreview
+        visual={visual}
+        showLabels={showLabels}
+        showBaseline={false}
+        className="lower-dots-bridge__produccion-posible-conteo-post-poda-shape"
+      />
+    </span>
+  );
+};
+
+export default ProduccionPosibleConteoPostPoda;

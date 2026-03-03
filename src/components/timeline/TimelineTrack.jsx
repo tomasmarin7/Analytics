@@ -3,10 +3,12 @@ import DayLines from "./DayLines";
 import MonthLabels from "./MonthLabels";
 import TodayMarker from "./TodayMarker";
 import { PeriodLayer } from "../../features/fertilization";
+import { PERIOD_PANEL_TYPES } from "../../features/fertilization/config/panelTypes";
 import { DAY_MS } from "./constants";
 import "./Timeline.css";
 
 const DORMANCY_BREAKERS_REGISTER_STORAGE_KEY = "dormancyBreakersRegisterByCuartel";
+const PRUNING_REGISTER_STORAGE_KEY = "pruningRegisterByCuartel";
 const normalizeText = (value) => String(value ?? "").trim().toUpperCase();
 
 const TimelineTrack = ({
@@ -41,6 +43,7 @@ const TimelineTrack = ({
   const [isPorcionesFriosPanelOpen, setIsPorcionesFriosPanelOpen] = useState(false);
   const [isPorcionesFriosZoomPending, setIsPorcionesFriosZoomPending] = useState(false);
   const [registeredDormancyBreakersByCuartel, setRegisteredDormancyBreakersByCuartel] = useState({});
+  const [registeredPruningByCuartel, setRegisteredPruningByCuartel] = useState({});
   const referenceYear = new Date(currentDate ?? Date.now()).getFullYear();
   const porcionesFriosZoomStartMs = useMemo(() => Date.UTC(referenceYear, 4, 1), [referenceYear]);
   const porcionesFriosZoomEndMs = useMemo(() => Date.UTC(referenceYear, 8, 1), [referenceYear]);
@@ -49,9 +52,17 @@ const TimelineTrack = ({
   const isPorcionesFriosZoomed =
     Math.abs(viewStartMs - porcionesFriosZoomStartMs) <= DAY_MS &&
     Math.abs(viewEndMs - porcionesFriosZoomEndMs) <= DAY_MS;
-  const periodsZIndex = foregroundLayer === "fertilization" ? 4 : 2;
+  const raisedPeriodPanelType = useMemo(
+    () => visiblePeriods.find((period) => period?.id === raisedPeriodId)?.panelType ?? null,
+    [raisedPeriodId, visiblePeriods],
+  );
+  const shouldRaiseFertilizationLayer =
+    foregroundLayer === "fertilization" &&
+    raisedPeriodId &&
+    raisedPeriodPanelType !== PERIOD_PANEL_TYPES.PRODUCTION_POTENTIAL_VARIETY_DARDO;
+  const periodsZIndex = shouldRaiseFertilizationLayer ? 4 : 2;
   const dataRecordsZIndex = foregroundLayer === "data-records" ? 4 : 3;
-  const porcionesFriosZIndex = foregroundLayer === "porciones-frios" ? 5 : 1;
+  const porcionesFriosZIndex = 3;
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -71,6 +82,21 @@ const TimelineTrack = ({
   useEffect(() => {
     if (typeof window === "undefined") return;
     try {
+      const raw = window.localStorage.getItem(PRUNING_REGISTER_STORAGE_KEY);
+      if (!raw) return;
+
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === "object") {
+        setRegisteredPruningByCuartel(parsed);
+      }
+    } catch {
+      setRegisteredPruningByCuartel({});
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
       window.localStorage.setItem(
         DORMANCY_BREAKERS_REGISTER_STORAGE_KEY,
         JSON.stringify(registeredDormancyBreakersByCuartel),
@@ -79,6 +105,15 @@ const TimelineTrack = ({
       // noop
     }
   }, [registeredDormancyBreakersByCuartel]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem(PRUNING_REGISTER_STORAGE_KEY, JSON.stringify(registeredPruningByCuartel));
+    } catch {
+      // noop
+    }
+  }, [registeredPruningByCuartel]);
 
   useEffect(() => {
     if (isPorcionesFriosZoomPending && isPorcionesFriosZoomed) {
@@ -125,6 +160,19 @@ const TimelineTrack = ({
       },
     }));
   };
+
+  const handleRegisterPruning = (payload) => {
+    const normalizedCuartel = normalizeText(payload?.cuartel ?? selectedCuartel);
+    if (!normalizedCuartel) return;
+
+    setRegisteredPruningByCuartel((current) => ({
+      ...current,
+      [normalizedCuartel]: {
+        ...payload,
+        cuartel: normalizedCuartel,
+      },
+    }));
+  };
   return (
     <div className="lower-dots-bridge__inner">
       <span className="lower-dots-bridge__dot" aria-hidden="true" />
@@ -148,6 +196,8 @@ const TimelineTrack = ({
           showProductionPotentialTitle={showProductionPotentialTitle}
           showProductionPotentialValue={showProductionPotentialValue}
           showPruningTitle={showPruningTitle}
+          registeredPruningByCuartel={registeredPruningByCuartel}
+          onRegisterPruning={handleRegisterPruning}
         />
         <DayLines
           dayLines={dayLines}
@@ -182,6 +232,7 @@ const TimelineTrack = ({
           registeredDormancyBreakers={
             registeredDormancyBreakersByCuartel[normalizeText(selectedCuartel)]
           }
+          registeredPruning={registeredPruningByCuartel[normalizeText(selectedCuartel)]}
         />
         <MonthLabels markers={monthMarkers} />
         {isTodayVisible ? (

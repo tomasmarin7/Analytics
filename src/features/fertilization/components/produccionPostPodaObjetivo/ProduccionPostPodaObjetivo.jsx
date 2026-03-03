@@ -88,6 +88,7 @@ const ProduccionPostPodaObjetivo = ({
   selectedCuartel,
   registeredProductionByCuartel = {},
   registeredPruningByCuartel = {},
+  showLabels = true,
   onMetricsChange,
 }) => {
   const geometry = useMemo(
@@ -155,7 +156,7 @@ const ProduccionPostPodaObjetivo = ({
     >
       <ProductionPotentialShapePreview
         visual={registeredPruningVisual}
-        showLabels
+        showLabels={showLabels}
         showBaseline={false}
         className="lower-dots-bridge__produccion-post-poda-objetivo-shape"
       />

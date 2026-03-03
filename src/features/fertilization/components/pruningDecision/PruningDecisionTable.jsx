@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   buildDraftDardosEliminar,
   buildDraftRows,
+  buildGeneratedPostPruningRows,
   buildHistoricalRows,
   DRAFT_YEAR,
   EMPTY_DRAFT_VALUES,
@@ -180,17 +181,23 @@ const PruningDecisionTable = ({
   const handleRegister = () => {
     if (!normalizedSelectedCuartel) return;
 
+    const registeredRows = draftRows.map((row) => {
+      const varietyDraft = draftByVariety[normalizeText(row.variedad)] ?? EMPTY_DRAFT_VALUES;
+      return {
+        year: DRAFT_YEAR,
+        variedad: row.variedad,
+        produccionObjetivo: toNumber(varietyDraft.produccionObjetivo),
+      };
+    });
+
     onRegisterPruning?.({
       cuartel: normalizedSelectedCuartel,
       year: DRAFT_YEAR,
       generatedAtIso: new Date().toISOString(),
-      rows: draftRows.map((row) => {
-        const varietyDraft = draftByVariety[normalizeText(row.variedad)] ?? EMPTY_DRAFT_VALUES;
-        return {
-          year: DRAFT_YEAR,
-          variedad: row.variedad,
-          produccionObjetivo: toNumber(varietyDraft.produccionObjetivo),
-        };
+      rows: registeredRows,
+      generatedPostPruningRows: buildGeneratedPostPruningRows({
+        draftRows,
+        draftByVariety,
       }),
     });
   };

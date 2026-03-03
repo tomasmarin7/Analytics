@@ -47,6 +47,20 @@ const round = (value, decimals = 2) => {
   return Math.round(value * factor) / factor;
 };
 
+const hashText = (value) => {
+  const text = String(value ?? "").trim().toUpperCase();
+  let hash = 0;
+  for (let index = 0; index < text.length; index += 1) {
+    hash = (hash * 31 + text.charCodeAt(index)) >>> 0;
+  }
+  return hash;
+};
+
+const buildDeterministicSpread = (value, min, max) => {
+  const normalized = (hashText(value) % 1000) / 1000;
+  return min + normalized * (max - min);
+};
+
 const pickSeriesValueForYear = (series, year) => {
   if (!Array.isArray(series) || series.length === 0 || !Number.isFinite(year)) return null;
   const offset = year - SERIES_BASE_YEAR;
@@ -218,6 +232,70 @@ export const buildDraftDardosEliminar = ({ preRow, budRow, registeredRow, produc
     dardosEliminar: round(dardosEliminar, 2),
   };
 };
+
+export const buildGeneratedPostPruningRows = ({ draftRows = [], draftByVariety = {} }) =>
+  draftRows
+    .map((row) => {
+      const normalizedVariedad = normalizeText(row.variedad);
+      const varietyDraft = draftByVariety[normalizedVariedad] ?? EMPTY_DRAFT_VALUES;
+      const pruningMetrics = buildDraftDardosEliminar({
+        preRow: row.preRow,
+        budRow: row.budRow,
+        registeredRow: row.registeredRow,
+        productionObjectiveKgHa: varietyDraft.produccionObjetivo,
+      });
+
+      const preDardosPlanta = toNumber(row.preRow?.dardosPlanta);
+      const dardosEliminar = toNumber(pruningMetrics?.dardosEliminar);
+      if (!Number.isFinite(preDardosPlanta) || !Number.isFinite(dardosEliminar) || preDardosPlanta <= 0) {
+        return null;
+      }
+
+      const targetRemainingDardos = Math.max(0, preDardosPlanta - dardosEliminar);
+      const variationSeed = `${row.preRow?.year}-${row.preRow?.cuartel}-${row.variedad}`;
+      const remainingFactor = buildDeterministicSpread(variationSeed, 0.96, 1.04);
+      const productivePlantsFactor = buildDeterministicSpread(`${variationSeed}-productive`, 0.986, 0.998);
+      const lateralFactor = buildDeterministicSpread(`${variationSeed}-lateral`, -0.018, 0.018);
+      const ramillasFactor = buildDeterministicSpread(`${variationSeed}-ramillas`, -0.04, 0.04);
+      const promRamillasFactor = buildDeterministicSpread(`${variationSeed}-prom-ramillas`, -0.04, 0.04);
+
+      const postDardosPlanta = Math.min(preDardosPlanta, Math.max(0, targetRemainingDardos * remainingFactor));
+      const dardosRatio = postDardosPlanta / preDardosPlanta;
+
+      const prePlantasHaProductivas = toNumber(row.preRow?.plantasHaProductivas);
+      const prePromDardosLateral = toNumber(row.preRow?.promDardosLateral);
+      const preRamillasPlanta = toNumber(row.preRow?.ramillasPlanta);
+      const prePromRamillasLateral = toNumber(row.preRow?.promRamillasLateral);
+
+      return {
+        year: Number(row.preRow?.year) || DRAFT_YEAR,
+        temp: Number(row.preRow?.year) || DRAFT_YEAR,
+        huerto: row.preRow?.huerto ?? "",
+        cuartel: row.preRow?.cuartel ?? "",
+        variedad: row.variedad,
+        superficieCuartelHa: toNumber(row.preRow?.superficieCuartelHa),
+        superficieVariedadHa: toNumber(row.preRow?.superficieVariedadHa),
+        plantasHa: toNumber(row.preRow?.plantasHa),
+        plantasHaProductivas: Number.isFinite(prePlantasHaProductivas)
+          ? round(prePlantasHaProductivas * productivePlantsFactor, 0)
+          : null,
+        dardosPlanta: round(postDardosPlanta, 2),
+        promDardosLateral: Number.isFinite(prePromDardosLateral)
+          ? round(prePromDardosLateral * Math.max(0.8, Math.min(1, 0.76 + dardosRatio * 0.16 + lateralFactor)), 1)
+          : null,
+        ramillasPlanta: Number.isFinite(preRamillasPlanta)
+          ? round(preRamillasPlanta * Math.max(0.34, Math.min(0.82, 0.3 + dardosRatio * 0.36 + ramillasFactor)), 0)
+          : null,
+        promRamillasLateral: Number.isFinite(prePromRamillasLateral)
+          ? round(
+              prePromRamillasLateral *
+                Math.max(0.44, Math.min(0.9, 0.42 + dardosRatio * 0.3 + promRamillasFactor)),
+              1,
+            )
+          : null,
+      };
+    })
+    .filter(Boolean);
 
 export const buildDraftRows = ({ selectedCuartel, registeredProductionForSelectedCuartel }) => {
   const normalizedSelectedCuartel = normalizeText(selectedCuartel);

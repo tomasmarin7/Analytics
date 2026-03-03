@@ -1,0 +1,13 @@
+.lower-dots-bridge__produccion-posible-conteo-post-poda {
+  position: absolute;
+  bottom: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.lower-dots-bridge__produccion-posible-conteo-post-poda-shape {
+  position: absolute;
+  inset: 0;
+}
+
