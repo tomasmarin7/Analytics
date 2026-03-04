@@ -294,9 +294,7 @@ const FertilizationButton = ({
 
         {isRaised ? (
           <div className="lower-dots-bridge__pruning-expanded" onPointerDown={onRequestForeground}>
-            {showPruningTitle ? (
-              <span className="lower-dots-bridge__pruning-expanded-title">{period.label}</span>
-            ) : null}
+            <span className="lower-dots-bridge__pruning-expanded-title">{period.label}</span>
             {isPanelVisible ? (
               <div className="lower-dots-bridge__pruning-panel" onPointerDown={onRequestForeground}>
                 {renderPanelContent()}

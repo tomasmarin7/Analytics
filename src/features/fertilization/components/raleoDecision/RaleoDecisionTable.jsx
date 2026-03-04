@@ -131,7 +131,7 @@ const RaleoDecisionTable = ({
   if (!hasRows) {
     return (
       <div className="pruning-decision-table__empty">
-        Registra Produccion Posible y Poda para calcular la tabla de raleo.
+        Registra Produccion Posible y el objetivo post poda para calcular la tabla de raleo.
       </div>
     );
   }

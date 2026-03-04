@@ -7,6 +7,7 @@ import {
   ProductionPotentialShapePreview,
 } from "../../../productionPotential";
 import { createDefaultPeriods } from "../../config/periods";
+import { getDraftPostPruningRowsForCuartel } from "../raleoDecision/raleoDecisionService";
 import "./produccionPosibleConteoPostPoda.css";
 
 const PRODUCTION_POTENTIAL_DARDO_PERIOD_ID = "periodo-produccion-posible-variedad-dardo";
@@ -121,12 +122,12 @@ const resolveGeometry = ({
 };
 
 const buildVisual = ({
-  generatedPostPruningRows = [],
+  draftPostPruningRows = [],
   registeredProduction,
   selectedCuartel,
 }) => {
   const normalizedSelectedCuartel = normalizeText(selectedCuartel);
-  if (!normalizedSelectedCuartel || !Array.isArray(generatedPostPruningRows) || generatedPostPruningRows.length === 0) {
+  if (!normalizedSelectedCuartel || !Array.isArray(draftPostPruningRows) || draftPostPruningRows.length === 0) {
     return null;
   }
 
@@ -142,7 +143,7 @@ const buildVisual = ({
       .map((row) => [`${row.year}::${normalizeText(row.variedad)}`, row]),
   );
 
-  const varieties = generatedPostPruningRows.reduce((accumulator, row) => {
+  const varieties = draftPostPruningRows.reduce((accumulator, row) => {
     if (normalizeText(row?.cuartel) !== normalizedSelectedCuartel) return accumulator;
 
     const varietyKey = normalizeText(row.variedad);
@@ -207,26 +208,23 @@ const ProduccionPosibleConteoPostPoda = ({
   const registeredProduction = normalizedSelectedCuartel
     ? registeredProductionByCuartel[normalizedSelectedCuartel]
     : null;
+  const draftPostPruningRows = useMemo(
+    () => getDraftPostPruningRowsForCuartel(selectedCuartel),
+    [selectedCuartel],
+  );
   const normalizedProductionVisual = useMemo(
     () => normalizeRegisteredProductionVisual(registeredProduction),
     [registeredProduction],
   );
-  const generatedPostPruningRows = Array.isArray(
-    normalizedSelectedCuartel
-      ? registeredPruningByCuartel[normalizedSelectedCuartel]?.generatedPostPruningRows
-      : null,
-  )
-    ? registeredPruningByCuartel[normalizedSelectedCuartel].generatedPostPruningRows
-    : [];
 
   const visual = useMemo(
     () =>
       buildVisual({
-        generatedPostPruningRows,
+        draftPostPruningRows,
         registeredProduction,
         selectedCuartel,
       }),
-    [generatedPostPruningRows, registeredProduction, selectedCuartel],
+    [draftPostPruningRows, registeredProduction, selectedCuartel],
   );
 
   const heightPx = useMemo(() => {

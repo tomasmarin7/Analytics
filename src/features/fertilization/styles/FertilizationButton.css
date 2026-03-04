@@ -355,9 +355,9 @@
 
 .lower-dots-bridge__pruning-expanded-title {
   position: absolute;
-  top: 8px;
+  top: 14px;
   left: 16px;
-  right: 18px;
+  right: 16px;
   margin: 0;
   z-index: 3;
   font-family: "Lufga", var(--font-brand);
@@ -374,10 +374,10 @@
 
 .lower-dots-bridge__pruning-panel {
   position: absolute;
-  left: 8px;
-  right: 8px;
-  top: 46px;
-  bottom: 8px;
+  left: 16px;
+  right: 16px;
+  top: 60px;
+  bottom: 16px;
   pointer-events: auto;
   z-index: 2;
   overflow: hidden;

@@ -5,7 +5,6 @@ import { mapBudRow } from "../../../../components/foliarAnalysis/budAnalysisConf
 import { mapPrePruningCountRow } from "../../../../components/foliarAnalysis/prePruningCountConfig";
 
 export const DRAFT_YEAR = 2026;
-export const OBJECTIVE_FACTOR = 0.93;
 
 const SERIES_BASE_YEAR = 2017;
 const BUD_MAPPED_ROWS = budAnalysisRows.map(mapBudRow);
@@ -117,10 +116,14 @@ const calculateThinningFruitPerTree = ({ fruitPerTree, objectiveFruitPerTree }) 
   return round(Math.max(0, parsedFruitPerTree - parsedObjectiveFruitPerTree), 2);
 };
 
-const addPercentagePoints = (value, delta) => {
-  const parsedValue = toNumber(value);
-  if (!Number.isFinite(parsedValue)) return null;
-  return round(parsedValue + delta, 2);
+export const getDraftPostPruningRowsForCuartel = (selectedCuartel) => {
+  const normalizedSelectedCuartel = normalizeText(selectedCuartel);
+  if (!normalizedSelectedCuartel) return [];
+
+  return POST_PRUNING_MAPPED_ROWS.filter(
+    (row) =>
+      normalizeText(row.cuartel) === normalizedSelectedCuartel && Number(row.year) === DRAFT_YEAR,
+  );
 };
 
 export const buildHistoricalRaleoRows = ({ selectedCuartel, selectedYears = [] }) => {
@@ -159,9 +162,21 @@ export const buildHistoricalRaleoRows = ({ selectedCuartel, selectedYears = [] }
       danoPercent: budRow.dano,
       cuajaPercent: cuajaReal,
     });
-    const frutosObjetivoPorArbol = Number.isFinite(frutosEstimadosPorArbol)
-      ? round(frutosEstimadosPorArbol * OBJECTIVE_FACTOR, 2)
+    const produccionObjetivo = Number.isFinite(frutosEstimadosPorArbol) && Number.isFinite(toNumber(postRow.plantasHaProductivas))
+      ? round(
+          (frutosEstimadosPorArbol *
+            toNumber(postRow.plantasHaProductivas) *
+            toNumber(pickSeriesValueForYear(profile?.calibreEstimado, year))) /
+            1000,
+          2,
+        )
       : null;
+    const frutosObjetivoPorArbol =
+      calculateObjectiveFruitPerTree({
+        productionObjectiveKgHa: produccionObjetivo,
+        plantasHaProductivas: postRow.plantasHaProductivas,
+        calibreGr: pickSeriesValueForYear(profile?.calibreEstimado, year),
+      }) ?? frutosEstimadosPorArbol;
 
     rows.push({
       year,
@@ -197,14 +212,12 @@ export const buildDraftRaleoRows = ({
   const registeredPruningRows = Array.isArray(registeredPruningForSelectedCuartel?.rows)
     ? registeredPruningForSelectedCuartel.rows
     : [];
-  const generatedPostPruningRows = Array.isArray(registeredPruningForSelectedCuartel?.generatedPostPruningRows)
-    ? registeredPruningForSelectedCuartel.generatedPostPruningRows
-    : [];
+  const draftPostPruningRows = getDraftPostPruningRowsForCuartel(selectedCuartel);
 
   if (
     registeredProductionRows.length === 0 ||
     registeredPruningRows.length === 0 ||
-    generatedPostPruningRows.length === 0
+    draftPostPruningRows.length === 0
   ) {
     return [];
   }
@@ -224,7 +237,7 @@ export const buildDraftRaleoRows = ({
     registeredPruningRows.map((row) => [normalizeText(row.variedad), row]),
   );
 
-  return generatedPostPruningRows
+  return draftPostPruningRows
     .map((postRow) => {
       const normalizedVariedad = normalizeText(postRow.variedad);
       const budRow = budByVariety.get(normalizedVariedad);
@@ -233,27 +246,39 @@ export const buildDraftRaleoRows = ({
       if (!budRow || !productionRow || !pruningRow) return null;
 
       const cuajaEstimada = round(toPercent(productionRow.cuajaEsperada), 2);
-      const cuajaReal = addPercentagePoints(cuajaEstimada, 5);
       const frutosPorArbol = calculateFruitPerTree({
         dardosPlanta: postRow.dardosPlanta,
         floresDardo: budRow.floresDardo,
         danoPercent: budRow.dano,
-        cuajaPercent: cuajaReal,
+        cuajaPercent: cuajaEstimada,
       });
+      const produccionSinRaleo =
+        Number.isFinite(frutosPorArbol) &&
+        Number.isFinite(toNumber(postRow.plantasHaProductivas)) &&
+        Number.isFinite(toNumber(productionRow.calibreEsperado))
+          ? round(
+              (frutosPorArbol *
+                toNumber(postRow.plantasHaProductivas) *
+                toNumber(productionRow.calibreEsperado)) /
+                1000,
+              2,
+            )
+          : null;
       const frutosObjetivoPorArbol =
         calculateObjectiveFruitPerTree({
           productionObjectiveKgHa: pruningRow.produccionObjetivo,
           plantasHaProductivas: postRow.plantasHaProductivas,
           calibreGr: productionRow.calibreEsperado,
-        }) ??
-        (Number.isFinite(frutosPorArbol) ? round(frutosPorArbol * OBJECTIVE_FACTOR, 2) : null);
+        }) ?? frutosPorArbol;
 
       return {
         year: DRAFT_YEAR,
         variedad: postRow.variedad,
         cuajaEstimada,
-        cuajaReal,
+        cuajaReal: cuajaEstimada,
         frutosPorArbol,
+        produccionSinRaleo,
+        produccionObjetivo: toNumber(pruningRow.produccionObjetivo),
         frutosObjetivoPorArbol,
         raleoFrutosPorArbol: calculateThinningFruitPerTree({
           fruitPerTree: frutosPorArbol,

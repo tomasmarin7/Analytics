@@ -3,6 +3,7 @@ import { PERIODS_ARIA_LABEL } from "../../../components/timeline/constants";
 import { POST_PRUNING_COUNT_EVENT_ID } from "../../timelineEvents";
 import { PERIOD_PANEL_TYPES } from "../config/panelTypes";
 import FertilizationButton from "./FertilizationButton";
+import ProduccionObjetivoFinal from "./produccionObjetivoFinal";
 import ProduccionPosibleConteoPostPoda from "./produccionPosibleConteoPostPoda";
 import ProduccionPostPodaObjetivo from "./produccionPostPodaObjetivo";
 import ProductionHistoricalBridge from "./productionBridge/ProductionHistoricalBridge";
@@ -36,6 +37,7 @@ const PeriodLayer = ({
 }) => {
   const [productionRegisterByCuartel, setProductionRegisterByCuartel] = useState({});
   const [postPruningObjectiveMetrics, setPostPruningObjectiveMetrics] = useState(null);
+  const [finalObjectiveMetrics, setFinalObjectiveMetrics] = useState(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -76,6 +78,10 @@ const PeriodLayer = ({
 
   const handlePostPruningObjectiveMetricsChange = useCallback((metrics) => {
     setPostPruningObjectiveMetrics(metrics);
+  }, []);
+
+  const handleFinalObjectiveMetricsChange = useCallback((metrics) => {
+    setFinalObjectiveMetrics(metrics);
   }, []);
 
   const productionPotentialDardoPeriod = useMemo(
@@ -126,26 +132,37 @@ const PeriodLayer = ({
       Number.isFinite(pruningHeightPx) && pruningHeightPx > 0
         ? pruningHeightPx
         : PRODUCTION_POTENTIAL_CURRENT_HEIGHT_PX * PRUNING_LINE_FALLBACK_RATIO;
+    const raleoHeightPx = Number(finalObjectiveMetrics?.heightPx);
+    const raleoLineHeightPx =
+      Number.isFinite(raleoHeightPx) && raleoHeightPx > 0
+        ? raleoHeightPx
+        : PRODUCTION_POTENTIAL_CURRENT_HEIGHT_PX * PRUNING_LINE_FALLBACK_RATIO;
 
     return periods.map((period) => {
-      if (period?.panelType !== PERIOD_PANEL_TYPES.PRUNING_DECISION) return period;
+      const isPruningDecisionPeriod = period?.panelType === PERIOD_PANEL_TYPES.PRUNING_DECISION;
+      const isRaleoDecisionPeriod = period?.panelType === PERIOD_PANEL_TYPES.RALEO_DECISION;
+      if (!isPruningDecisionPeriod && !isRaleoDecisionPeriod) return period;
 
       return {
         ...period,
-        left: Number.isFinite(Number(pruningGeometry?.left)) ? Number(pruningGeometry.left) : period.left,
-        width: Number.isFinite(Number(pruningGeometry?.width)) ? Number(pruningGeometry.width) : period.width,
-        raisedLeft: Number.isFinite(Number(pruningGeometry?.left))
-          ? Number(pruningGeometry.left)
-          : period.raisedLeft,
-        raisedWidth: Number.isFinite(Number(pruningGeometry?.width))
-          ? Number(pruningGeometry.width)
-          : period.raisedWidth,
-        pruningLineHeightPx: Number.isFinite(pruningLineHeightPx)
-          ? pruningLineHeightPx
-          : period.pruningLineHeightPx,
+        ...(isPruningDecisionPeriod
+          ? {
+              left: Number.isFinite(Number(pruningGeometry?.left)) ? Number(pruningGeometry.left) : period.left,
+              width: Number.isFinite(Number(pruningGeometry?.width)) ? Number(pruningGeometry.width) : period.width,
+              raisedLeft: Number.isFinite(Number(pruningGeometry?.left))
+                ? Number(pruningGeometry.left)
+                : period.raisedLeft,
+              raisedWidth: Number.isFinite(Number(pruningGeometry?.width))
+                ? Number(pruningGeometry.width)
+                : period.raisedWidth,
+            }
+          : {}),
+        pruningLineHeightPx: isRaleoDecisionPeriod
+          ? (Number.isFinite(raleoLineHeightPx) ? raleoLineHeightPx : period.pruningLineHeightPx)
+          : (Number.isFinite(pruningLineHeightPx) ? pruningLineHeightPx : period.pruningLineHeightPx),
       };
     });
-  }, [periods, postPruningObjectiveMetrics, timelineEvents]);
+  }, [finalObjectiveMetrics, periods, postPruningObjectiveMetrics, timelineEvents]);
 
   const visiblePeriods = useMemo(
     () =>
@@ -196,6 +213,18 @@ const PeriodLayer = ({
         registeredProductionByCuartel={productionRegisterByCuartel}
         registeredPruningByCuartel={registeredPruningByCuartel}
         showLabels={showProductionPotentialTitle}
+        onClick={handlePostPruningShapeClick}
+        onPointerDown={onRequestForeground}
+      />
+      <ProduccionObjetivoFinal
+        viewStartMs={viewStartMs}
+        viewEndMs={viewEndMs}
+        viewSpanMs={viewSpanMs}
+        selectedCuartel={selectedCuartel}
+        registeredProductionByCuartel={productionRegisterByCuartel}
+        registeredPruningByCuartel={registeredPruningByCuartel}
+        showLabels={showProductionPotentialTitle}
+        onMetricsChange={handleFinalObjectiveMetricsChange}
         onClick={handlePostPruningShapeClick}
         onPointerDown={onRequestForeground}
       />

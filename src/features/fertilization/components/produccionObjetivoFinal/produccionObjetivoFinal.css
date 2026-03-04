@@ -1,0 +1,22 @@
+.lower-dots-bridge__produccion-objetivo-final {
+  position: absolute;
+  bottom: 0;
+  overflow: hidden;
+  pointer-events: auto;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  appearance: none;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.lower-dots-bridge__produccion-objetivo-final-shape {
+  position: absolute;
+  inset: 0;
+}
+
+.lower-dots-bridge__produccion-objetivo-final:focus-visible {
+  outline: 2px solid rgba(34, 37, 39, 0.7);
+  outline-offset: 3px;
+}
