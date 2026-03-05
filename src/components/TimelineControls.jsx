@@ -1,9 +1,11 @@
 import { TIMELINE_ARIA_LABEL } from "./timeline/constants";
 import TimelineTrack from "./timeline/TimelineTrack";
 import { useTimelineController } from "./timeline/useTimelineController";
+import BotonesPestanas from "./botonesPestanas";
 
 const TimelineControls = ({
   currentDate,
+  selectedCuartel,
 }) => {
   const {
     dayLines,
@@ -24,6 +26,7 @@ const TimelineControls = ({
         isTodayVisible={isTodayVisible}
         todayLeftPercent={todayLeftPercent}
       />
+      <BotonesPestanas currentDate={currentDate} selectedCuartel={selectedCuartel} />
     </section>
   );
 };

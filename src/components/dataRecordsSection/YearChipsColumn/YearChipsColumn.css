@@ -1,0 +1,57 @@
+.data-records-years-panel--vertical {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  flex-direction: column;
+  width: max-content;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.data-records-section__years-column {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  z-index: 2;
+}
+
+.data-records-section__year-chip-vertical {
+  border: 0;
+  background: transparent;
+  color: rgba(22, 26, 30, 0.74);
+  font-family: var(--font-brand);
+  font-size: clamp(26px, 2vw, 34px);
+  line-height: var(--line-height-tight);
+  font-weight: var(--font-weight-regular);
+  letter-spacing: var(--letter-spacing-tight);
+  padding: 5px 14px;
+  border-radius: 999px;
+  min-width: 0;
+  height: auto;
+  cursor: pointer;
+  transition: color 120ms ease, transform 120ms ease, background-color 120ms ease;
+}
+
+.data-records-section__year-chip-vertical:hover {
+  color: rgba(17, 20, 23, 0.92);
+  transform: translateY(-1px);
+}
+
+.data-records-section__year-chip-vertical--selected {
+  background: rgba(177, 181, 186, 0.66);
+  color: rgba(18, 22, 26, 0.9);
+}
+
+@media (max-width: 900px) {
+  .data-records-section__year-chip-vertical {
+    font-size: 24px;
+    padding: 4px 10px;
+  }
+}

@@ -3,12 +3,12 @@ import { useEffect, useState } from "react";
 import Header from "../components/header/Header";
 import SidePopover from "../components/SidePopover";
 import DateSidePopover from "../components/DateSidePopover";
-import BotonesPestanas from "../components/botonesPestanas";
 import TimelineControls from "../components/TimelineControls";
 import "./index.css";
 
 const App = () => {
   const [currentDate, setCurrentDate] = useState(() => new Date());
+  const [selectedCuartel, setSelectedCuartel] = useState(null);
 
   useEffect(() => {
     if (typeof window === "undefined" || typeof document === "undefined") {
@@ -40,9 +40,9 @@ const App = () => {
       <main className="app__content">
         <TimelineControls
           currentDate={currentDate}
+          selectedCuartel={selectedCuartel}
         />
-        <BotonesPestanas currentDate={currentDate} />
-        <SidePopover />
+        <SidePopover onSelectedCuartelChange={setSelectedCuartel} />
         <DateSidePopover currentDate={currentDate} onCurrentDateChange={setCurrentDate} />
       </main>
     </div>
