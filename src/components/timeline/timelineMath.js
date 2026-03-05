@@ -18,15 +18,23 @@ export const getYearDomain = (year) => {
 export const getMonthMarkers = ({ year, startMs, endMs }) => {
   const markers = [];
   const viewSpanMs = endMs - startMs + DAY_MS;
+  const viewEndExclusiveMs = endMs + DAY_MS;
 
   for (let monthIndex = 0; monthIndex < 12; monthIndex += 1) {
     const monthStartMs = Date.UTC(year, monthIndex, 1);
     if (monthStartMs < startMs || monthStartMs > endMs) continue;
 
+    const monthEndExclusiveMs = Date.UTC(year, monthIndex + 1, 1);
+    const visibleMonthStartMs = Math.max(monthStartMs, startMs);
+    const visibleMonthEndExclusiveMs = Math.min(monthEndExclusiveMs, viewEndExclusiveMs);
+    const monthVisibleSpanMs = Math.max(DAY_MS, visibleMonthEndExclusiveMs - visibleMonthStartMs);
+    const monthCenterMs = visibleMonthStartMs + monthVisibleSpanMs / 2;
+
     markers.push({
       id: monthIndex,
       label: MONTH_NAMES[monthIndex],
       ratio: clamp((monthStartMs - startMs + DAY_MS / 2) / viewSpanMs, 0, 1),
+      labelRatio: clamp((monthCenterMs - startMs) / viewSpanMs, 0, 1),
     });
   }
 

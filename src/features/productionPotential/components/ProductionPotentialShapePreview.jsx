@@ -49,7 +49,6 @@ const resolveSegmentBackground = (color, opacityGradient) => {
 
   const startOpacity = opacityGradient.startOpacity ?? 1;
   const endOpacity = opacityGradient.endOpacity ?? 0.05;
-
   return `linear-gradient(90deg, ${toRgba(color, startOpacity)} 0%, ${toRgba(color, endOpacity)} 100%)`;
 };
 

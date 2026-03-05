@@ -269,7 +269,6 @@ const ProduccionPosibleConteoPostPoda = ({
         showLabels={showLabels}
         showBaseline={false}
         className="lower-dots-bridge__produccion-posible-conteo-post-poda-shape"
-        opacityGradient={{ startOpacity: 1, endOpacity: 0.05 }}
       />
     </button>
   );

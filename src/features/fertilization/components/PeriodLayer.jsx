@@ -3,6 +3,7 @@ import { PERIODS_ARIA_LABEL } from "../../../components/timeline/constants";
 import { POST_PRUNING_COUNT_EVENT_ID } from "../../timelineEvents";
 import { PERIOD_PANEL_TYPES } from "../config/panelTypes";
 import FertilizationButton from "./FertilizationButton";
+import ProduccionFinalReal from "./produccionFinalReal";
 import ProduccionObjetivoFinal from "./produccionObjetivoFinal";
 import ProduccionPosibleConteoPostPoda from "./produccionPosibleConteoPostPoda";
 import ProduccionPostPodaObjetivo from "./produccionPostPodaObjetivo";
@@ -225,6 +226,17 @@ const PeriodLayer = ({
         registeredPruningByCuartel={registeredPruningByCuartel}
         showLabels={showProductionPotentialTitle}
         onMetricsChange={handleFinalObjectiveMetricsChange}
+        onClick={handlePostPruningShapeClick}
+        onPointerDown={onRequestForeground}
+      />
+      <ProduccionFinalReal
+        viewStartMs={viewStartMs}
+        viewEndMs={viewEndMs}
+        viewSpanMs={viewSpanMs}
+        selectedCuartel={selectedCuartel}
+        registeredProductionByCuartel={productionRegisterByCuartel}
+        registeredPruningByCuartel={registeredPruningByCuartel}
+        showLabels={showProductionPotentialTitle}
         onClick={handlePostPruningShapeClick}
         onPointerDown={onRequestForeground}
       />

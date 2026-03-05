@@ -4,7 +4,7 @@ const MonthLabels = ({ markers }) => (
       <span
         key={`month-${marker.id}`}
         className="lower-dots-bridge__month-label"
-        style={{ left: `${marker.ratio * 100}%` }}
+        style={{ left: `${(marker.labelRatio ?? marker.ratio) * 100}%` }}
       >
         {marker.label}
       </span>

@@ -1,0 +1,291 @@
+@import "../../styles/effects/grainyGreenSurface.css";
+
+.botones-pestanas {
+  flex: 1 1 auto;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  padding: 0 0 12px;
+  display: grid;
+  grid-template-rows: var(--header-height) minmax(0, 1fr);
+  background: linear-gradient(180deg, #d8d8d8 0%, #d1d1d1 16%, #cccccc 100%);
+  overflow: hidden;
+}
+
+.botones-pestanas__linea-tiempo {
+  position: relative;
+  width: calc(100% - (2 * (var(--bridge-edge-offset) + 22px)));
+  height: 100%;
+  margin: 0 auto;
+  overflow: visible;
+  pointer-events: auto;
+  z-index: 3;
+}
+
+.botones-pestanas__slot {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  min-width: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0 clamp(1px, 0.25vw, 6px);
+}
+
+.botones-pestanas__slot .botones-pestanas__vignette {
+  width: 100%;
+  max-width: 100%;
+}
+
+.botones-pestanas__vignette {
+  --vignette-solid: #5c636b;
+  --vignette-gradient: linear-gradient(130deg, #515961 0%, #656e76 52%, #7b858f 100%);
+  position: relative;
+  min-width: 0;
+  min-height: clamp(40px, calc(var(--header-height) * 0.44), 50px);
+  padding: clamp(8px, 0.7vw, 11px) clamp(8px, 0.8vw, 12px);
+  border: 0;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #f2f4f6;
+  cursor: pointer;
+  background: var(--vignette-solid);
+  transition: transform 190ms ease, filter 190ms ease, background 190ms ease;
+}
+
+.botones-pestanas__vignette:hover {
+  filter: brightness(1.04);
+}
+
+.botones-pestanas__vignette:focus-visible {
+  outline: 2px solid rgba(20, 24, 28, 0.72);
+  outline-offset: 2px;
+}
+
+.botones-pestanas__vignette-label {
+  display: block;
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  font-size: clamp(12px, 0.98vw, 18px);
+  line-height: 1.06;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.botones-pestanas__vignette--active {
+  min-height: clamp(56px, calc(var(--header-height) * 0.72), 72px);
+  border-radius: 12px 12px 0 0;
+  transform: translateY(8px);
+  z-index: 3;
+  background: var(--vignette-gradient);
+}
+
+.botones-pestanas__vignette--fertilizacion {
+  --vignette-solid: #5f7d63;
+  --vignette-gradient: linear-gradient(130deg, #4f6f5a 0%, #648568 50%, #7c9d7b 100%);
+}
+
+.botones-pestanas__vignette--rdto-pre-poda {
+  --vignette-solid: #666d76;
+  --vignette-gradient: linear-gradient(130deg, #575d64 0%, #6a7178 52%, #7e868d 100%);
+}
+
+.botones-pestanas__vignette--poda {
+  --vignette-solid: #934b53;
+  --vignette-gradient: linear-gradient(130deg, #7f3a41 0%, #974a52 52%, #ae5d66 100%);
+}
+
+.botones-pestanas__vignette--clima {
+  --vignette-solid: #5f818d;
+  --vignette-gradient: linear-gradient(130deg, #4e6f78 0%, #5f828b 50%, #71939b 100%);
+}
+
+.botones-pestanas__vignette--raleo {
+  --vignette-solid: #98535b;
+  --vignette-gradient: linear-gradient(130deg, #88434a 0%, #9e545d 52%, #b66872 100%);
+}
+
+.botones-pestanas__vignette--cosecha {
+  --vignette-solid: #937a43;
+  --vignette-gradient: linear-gradient(130deg, #836730 0%, #96793f 50%, #ab8d51 100%);
+}
+
+.botones-pestanas__vignette--produccion {
+  --vignette-solid: #5f8b6e;
+  --vignette-gradient: linear-gradient(130deg, #4b7a5a 0%, #5f8f6f 48%, #74a485 100%);
+}
+
+.botones-pestanas__panel-slot {
+  position: relative;
+  min-height: 0;
+  margin-top: -8px;
+  z-index: 1;
+}
+
+.botones-pestanas__panel {
+  --panel-gradient: linear-gradient(130deg, #515961 0%, #656e76 52%, #7b858f 100%);
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  border-radius: 14px;
+  position: relative;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-8px) scaleX(0.08) scaleY(0.06);
+  transform-origin: var(--expansion-origin-x, 50%) 0;
+  transition: opacity 180ms ease, transform 340ms cubic-bezier(0.2, 0.76, 0.2, 1);
+  background: var(--panel-gradient);
+  --fx-green-saturation: 1;
+  --fx-green-contrast: 1;
+  --fx-green-noise-opacity: 0.028;
+  will-change: transform, opacity;
+}
+
+.botones-pestanas__panel--open {
+  opacity: 1;
+  transform: translateY(0) scaleX(1) scaleY(1);
+  pointer-events: auto;
+}
+
+.botones-pestanas__panel.fx-grainy-green-surface::before {
+  background-size: 300px 300px;
+  mix-blend-mode: soft-light;
+}
+
+.botones-pestanas__panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(56% 58% at 50% 44%, rgba(202, 210, 199, 0.18) 0%, rgba(202, 210, 199, 0) 72%),
+    linear-gradient(180deg, rgba(20, 26, 31, 0.07) 0%, rgba(20, 26, 31, 0.02) 100%);
+  opacity: 0;
+  transition: opacity 280ms ease;
+}
+
+.botones-pestanas__panel--open::after {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .botones-pestanas__panel,
+  .botones-pestanas__panel::after {
+    transition: none;
+  }
+}
+
+.botones-pestanas__panel--fertilizacion {
+  --panel-gradient: linear-gradient(130deg, #4f6f5a 0%, #648568 50%, #7c9d7b 100%);
+  --fx-green-c1: #4f6f5a;
+  --fx-green-c2: #8ea88f;
+  --fx-green-c3: #35513d;
+  --fx-green-c4: #6d8a72;
+}
+
+.botones-pestanas__panel--rdto-pre-poda {
+  --panel-gradient: linear-gradient(130deg, #575d64 0%, #6a7178 52%, #7e868d 100%);
+  --fx-green-c1: #575d64;
+  --fx-green-c2: #8c939a;
+  --fx-green-c3: #3f444b;
+  --fx-green-c4: #6f767d;
+}
+
+.botones-pestanas__panel--poda {
+  --panel-gradient: linear-gradient(130deg, #7f3a41 0%, #974a52 52%, #ae5d66 100%);
+  --fx-green-c1: #7f3a41;
+  --fx-green-c2: #b4777c;
+  --fx-green-c3: #5a252a;
+  --fx-green-c4: #96515a;
+}
+
+.botones-pestanas__panel--clima {
+  --panel-gradient: linear-gradient(130deg, #4e6f78 0%, #5f828b 50%, #71939b 100%);
+  --fx-green-c1: #4e6f78;
+  --fx-green-c2: #8aa8b0;
+  --fx-green-c3: #36555f;
+  --fx-green-c4: #668890;
+}
+
+.botones-pestanas__panel--raleo {
+  --panel-gradient: linear-gradient(130deg, #88434a 0%, #9e545d 52%, #b66872 100%);
+  --fx-green-c1: #88434a;
+  --fx-green-c2: #be8188;
+  --fx-green-c3: #642c32;
+  --fx-green-c4: #9e5861;
+}
+
+.botones-pestanas__panel--cosecha {
+  --panel-gradient: linear-gradient(130deg, #836730 0%, #96793f 50%, #ab8d51 100%);
+  --fx-green-c1: #836730;
+  --fx-green-c2: #c1ae84;
+  --fx-green-c3: #614a1d;
+  --fx-green-c4: #987b42;
+}
+
+.botones-pestanas__panel--produccion {
+  --panel-gradient: linear-gradient(130deg, #4b7a5a 0%, #5f8f6f 48%, #74a485 100%);
+  --fx-green-c1: #4b7a5a;
+  --fx-green-c2: #8eb69a;
+  --fx-green-c3: #33563e;
+  --fx-green-c4: #668f74;
+}
+
+@media (max-width: 1200px) {
+  .botones-pestanas {
+    padding-bottom: 10px;
+  }
+
+  .botones-pestanas__vignette {
+    border-radius: 10px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .botones-pestanas__linea-tiempo {
+    width: calc(100% - 68px);
+  }
+}
+
+@media (max-width: 900px) {
+  .botones-pestanas {
+    padding-bottom: 8px;
+  }
+
+  .botones-pestanas__linea-tiempo {
+    width: calc(100% - 56px);
+  }
+
+  .botones-pestanas__slot {
+    padding-left: 1px;
+    padding-right: 1px;
+  }
+
+  .botones-pestanas__vignette {
+    min-height: clamp(38px, 7.2vw, 46px);
+    border-radius: 9px;
+    padding-left: 7px;
+    padding-right: 7px;
+  }
+
+  .botones-pestanas__vignette--active {
+    min-height: clamp(50px, 8.8vw, 62px);
+    transform: translateY(6px);
+    border-radius: 10px 10px 0 0;
+  }
+
+  .botones-pestanas__vignette-label {
+    font-size: clamp(11px, 1.65vw, 14px);
+    letter-spacing: 0.016em;
+  }
+
+  .botones-pestanas__panel-slot {
+    margin-top: -6px;
+  }
+}
